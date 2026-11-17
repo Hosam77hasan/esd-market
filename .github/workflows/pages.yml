@@ -21,25 +21,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Syntax-check homepage
-        run: |
-          python -c "import ast; ast.parse(open('esd_market.html', encoding='utf-8').read()); print('HTML/Javascript OK')"
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      - name: Prepare landing index.html
+        run: cp esd_market.html index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: |
+            index.html
             esd_market.html
             bg_music.mp3
-            esd_market_hypermarket_transition.mp4
+            esd_market_hyperarium_transition.mp4
             logo esd market.jpg
             logo esd market.webp
             og-image.jpg
