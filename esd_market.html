@@ -50,9 +50,10 @@ header button{flex:0 0 auto;white-space:nowrap;background:#ffffff24;color:#fff;b
 header button.pr{background:var(--p);border-color:var(--p)}
 @media(max-width:430px){header{gap:4px;padding:calc(6px + env(safe-area-inset-top,0px)) 8px 6px}header b{font-size:16px;padding:4px}header button{padding:6px 7px;font-size:13px;border-radius:9px}}
 /* أسهم أمام وخلف بدون حواف أو خلفية زر */
-#navArrows{position:fixed;top:58%;left:50%;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+#navArrows{position:fixed;top:58%;left:50%;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none}
 #navArrows.show{display:flex}
-.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:2px 8px;margin:0;color:#000;font-size:33px;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.6),0 0 12px rgba(255,255,255,.4);transition:transform .15s,color .15s}
+#navArrows .arr-plain{pointer-events:auto}
+.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:6px 14px;margin:0;color:#000;font-size:46px;line-height:1;text-shadow:0 2px 0 rgba(255,255,255,.7),0 0 16px rgba(255,255,255,.55);transition:transform .15s,color .15s;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .arr-plain:active{transform:scale(1.22);color:#000}
 .arr-plain:focus-visible{outline:none}
 #toast{position:fixed;z-index:30;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:12px;margin:auto;max-width:420px;text-align:center;background:var(--p);color:#fff;padding:10px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
@@ -648,28 +649,29 @@ function makeCart() {
 }
 const rowCarts = []; for (let i = 0; i < 8; i++) { const c = makeCart(); c.rotation.y = Math.PI / 2; c.position.set(-5.2 - i * .5, 0, 10.8); sc.add(c); rowCarts.push(c) }
 sign("خد عربية", 2, .6, "#14110e", CONFIG.ACCENT_COLOR, -6.5, 3, 12.5);
-/* حامل العربة: يتبع موقع الكاميرا والالتفاف الأفقي فقط، دون ميل النظر الرأسي */
-const cartRig = new THREE.Group(); sc.add(cartRig); sc.add(cam);
-const myCart = makeCart(); myCart.visible = false; cartRig.add(myCart);
-function syncCartRig() {
-  cartRig.position.set(cam.position.x, 0, cam.position.z); // Y = 0 دائماً: العربة على الأرض
-  cartRig.rotation.y = S.yaw;                            // تدور مع الالتفاف الأفقي فقط
-  cartRig.updateMatrixWorld(true);
-}
+/* عربة التسوق: مشهد HUD منفصل + كاميرا ثابتة — تُرسم كطبقة واجهة ثابتة فوق المشهد
+   ولا تتأثر أبداً بدوران كاميرا المشهد (Pitch / Look Up & Down): لا ترتفع للسقف ولا تغوص في الأرض */
+sc.add(cam);
+const hudScene = new THREE.Scene();
+hudScene.environment = sc.environment;
+hudScene.add(new THREE.HemisphereLight(0xffffff, 0xbab4aa, .95));
+const hudCam = new THREE.PerspectiveCamera(FOV_LAND, 1, .1, 50);
+const myCart = makeCart(); myCart.visible = false; hudScene.add(myCart);
 function centerMyCart() {
-  const base = .80;
+  const base = 1.2;               // أوسع وأعمق: تغطي مساحة مريحة من حواف الشاشة يميناً ويساراً
   myCart.userData.baseScale = base;
   myCart.scale.setScalar(base);
-  myCart.position.set(0, 0, -2.15); // على مستوى الأرض أمام الكاميرا (بلا ارتفاع طائر)
+  // موضع ثابت في مشهد الـ HUD: أسفل مركز الشاشة مع انخفاض إضافي حتى تبقى العربة والأسهم في الأسفل رغم كبر الحجم
+  myCart.position.set(0, -2.6, -2.85);
 }
 centerMyCart();
 let arrowsH = 0;
 function placeCartArrows() {
-  syncCartRig();
-  cam.updateMatrixWorld(true);
+  hudScene.updateMatrixWorld(true);
+  hudCam.updateMatrixWorld(true);
   const p = new THREE.Vector3(0, 1.62, .8);
   myCart.localToWorld(p);
-  p.project(cam);
+  p.project(hudCam);
   const x = (p.x * .5 + .5) * innerWidth;
   const y = (-p.y * .5 + .5) * innerHeight;
   const el = $("navArrows");
@@ -1273,8 +1275,9 @@ function syncCart(last, from) {
       if (it.k == last && q == it.q - 1) {
         if (from) {
           m.visible = false;
+          // هدف متطابق مع موضع فتحة السلة على الشاشة: يُشتق من تحويل العربة الفعلي (يتبع أي تغيير في الحجم/الموضع)
           myCart.updateWorldMatrix(true, false);
-          const tgt = cam.worldToLocal(myCart.localToWorld(new THREE.Vector3(s[0], y, s[2])));
+          const tgt = myCart.localToWorld(new THREE.Vector3(s[0], y, s[2]));
           fly(it.p, from, tgt, () => {
             m.visible = true; m.position.y = y + .25;
             gsap.to(m.position, { y, duration: .6, ease: "bounce.out" });
@@ -1372,7 +1375,7 @@ function go(x, z, yaw, pitch) {
 }
 function toast(m) { const t = $("toast"); t.textContent = m; t.style.opacity = 1; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.opacity = 0, 2600) }
 const keys = {}; addEventListener("keydown", e => { if (/INPUT|SELECT|TEXTAREA/.test((e.target.tagName || ""))) return; keys[e.key.toLowerCase()] = 1 }); addEventListener("keyup", e => keys[e.key.toLowerCase()] = 0);
-function resize() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = innerWidth < innerHeight ? FOV_PORT : FOV_LAND; cam.updateProjectionMatrix(); centerMyCart(); arrowsH = 0; placeCartArrows() }
+function resize() { R.setSize(innerWidth, innerHeight, false); const fov = innerWidth < innerHeight ? FOV_PORT : FOV_LAND; cam.aspect = innerWidth / innerHeight; cam.fov = fov; cam.updateProjectionMatrix(); hudCam.aspect = innerWidth / innerHeight; hudCam.fov = fov; hudCam.updateProjectionMatrix(); centerMyCart(); arrowsH = 0; placeCartArrows() }
 addEventListener("resize", resize); resize();
 
 /* أزرار الأسهم العلوية والسفلية (أمام وخلف بدون حواف) */
@@ -1385,7 +1388,7 @@ function bindArrow(id, dir) {
   el.addEventListener("pointerup", stop);
   el.addEventListener("pointerleave", stop);
   el.addEventListener("pointercancel", stop);
-  el.addEventListener("click", () => { if (S.open && !S.lock) S.q += dir * 3.5 });
+  el.addEventListener("click", () => { if (S.open && !S.lock) S.q += dir * 0.6 });
 }
 bindArrow("arrUp", 1);
 bindArrow("arrDn", -1);
@@ -1417,15 +1420,19 @@ cv.addEventListener("wheel", e => {
 const ray = new THREE.Raycaster();
 function pick(e) {
   if (!S.open || S.lock) return;
-  ray.setFromCamera({ x: e.clientX / innerWidth * 2 - 1, y: -(e.clientY / innerHeight) * 2 + 1 }, cam);
+  const ndc = { x: e.clientX / innerWidth * 2 - 1, y: -(e.clientY / innerHeight) * 2 + 1 };
 
-  // الضغط على عربة التسوق أو مقبضها الأحمر يحرك المستخدم للأمام
+  // الضغط على عربة التسوق أو مقبضها الأحمر يحرك المستخدم للأمام (كاميرا HUD الثابتة)
+  hudScene.updateMatrixWorld(true);
+  hudCam.updateMatrixWorld(true);
+  ray.setFromCamera(ndc, hudCam);
   const hc = ray.intersectObject(myCart, true)[0];
   if (hc) {
-    S.q += 4.2;
+    S.q += 1.0;
     return;
   }
 
+  ray.setFromCamera(ndc, cam);
   const hh = ray.intersectObjects(HS)[0], hp = ray.intersectObjects(hit)[0];
   if (hp && (!hh || hp.distance < hh.distance + 1)) {
     const m = new THREE.Matrix4(), v = new THREE.Vector3();
@@ -1448,14 +1455,14 @@ function loop() {
   if (now - lastScr > 110) { lastScr = now; tickScr(t) }
   const can = S.open && !S.lock && !mm.classList.contains("on");
   if (can) {
-    const sp = 6.2 * dt;
+    const sp = 3.2 * dt;
     if (keys.w || keys.arrowup || moveDir === 1) walk(sp, 0);
     if (keys.s || keys.arrowdown || moveDir === -1) walk(-sp, 0);
     if (keys.a) walk(0, -sp);
     if (keys.d) walk(0, sp);
     if (keys.arrowleft || keys.q) S.tyaw += 1.6 * dt;
     if (keys.arrowright || keys.e) S.tyaw -= 1.6 * dt;
-    if (S.q) { const d = Math.sign(S.q) * Math.min(.16, Math.abs(S.q)); if (walk(d, 0)) S.q -= d; else S.q = 0 }
+    if (S.q) { const d = Math.sign(S.q) * Math.min(.04, Math.abs(S.q)); if (walk(d, 0)) S.q -= d; else S.q = 0 }
   }
   const k = Math.min(1, dt * 7);
   const px = S.x, pz = S.z;
@@ -1498,7 +1505,13 @@ function loop() {
   });
 
   // لا نرسم المشهد ثلاثي الأبعاد خلف الفيديو التعريفي لتوفير أداء الجهاز
-  if (!$("videoIntro").classList.contains("show")) R.render(sc, cam);
+  if (!$("videoIntro").classList.contains("show")) {
+    R.render(sc, cam);             // المشهد الرئيسي
+    R.clear(false, true, false);   // امسح العمق فقط لترسم العربة كطبقة HUD فوق كل شيء
+    R.autoClear = false;
+    R.render(hudScene, hudCam);    // عربة التسوق الثابتة أسفل الشاشة
+    R.autoClear = true;
+  }
 }
 loop();
 
@@ -1512,10 +1525,8 @@ const MUSIC_INTRO_VOL = 0.55;  // الموسيقى مع فيديو الدخلة 
 let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
 
 musicEl.volume = MUSIC_VOL;
-/* تحميل مسبق فوري للموسيقى حتى تكون جاهزة في نفس لحظة تشغيل الفيديو (بلا تأخير) */
-try { musicEl.load() } catch (e) {}
-/* محاولة تشغيل فورية أثناء الـ Splash وقبل أي انتقال — وأول تفاعل يعيد المحاولة تلقائياً */
-try { playIntroMusic() } catch (e) {}
+/* تشغيل صامت فوري منذ فتح الموقع: يحمّل الملف ويشغّله بصمت ليكون جاهزاً متزامناً، ثم يُرفع الصوت لحظة بدء الفيديو */
+try { musicEl.load(); musicEl.muted = true; const p = musicEl.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
 /* نسختان: أفقية 16:9 للكمبيوتر، ورأسية 9:20 للهواتف تملأ الشاشة مع الحفاظ على المشهد كاملاً */
 const VIDEO_LAND_SRC = "esd_market_hypermarket_transition.mp4";
 const VIDEO_PORT_SRC = "esd_market_hypermarket_transition_portrait.mp4";
@@ -1533,8 +1544,9 @@ function playIntroMusic() {
   clearInterval(musicFadeTimer);
   musicShouldPlay = true;
   if (document.hidden) { musicPausedByHide = true; return; }
+  if (musicOn && !musicEl.paused && !musicEl.muted) return; // تعمل بصوت بالفعل: لا نعيد تشغيلها
   try {
-    if (musicEl.ended) musicEl.currentTime = 0;
+    try { musicEl.currentTime = 0; } catch (e) {} // بداية نظيفة متزامنة مع أول إطار للفيديو
     musicEl.muted = false;
     musicEl.volume = MUSIC_INTRO_VOL;
     const p = musicEl.play();
@@ -1643,7 +1655,7 @@ function kickIntro() {
 
 videoEl.addEventListener("loadedmetadata", () => { if (introStarted) armIntroGuard() });
 videoEl.addEventListener("loadeddata", kickIntro);
-videoEl.addEventListener("playing", () => { clearTimeout(introTimer); armIntroGuard(); if (!musicOn && introStarted && !entered) armMusicKick() });
+videoEl.addEventListener("playing", () => { clearTimeout(introTimer); armIntroGuard(); if (introStarted && !entered) playIntroMusic() });
 videoEl.addEventListener("canplay", () => { markMediaReady(); kickIntro() });
 videoEl.addEventListener("error", () => {
   if (!introStarted || entered) return;
@@ -1675,6 +1687,7 @@ function finishEnter() {
   S.open = true;
   document.querySelector("header").classList.add("show");
   $("navArrows").classList.add("show");
+  arrowsH = 0;
   placeCartArrows();
   startMusic();
   toast("مرحباً بك في ESD Market 🛒");
@@ -1720,7 +1733,7 @@ addEventListener("keydown", e => {
 
 /* ---------- شاشة البداية (Splash): تنتهي تلقائياً إلى فيديو الدخلة مباشرة ---------- */
 const bootAt = window.__esdBootAt || Date.now();
-const SPLASH_MS = 4000; // مدة أنيميشن الـ Splash قبل الانتقال لفيديو الدخلة
+const SPLASH_MS = 4600; // مدة أنيميشن الـ Splash قبل الانتقال لفيديو الدخلة (4-5 ثوانٍ كاملة)
 let sceneReady = false, mediaReady = false, loaderHidden = false;
 function hideLoader() {
   if (loaderHidden || !sceneReady) return;
@@ -1745,16 +1758,16 @@ requestAnimationFrame(() => setTimeout(() => { sceneReady = true; hideLoader(); 
    ===================================================================== */
 const mb = $("mb");
 function openM(h) { mb.innerHTML = h; mm.classList.add("on"); mb.scrollTop = 0 }
-function closeM() { mm.classList.remove("on"); if (S.prev) { const p = S.prev; S.prev = null; S.lock = false; go(p.x, p.z, p.y, p.pt) } S.lock = false }
+function closeM() { mm.classList.remove("on"); S.prev = null; S.lock = false }
 mm.addEventListener("click", e => { if (e.target == mm) closeM() }); addEventListener("keydown", e => { if (e.key == "Escape") closeM() });
 const X = '<button onclick="closeM()" style="float:left">إغلاق ✕</button>';
 function upd() { $("bCart").textContent = "السلة (" + cnt() + ")"; save("_c4", cart) } upd();
 
 let sel = null;
 function showP(p, pos, nx) {
-  if (!S.prev) S.prev = { x: S.tx, z: S.tz, y: S.tyaw, pt: S.tpitch };
-  S.lock = true; go(pos.x + nx * 2.0, pos.z, nx * Math.PI / 2, Math.max(-.5, Math.min(.95, Math.atan2(pos.y - EYE_Y, 2))));
-  sel = { p, vi: 1, q: 1, pos }; if (vr(p).length != 3) sel.vi = 0; setTimeout(() => { if (S.lock) cardH() }, 650);
+  S.lock = true; // قفل الكاميرا في مكانها دون أي تحريك نهائياً
+  sel = { p, vi: 1, q: 1, pos }; if (vr(p).length != 3) sel.vi = 0;
+  cardH(); // فتح كارت المنتج فوراً في مكانه
 }
 function cardH() {
   const { p, vi, q } = sel, sz = vr(p);
