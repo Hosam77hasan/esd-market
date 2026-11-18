@@ -70,7 +70,7 @@ header button.pr{background:var(--p);border-color:var(--p)}
 @keyframes dotPulse{0%,100%{opacity:.18;transform:translateY(0)}50%{opacity:1;transform:translateY(-6px)}}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* فيديو الدخلة: ملء الشاشة بالكامل على كل الأجهزة دون أي فراغات سوداء */
-#videoIntro{position:fixed;inset:0;z-index:45;width:100vw;height:100vh;height:100dvh;object-fit:cover;object-position:center;background:#000;opacity:0;pointer-events:none;transition:opacity .9s}
+#videoIntro{position:fixed;inset:0;z-index:45;width:100vw;max-width:100vw;height:100vh;height:100dvh;max-height:100dvh;object-fit:cover;object-position:center;background:#000;opacity:0;pointer-events:none;transition:opacity .9s}
 /* خلفية سينمائية: نفس الفيديو مكبّر ومموّه يملأ الشاشة خلف الصورة الكاملة (خصوصاً على الهواتف الطولية) */
 #videoIntroBg{position:fixed;inset:0;z-index:44;width:100%;height:100%;object-fit:cover;object-position:center;background:#05050a radial-gradient(58% 46% at 50% 50%,#1b0a14,#05050a 78%);filter:blur(30px) brightness(.42) saturate(1.15);transform:scale(1.16);opacity:0;pointer-events:none;transition:opacity .9s}
 #videoIntroBg.show{opacity:1}
@@ -82,13 +82,24 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #landing.hide{opacity:0;transform:scale(1.06);filter:blur(6px);pointer-events:none}
 #landing .stage{position:absolute;inset:0;z-index:0;display:block;padding:0;overflow:hidden}
 #landing .stage::before{content:"";position:absolute;width:min(90vw,780px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#f2c94c24,#c8102e0f 46%,transparent 68%);filter:blur(8px);pointer-events:none}
-#landing .art{position:absolute;inset:0;width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;object-fit:cover;object-position:center;display:block;border-radius:0;box-shadow:none;filter:saturate(1.04)}
+#landing .art{position:absolute;inset:0;z-index:1;width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;object-fit:cover;object-position:center top;display:block;border-radius:0;box-shadow:none;filter:saturate(1.04)}
 #landing .cta{position:absolute;z-index:2;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;width:min(92vw,560px);padding:0;margin:0;pointer-events:none}
+/* شاشات عمودية (موبايل 9:16): ملء الشاشة بالكامل — الصورة كاملة العرض ومساحة الخلفية مموّهة من نفس الصورة بلا فراغات سوداء */
 @media(max-aspect-ratio:1/1){
-  #landing::before{filter:blur(26px) brightness(.56) saturate(1.2)}
-  #landing .art{inset:auto;top:50%;left:50%;width:125vw;height:auto;aspect-ratio:1376/768;transform:translate(-50%,-50%);object-fit:cover;border-radius:18px;box-shadow:0 24px 70px #0009}
-  #videoIntro{inset:auto;top:50%;left:50%;width:140vw;height:auto;aspect-ratio:16/9;transform:translate(-50%,-50%);object-fit:cover;background:transparent;border-radius:16px;box-shadow:0 24px 70px #0009}
-  #videoIntroBg{filter:blur(22px) brightness(.56) saturate(1.2)}
+  #landing::before{filter:blur(34px) brightness(.5) saturate(1.28);transform:scale(1.42);background-position:center 40%}
+  #landing::after{background:linear-gradient(180deg,#05050855 0%,#05050800 26%,#05050800 52%,#050508cc 100%)}
+  #landing .stage::before{width:130vw;opacity:.7}
+  #landing .art{inset:auto;top:calc(env(safe-area-inset-top,0px) + 6dvh);left:50%;width:106vw;height:auto;aspect-ratio:1376/768;transform:translateX(-50%);object-fit:contain;object-position:center;border-radius:0;box-shadow:none;-webkit-mask-image:linear-gradient(180deg,#0000 0%,#000 5%,#000 85%,#0000 100%);mask-image:linear-gradient(180deg,#0000 0%,#000 5%,#000 85%,#0000 100%)}
+  #landing .cta{bottom:calc(env(safe-area-inset-bottom,0px) + 8dvh)}
+  #landing .cta::before{content:"";position:absolute;left:50%;bottom:-34%;width:min(150vw,620px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#f2c94c26,#c8102e0e 46%,transparent 70%);filter:blur(12px);z-index:-1;pointer-events:none}
+  #landing .cta .enter-btn{font-size:clamp(28px,7.4vw,36px)}
+  #videoIntro{inset:0;width:100vw;max-width:100vw;height:100vh;height:100dvh;max-height:100dvh;object-fit:cover;object-position:center;transform:none;border-radius:0;box-shadow:none;background:#000}
+  #videoIntroBg{filter:blur(30px) brightness(.5) saturate(1.2)}
+}
+/* شاشات عريضة جداً (21:9 وأوسع): لا نقصّ أعلى الصورة — امتلاء الخلفية المموّهة حول إطار كامل */
+@media(min-aspect-ratio:21/10){
+  #landing .art{object-fit:contain}
+  #videoIntro{object-fit:contain}
 }
 /* زر الدخول: نص حر بلا إطار أو خلفية، أصفر ينبض بهدوء مع سهم وعربة تسوق */
 #landing .enter-btn{display:inline-flex;align-items:center;justify-content:center;gap:.42em;max-width:100%;background:none;border:0;border-radius:0;box-shadow:none;padding:10px 6px;margin:0;color:#f2c94c;font-size:clamp(24px,4.4vw,34px);font-weight:800;letter-spacing:.4px;line-height:1.25;cursor:pointer;pointer-events:auto;animation:ctaPulse 2.8s ease-in-out infinite;text-shadow:0 2px 18px #000c,0 0 26px #f2c94c55;transition:transform .2s}
@@ -1223,8 +1234,13 @@ let entered = false, musicOn = false, introStarted = false, introTimer = null, m
 musicEl.volume = MUSIC_VOL;
 /* تحميل مسبق فوري للموسيقى حتى تكون جاهزة في نفس لحظة تشغيل الفيديو (بلا تأخير) */
 try { musicEl.load() } catch (e) {}
-videoEl.src = "esd_market_hypermarket_transition.mp4";
-/* نفس الملف كخلفية مموّهة تملأ المساحات حول الفيديو 16:9 على الشاشات الطولية */
+/* نسختان: أفقية 16:9 للكمبيوتر، ورأسية 9:20 للهواتف تملأ الشاشة مع الحفاظ على المشهد كاملاً */
+const VIDEO_LAND_SRC = "esd_market_hypermarket_transition.mp4";
+const VIDEO_PORT_SRC = "esd_market_hypermarket_transition_portrait.mp4";
+const isPortraitView = () => matchMedia("(max-aspect-ratio:1/1)").matches;
+const introSrcForView = () => isPortraitView() ? VIDEO_PORT_SRC : VIDEO_LAND_SRC;
+videoEl.src = introSrcForView();
+/* نفس الملف كخلفية مموّهة احتياطية حول الفيديو على المقاسات غير المتطابقة */
 videoBgEl.src = videoEl.src; videoBgEl.muted = true; videoBgEl.playsInline = true;
 /* الفيديو الجديد 16:9 بلا مسار صوت: يبقى صامتاً دائماً، وكل الصوت من الموسيقى */
 videoEl.muted = true; videoEl.volume = 0; videoEl.playsInline = true;
@@ -1392,6 +1408,13 @@ function startExperience() {
   if (entered || introStarted) return;
   introStarted = true;
   hideLanding();
+  // مطابقة نسخة الفيديو مع اتجاه الشاشة لحظة الدخول (كمبيوتر / موبايل)
+  const wantSrc = introSrcForView();
+  if (videoEl.getAttribute("src") !== wantSrc) {
+    videoEl.src = wantSrc;
+    videoBgEl.src = wantSrc;
+    try { videoEl.load(); } catch (e) {}
+  }
   videoEl.classList.add("show");
   videoBgEl.classList.add("show");
   videoEl.playsInline = true;
