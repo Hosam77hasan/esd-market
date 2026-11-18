@@ -48,7 +48,7 @@ header button.pr{background:var(--p);border-color:var(--p)}
 /* أسهم أمام وخلف بدون حواف أو خلفية زر */
 #navArrows{position:fixed;top:58%;left:50%;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 #navArrows.show{display:flex}
-.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:2px 8px;margin:0;color:#000;font-size:30px;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.6),0 0 12px rgba(255,255,255,.4);transition:transform .15s,color .15s}
+.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:2px 8px;margin:0;color:#000;font-size:33px;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.6),0 0 12px rgba(255,255,255,.4);transition:transform .15s,color .15s}
 .arr-plain:active{transform:scale(1.22);color:#000}
 .arr-plain:focus-visible{outline:none}
 #toast{position:fixed;z-index:30;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:12px;margin:auto;max-width:420px;text-align:center;background:var(--p);color:#fff;padding:10px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
@@ -84,6 +84,12 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #landing .stage::before{content:"";position:absolute;width:min(90vw,780px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#f2c94c24,#c8102e0f 46%,transparent 68%);filter:blur(8px);pointer-events:none}
 #landing .art{position:absolute;inset:0;width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;object-fit:cover;object-position:center;display:block;border-radius:0;box-shadow:none;filter:saturate(1.04)}
 #landing .cta{position:absolute;z-index:2;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;width:min(92vw,560px);padding:0;margin:0;pointer-events:none}
+@media(max-aspect-ratio:1/1){
+  #landing::before{filter:blur(26px) brightness(.56) saturate(1.2)}
+  #landing .art{inset:auto;top:50%;left:50%;width:125vw;height:auto;aspect-ratio:1376/768;transform:translate(-50%,-50%);object-fit:cover;border-radius:18px;box-shadow:0 24px 70px #0009}
+  #videoIntro{inset:auto;top:50%;left:50%;width:140vw;height:auto;aspect-ratio:16/9;transform:translate(-50%,-50%);object-fit:cover;background:transparent;border-radius:16px;box-shadow:0 24px 70px #0009}
+  #videoIntroBg{filter:blur(22px) brightness(.56) saturate(1.2)}
+}
 /* زر الدخول: نص حر بلا إطار أو خلفية، أصفر ينبض بهدوء مع سهم وعربة تسوق */
 #landing .enter-btn{display:inline-flex;align-items:center;justify-content:center;gap:.42em;max-width:100%;background:none;border:0;border-radius:0;box-shadow:none;padding:10px 6px;margin:0;color:#f2c94c;font-size:clamp(24px,4.4vw,34px);font-weight:800;letter-spacing:.4px;line-height:1.25;cursor:pointer;pointer-events:auto;animation:ctaPulse 2.8s ease-in-out infinite;text-shadow:0 2px 18px #000c,0 0 26px #f2c94c55;transition:transform .2s}
 @keyframes ctaPulse{0%,100%{opacity:.62;filter:drop-shadow(0 0 0 #f2c94c00)}50%{opacity:1;filter:drop-shadow(0 0 16px #f2c94c66)}}
@@ -558,7 +564,7 @@ const rowCarts = []; for (let i = 0; i < 8; i++) { const c = makeCart(); c.rotat
 sign("خد عربية", 2, .6, "#14110e", CONFIG.ACCENT_COLOR, -6.5, 3, 12.5);
 const myCart = makeCart(); myCart.visible = false; sc.add(cam); cam.add(myCart);
 function centerMyCart() {
-  const base = .6;
+  const base = .63;
   myCart.userData.baseScale = base;
   myCart.scale.setScalar(base);
   myCart.position.set(0, -1.12, -1.05);
