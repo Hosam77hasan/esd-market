@@ -41,16 +41,15 @@ button.pr{background:var(--p);color:#fff;border-color:var(--p);font-weight:800}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--p);outline-offset:2px}
 header{position:fixed;top:0;inset-inline:0;z-index:5;display:none;gap:6px;align-items:center;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 8px;background:linear-gradient(#000d,#0000);color:#fff}
 header.show{display:flex}
-header b{font-size:19px;margin-inline-end:auto;white-space:nowrap;text-shadow:0 2px 8px #000;cursor:pointer;padding:4px 8px;border-radius:8px;transition:transform .2s,color .2s;min-width:0;overflow:hidden;text-overflow:ellipsis}
-header b.hold{color:#f2c94c;transform:scale(1.06)}
+header b{font-size:19px;margin-inline-end:auto;white-space:nowrap;text-shadow:0 2px 8px #000;padding:4px 8px;border-radius:8px;min-width:0;overflow:hidden;text-overflow:ellipsis;-webkit-touch-callout:none}
 header button{flex:0 0 auto;white-space:nowrap;background:#ffffff24;color:#fff;border-color:#ffffff45;backdrop-filter:blur(8px);padding:7px 10px}
 header button.pr{background:var(--p);border-color:var(--p)}
 @media(max-width:430px){header{gap:4px;padding:calc(6px + env(safe-area-inset-top,0px)) 8px 6px}header b{font-size:16px;padding:4px}header button{padding:6px 7px;font-size:13px;border-radius:9px}}
 /* أسهم أمام وخلف بدون حواف أو خلفية زر */
-#navArrows{position:fixed;bottom:calc(52px + env(safe-area-inset-bottom,0px));left:18px;z-index:6;display:none;flex-direction:column;align-items:center;gap:14px}
+#navArrows{position:fixed;top:58%;left:50%;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 #navArrows.show{display:flex}
-.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:2px 8px;margin:0;color:rgba(255,255,255,.92);font-size:32px;line-height:1;text-shadow:0 3px 12px rgba(0,0,0,.95);transition:transform .15s,color .15s}
-.arr-plain:active{transform:scale(1.22);color:#f2c94c}
+.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:2px 8px;margin:0;color:#000;font-size:30px;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.6),0 0 12px rgba(255,255,255,.4);transition:transform .15s,color .15s}
+.arr-plain:active{transform:scale(1.22);color:#000}
 .arr-plain:focus-visible{outline:none}
 #toast{position:fixed;z-index:30;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:12px;margin:auto;max-width:420px;text-align:center;background:var(--p);color:#fff;padding:10px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
 #load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 38%,#231a23,#050508 68%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .9s;text-align:center;padding:20px}
@@ -138,7 +137,7 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
 <video id="videoIntro" autoplay playsinline webkit-playsinline x5-playsinline preload="auto" muted disablepictureinpicture disableRemotePlayback controlslist="nodownload noplaybackrate nofullscreen" oncontextmenu="return false"></video>
 <audio id="bgMusic" loop preload="auto" src="bg_music.mp3"></audio>
 <header>
-  <b id="nm" title="اضغط مطولاً 5 ثوانٍ لفتح الإدارة"></b>
+  <b id="nm"></b>
   <button id="bCat">الأقسام</button><button id="bOff">العروض</button>
   <button id="bOrd">طلباتي</button><button class="pr" id="bCart">السلة (0)</button>
 </header>
@@ -243,15 +242,12 @@ let holdTimer = null;
 const nmEl = $("nm");
 function startHold(e) {
   if (e.button && e.button !== 0) return;
-  nmEl.classList.add("hold");
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
-    nmEl.classList.remove("hold");
     openAdminLogin();
   }, 5000);
 }
 function cancelHold() {
-  nmEl.classList.remove("hold");
   clearTimeout(holdTimer);
 }
 nmEl.addEventListener("pointerdown", startHold);
@@ -562,7 +558,26 @@ function makeCart() {
 }
 const rowCarts = []; for (let i = 0; i < 8; i++) { const c = makeCart(); c.rotation.y = Math.PI / 2; c.position.set(-5.2 - i * .5, 0, 10.8); sc.add(c); rowCarts.push(c) }
 sign("خد عربية", 2, .6, "#14110e", CONFIG.ACCENT_COLOR, -6.5, 3, 12.5);
-const myCart = makeCart(); myCart.scale.setScalar(.6); myCart.position.set(0, -1.12, -1.05); myCart.visible = false; sc.add(cam); cam.add(myCart);
+const myCart = makeCart(); myCart.visible = false; sc.add(cam); cam.add(myCart);
+function centerMyCart() {
+  const base = .6;
+  myCart.userData.baseScale = base;
+  myCart.scale.setScalar(base);
+  myCart.position.set(0, -1.12, -1.05);
+}
+centerMyCart();
+function placeCartArrows() {
+  cam.updateMatrixWorld(true);
+  const p = new THREE.Vector3(0, 1.326, .8);
+  myCart.localToWorld(p);
+  p.project(cam);
+  const x = (p.x * .5 + .5) * innerWidth;
+  const y = (-p.y * .5 + .5) * innerHeight;
+  const el = $("navArrows");
+  const h = el.offsetHeight || 72;
+  el.style.left = x + "px";
+  el.style.top = Math.min(y + 8, Math.max(6, innerHeight - h - 6)) + "px";
+}
 const cartItems = new THREE.Group(); myCart.add(cartItems);
 
 /* ---------- مجسمات المنتجات 3D ---------- */
@@ -951,10 +966,10 @@ function syncCart(last, from) {
       if (it.k == last && q == it.q - 1) {
         if (from) {
           m.visible = false;
-          fly(it.p, from, new THREE.Vector3(s[0] * .6, -1.12 + y * .6, -1.05 + s[2] * .6), () => {
+          const bs = myCart.userData.baseScale || .6;
+          fly(it.p, from, new THREE.Vector3(s[0] * bs, myCart.position.y + y * bs, myCart.position.z + s[2] * bs), () => {
             m.visible = true; m.position.y = y + .25;
             gsap.to(m.position, { y, duration: .6, ease: "bounce.out" });
-            gsap.fromTo(myCart.scale, { y: .52 }, { y: .6, duration: .5, ease: "elastic.out(1,.4)" });
           });
         } else {
           m.position.y = y + 1.8;
@@ -1049,7 +1064,7 @@ function go(x, z, yaw, pitch) {
 }
 function toast(m) { const t = $("toast"); t.textContent = m; t.style.opacity = 1; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.opacity = 0, 2600) }
 const keys = {}; addEventListener("keydown", e => { if (/INPUT|SELECT|TEXTAREA/.test((e.target.tagName || ""))) return; keys[e.key.toLowerCase()] = 1 }); addEventListener("keyup", e => keys[e.key.toLowerCase()] = 0);
-function resize() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = innerWidth < innerHeight ? 80 : 65; cam.updateProjectionMatrix() }
+function resize() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = innerWidth < innerHeight ? 80 : 65; cam.updateProjectionMatrix(); centerMyCart(); placeCartArrows() }
 addEventListener("resize", resize); resize();
 
 /* أزرار الأسهم العلوية والسفلية (أمام وخلف بدون حواف) */
@@ -1072,7 +1087,7 @@ let drag = null;
 cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY } });
 cv.addEventListener("pointermove", e => {
   if (!drag || !S.open || S.lock) return;
-  S.tyaw += (e.clientX - drag.x) * .0055;
+  S.tyaw -= (e.clientX - drag.x) * .0055;
   S.tpitch = Math.max(-.6, Math.min(1.05, S.tpitch + (e.clientY - drag.y) * .0035));
   drag.x = e.clientX; drag.y = e.clientY;
 });
@@ -1185,7 +1200,7 @@ const musicEl = $("bgMusic");
 const landingEl = $("landing");
 const MUSIC_VOL = 0.15;        // موسيقى الخلفية داخل المتجر (15%)
 const MUSIC_INTRO_VOL = 0.55;  // الموسيقى مع فيديو الدخلة (الفيديو صامت تماماً)
-let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null;
+let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
 
 musicEl.volume = MUSIC_VOL;
 /* تحميل مسبق فوري للموسيقى حتى تكون جاهزة في نفس لحظة تشغيل الفيديو (بلا تأخير) */
@@ -1200,6 +1215,8 @@ try { videoEl.setAttribute("webkit-playsinline", ""); videoEl.setAttribute("x5-p
 /* الموسيقى تبدأ في نفس اللحظة مع أول إطار من الفيديو، داخل ضغطة الدخول (سماح المتصفحات بالصوت) */
 function playIntroMusic() {
   clearInterval(musicFadeTimer);
+  musicShouldPlay = true;
+  if (document.hidden) { musicPausedByHide = true; return; }
   try {
     if (musicEl.ended || musicEl.currentTime > 0.3) musicEl.currentTime = 0;
     musicEl.muted = false;
@@ -1211,6 +1228,8 @@ function playIntroMusic() {
 }
 /* بعد الفيديو: نفس الموسيقى تكمل داخل المتجر بمستوى الخلفية (خفض ناعم بلا انقطاع) */
 function startMusic() {
+  musicShouldPlay = true;
+  if (document.hidden) { musicPausedByHide = true; return; }
   if (musicEl.paused) {
     try {
       musicEl.muted = false; musicEl.volume = MUSIC_VOL;
@@ -1236,6 +1255,8 @@ function armMusicKick() {
   if (musicKickAdded) return;
   musicKickAdded = true;
   const retry = () => {
+    musicShouldPlay = true;
+    if (document.hidden) { musicPausedByHide = true; return; }
     try {
       musicEl.muted = false;
       musicEl.volume = entered ? MUSIC_VOL : MUSIC_INTRO_VOL;
@@ -1250,6 +1271,31 @@ function armMusicKick() {
     retry();
   }, { once: true, passive: true }));
 }
+
+function pauseMusicForBackground() {
+  clearInterval(musicFadeTimer);
+  if (musicShouldPlay) musicPausedByHide = true;
+  if (musicEl.paused) return;
+  try { musicEl.pause(); } catch (e) {}
+}
+function resumeMusicForForeground() {
+  if (!musicPausedByHide || document.hidden) return;
+  if (!musicEl.paused) { musicPausedByHide = false; return; }
+  musicPausedByHide = false;
+  const wasMuted = musicEl.muted;
+  try {
+    musicEl.volume = entered ? MUSIC_VOL : MUSIC_INTRO_VOL;
+    const p = musicEl.play();
+    if (p && p.then) p.then(() => { musicOn = true }).catch(() => { if (!wasMuted) armMusicKick() });
+    else musicOn = true;
+  } catch (e) { if (!wasMuted) armMusicKick() }
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden || document.visibilityState === "hidden") pauseMusicForBackground();
+  else resumeMusicForForeground();
+});
+addEventListener("pagehide", pauseMusicForBackground);
+addEventListener("pageshow", resumeMusicForForeground);
 
 /* حد أمان فقط في حال توقف الفيديو فعلياً (لا يقطع الفيديو القصير) */
 function armIntroGuard() {
@@ -1313,6 +1359,7 @@ function finishEnter() {
   S.open = true;
   document.querySelector("header").classList.add("show");
   $("navArrows").classList.add("show");
+  placeCartArrows();
   startMusic();
   toast("مرحباً بك في ESD Market 🛒");
 }
