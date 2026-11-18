@@ -274,7 +274,9 @@ const MAXA = Math.min(8, R.capabilities.getMaxAnisotropy());
 const sc = new THREE.Scene();
 sc.background = new THREE.Color(0x0b0b0e);
 sc.fog = new THREE.Fog(0x0b0b0e, 38, 145);
-const cam = new THREE.PerspectiveCamera(65, 1, .1, 260);
+const EYE_Y = 1.72; // ارتفاع نظر الشخص الأول (م) — يجعل المتسوقين في حجمهم الطبيعي
+const FOV_LAND = 60, FOV_PORT = 70; // زاوية رؤية أضيق = تقريب بسيط (Zoom-In) بمنظور أول شخص
+const cam = new THREE.PerspectiveCamera(FOV_LAND, 1, .1, 260);
 
 /* بيئة انعكاس ناعمة بدون أي خطوط طويلة */
 (function () {
@@ -562,23 +564,33 @@ function makeCart() {
 }
 const rowCarts = []; for (let i = 0; i < 8; i++) { const c = makeCart(); c.rotation.y = Math.PI / 2; c.position.set(-5.2 - i * .5, 0, 10.8); sc.add(c); rowCarts.push(c) }
 sign("خد عربية", 2, .6, "#14110e", CONFIG.ACCENT_COLOR, -6.5, 3, 12.5);
-const myCart = makeCart(); myCart.visible = false; sc.add(cam); cam.add(myCart);
+/* حامل العربة: يتبع موقع الكاميرا والالتفاف الأفقي فقط، دون ميل النظر الرأسي */
+const cartRig = new THREE.Group(); sc.add(cartRig); sc.add(cam);
+const myCart = makeCart(); myCart.visible = false; cartRig.add(myCart);
+function syncCartRig() {
+  cartRig.position.set(cam.position.x, 0, cam.position.z); // Y = 0 دائماً: العربة على الأرض
+  cartRig.rotation.y = S.yaw;                            // تدور مع الالتفاف الأفقي فقط
+  cartRig.updateMatrixWorld(true);
+}
 function centerMyCart() {
-  const base = .63;
+  const base = .80;
   myCart.userData.baseScale = base;
   myCart.scale.setScalar(base);
-  myCart.position.set(0, -1.12, -1.05);
+  myCart.position.set(0, 0, -2.15); // على مستوى الأرض أمام الكاميرا (بلا ارتفاع طائر)
 }
 centerMyCart();
+let arrowsH = 0;
 function placeCartArrows() {
+  syncCartRig();
   cam.updateMatrixWorld(true);
-  const p = new THREE.Vector3(0, 1.326, .8);
+  const p = new THREE.Vector3(0, 1.62, .8);
   myCart.localToWorld(p);
   p.project(cam);
   const x = (p.x * .5 + .5) * innerWidth;
   const y = (-p.y * .5 + .5) * innerHeight;
   const el = $("navArrows");
-  const h = el.offsetHeight || 72;
+  if (!arrowsH) arrowsH = el.offsetHeight || 72;
+  const h = arrowsH;
   el.style.left = x + "px";
   el.style.top = Math.min(y + 8, Math.max(6, innerHeight - h - 6)) + "px";
 }
@@ -970,8 +982,9 @@ function syncCart(last, from) {
       if (it.k == last && q == it.q - 1) {
         if (from) {
           m.visible = false;
-          const bs = myCart.userData.baseScale || .6;
-          fly(it.p, from, new THREE.Vector3(s[0] * bs, myCart.position.y + y * bs, myCart.position.z + s[2] * bs), () => {
+          myCart.updateWorldMatrix(true, false);
+          const tgt = cam.worldToLocal(myCart.localToWorld(new THREE.Vector3(s[0], y, s[2])));
+          fly(it.p, from, tgt, () => {
             m.visible = true; m.position.y = y + .25;
             gsap.to(m.position, { y, duration: .6, ease: "bounce.out" });
           });
@@ -1068,7 +1081,7 @@ function go(x, z, yaw, pitch) {
 }
 function toast(m) { const t = $("toast"); t.textContent = m; t.style.opacity = 1; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.opacity = 0, 2600) }
 const keys = {}; addEventListener("keydown", e => { if (/INPUT|SELECT|TEXTAREA/.test((e.target.tagName || ""))) return; keys[e.key.toLowerCase()] = 1 }); addEventListener("keyup", e => keys[e.key.toLowerCase()] = 0);
-function resize() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = innerWidth < innerHeight ? 80 : 65; cam.updateProjectionMatrix(); centerMyCart(); placeCartArrows() }
+function resize() { R.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.fov = innerWidth < innerHeight ? FOV_PORT : FOV_LAND; cam.updateProjectionMatrix(); centerMyCart(); arrowsH = 0; placeCartArrows() }
 addEventListener("resize", resize); resize();
 
 /* أزرار الأسهم العلوية والسفلية (أمام وخلف بدون حواف) */
@@ -1092,7 +1105,7 @@ cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, x
 cv.addEventListener("pointermove", e => {
   if (!drag || !S.open || S.lock) return;
   S.tyaw -= (e.clientX - drag.x) * .0055;
-  S.tpitch = Math.max(-.6, Math.min(1.05, S.tpitch + (e.clientY - drag.y) * .0035));
+  S.tpitch = Math.max(-.6, Math.min(1.05, S.tpitch - (e.clientY - drag.y) * .0035)); // السحب لأعلى = النظر لأعلى
   drag.x = e.clientX; drag.y = e.clientY;
 });
 addEventListener("pointerup", e => {
@@ -1160,8 +1173,9 @@ function loop() {
   S.pitch += (S.tpitch - S.pitch) * Math.min(1, dt * 8);
   const spd = Math.hypot(S.x - px, S.z - pz) / Math.max(dt, .001);
   const hh = S.z > 19.4 ? -.6 : S.z > 15.5 ? -.6 + .6 * (19.4 - S.z) / 3.9 : 0;
-  cam.position.set(S.x, hh + 2.4 + Math.sin(t * 9) * .028 * Math.min(1, spd / 3), S.z);
+  cam.position.set(S.x, hh + EYE_Y + Math.sin(t * 9) * .028 * Math.min(1, spd / 3), S.z);
   cam.rotation.set(S.pitch, S.yaw, Math.sin(t * 4.5) * .003 * Math.min(1, spd / 3), "YXZ");
+  if (S.open) placeCartArrows();
   if (S.z < 13 && !myCart.visible) { myCart.visible = true; rowCarts[rowCarts.length - 1].visible = false }
 
   greeters.forEach((gp, i) => {
@@ -1433,7 +1447,7 @@ function upd() { $("bCart").textContent = "السلة (" + cnt() + ")"; save("_c
 let sel = null;
 function showP(p, pos, nx) {
   if (!S.prev) S.prev = { x: S.tx, z: S.tz, y: S.tyaw, pt: S.tpitch };
-  S.lock = true; go(pos.x + nx * 2.0, pos.z, nx * Math.PI / 2, Math.max(-.5, Math.min(.95, Math.atan2(pos.y - 2.4, 2))));
+  S.lock = true; go(pos.x + nx * 2.0, pos.z, nx * Math.PI / 2, Math.max(-.5, Math.min(.95, Math.atan2(pos.y - EYE_Y, 2))));
   sel = { p, vi: 1, q: 1, pos }; if (vr(p).length != 3) sel.vi = 0; setTimeout(() => { if (S.lock) cardH() }, 650);
 }
 function cardH() {
