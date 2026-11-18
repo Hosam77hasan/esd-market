@@ -223,7 +223,7 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
 <video id="videoIntro" autoplay playsinline webkit-playsinline x5-playsinline preload="auto" muted disablepictureinpicture disableRemotePlayback controlslist="nodownload noplaybackrate nofullscreen" oncontextmenu="return false"></video>
 <audio id="bgMusic" loop preload="auto" src="bg_music.mp3"></audio>
 <script>
-(function(){var a=document.getElementById("bgMusic");if(!a)return;try{a.muted=false;a.volume=.55;var p=a.play();if(p&&p.catch)p.catch(function(){});}catch(e){}})();
+(function(){var a=document.getElementById("bgMusic");if(!a)return;try{a.muted=true;var p=a.play();if(p&&p.catch)p.catch(function(){});}catch(e){}})();
 </script>
 <header>
   <b id="nm"></b>
@@ -1525,8 +1525,21 @@ const MUSIC_INTRO_VOL = 0.55;  // الموسيقى مع فيديو الدخلة 
 let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
 
 musicEl.volume = MUSIC_VOL;
-/* تشغيل صامت فوري منذ فتح الموقع: يحمّل الملف ويشغّله بصمت ليكون جاهزاً متزامناً، ثم يُرفع الصوت لحظة بدء الفيديو */
+/* إخفاء أي واجهة تحكم/كارت للموسيقى: تعمل كصوت خلفية خفي بالكامل (بلا أزرار تشغيل/إيقاف) */
+try { musicEl.removeAttribute("controls"); musicEl.setAttribute("playsinline", ""); musicEl.setAttribute("webkit-playsinline", ""); } catch (e) {}
+function hideMediaSession() {
+  try {
+    if (navigator.mediaSession) {
+      navigator.mediaSession.metadata = null;
+      try { navigator.mediaSession.playbackState = "none"; } catch (e) {}
+    }
+  } catch (e) {}
+}
+hideMediaSession();
+/* تحميل + تشغيل صامت فوري منذ فتح الموقع (يعمل على الديسك توب/أندرويد دون تفاعل) */
 try { musicEl.load(); musicEl.muted = true; const p = musicEl.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+/* سلّح أول تفاعل من المستخدم فوراً: يضمن تشغيل الموسيقى على الجوال (حل سياسات Mobile Autoplay) */
+armMusicKick();
 /* نسختان: أفقية 16:9 للكمبيوتر، ورأسية 9:20 للهواتف تملأ الشاشة مع الحفاظ على المشهد كاملاً */
 const VIDEO_LAND_SRC = "esd_market_hypermarket_transition.mp4";
 const VIDEO_PORT_SRC = "esd_market_hypermarket_transition_portrait.mp4";
@@ -1578,31 +1591,31 @@ function fadeMusic(to, ms) {
     if (k >= 1) clearInterval(musicFadeTimer);
   }, 60);
 }
-/* لو منع المتصفح الصوت: إعادة محاولة فورية ثم مع أول تفاعل — الفيديو لا يتأثر إطلاقاً */
+/* سلّح أول تفاعل من المستخدم: يبدأ الموسيقى فور أول لمسة/نقرة (يحل قيود الجوال) */
 function armMusicKick() {
   if (musicKickAdded) return;
   musicKickAdded = true;
-  const retry = () => {
-    musicShouldPlay = true;
+  const kick = () => {
     if (document.hidden) { musicPausedByHide = true; return; }
+    musicShouldPlay = true;
+    if (musicOn && !musicEl.paused && !musicEl.muted) return;
     try {
       musicEl.muted = false;
       musicEl.volume = entered ? MUSIC_VOL : MUSIC_INTRO_VOL;
       const p = musicEl.play();
       if (p && p.then) p.then(() => { musicOn = true }).catch(() => {});
+      else musicOn = true;
     } catch (e) {}
   };
-  setTimeout(retry, 300);
-  setTimeout(retry, 1200);
-  ["pointerdown", "keydown", "touchstart"].forEach(ev => addEventListener(ev, function kick() {
-    musicKickAdded = false;
-    retry();
-  }, { once: true, passive: true }));
+  ["touchstart", "pointerdown", "mousedown", "keydown", "click"].forEach(ev =>
+    addEventListener(ev, kick, { once: true, passive: true })
+  );
 }
 
 function pauseMusicForBackground() {
   clearInterval(musicFadeTimer);
   if (musicShouldPlay) musicPausedByHide = true;
+  hideMediaSession(); // إخفاء بطاقة الوسائط فوراً عند الإيقاف
   if (musicEl.paused) return;
   try { musicEl.pause(); } catch (e) {}
 }
@@ -1623,6 +1636,7 @@ document.addEventListener("visibilitychange", () => {
   else resumeMusicForForeground();
 });
 addEventListener("pagehide", pauseMusicForBackground);
+addEventListener("beforeunload", pauseMusicForBackground);
 addEventListener("pageshow", resumeMusicForForeground);
 
 /* حد أمان فقط في حال توقف الفيديو فعلياً (لا يقطع الفيديو القصير) */
