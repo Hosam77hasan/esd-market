@@ -28,7 +28,9 @@ jobs:
         run: |
           mkdir -p dist
           cp esd_market.html dist/index.html
-          cp esd_market.html bg_music.mp3 esd_market_hypermarket_transition.mp4 esd_market_hypermarket_transition_portrait.mp4 "logo esd market.jpg" "logo esd market.webp" og-image.jpg dist/
+          cp esd_market.html bg_music.mp3 esd_market_hypermarket_transition.mp4 esd_market_hypermarket_transition_portrait.mp4 "logo esd market.jpg" "logo esd market.webp" og-image.jpg esd.jpg manifest.json sw.js dist/
+          cp -r icons dist/icons
+          cp -r public dist/public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
