@@ -53,9 +53,15 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #navArrows{position:fixed;top:58%;left:50%;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none}
 #navArrows.show{display:flex}
 #navArrows .arr-plain{pointer-events:auto}
-.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:6px 14px;margin:0;color:#000;font-size:46px;line-height:1;text-shadow:0 2px 0 rgba(255,255,255,.7),0 0 16px rgba(255,255,255,.55);transition:transform .15s,color .15s;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.arr-plain{background:transparent !important;border:none !important;box-shadow:none !important;padding:6px 14px;margin:0;color:#000;font-size:46px;line-height:1;text-shadow:0 2px 0 rgba(255,255,255,.7),0 0 16px rgba(255,255,255,.55);transition:transform .15s,color .15s;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer}
 .arr-plain:active{transform:scale(1.22);color:#000}
 .arr-plain:focus-visible{outline:none}
+#hoverTip{position:fixed;z-index:25;pointer-events:none;display:none;max-width:260px;background:rgba(15,17,22,.92);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:9px 12px;box-shadow:0 14px 32px rgba(0,0,0,.45);backdrop-filter:blur(10px);font-size:13px;line-height:1.45}
+#hoverTip .ht-cat{font-size:11px;color:#f2c94c;font-weight:700}
+#hoverTip .ht-name{font-size:14px;font-weight:800;margin:2px 0}
+#hoverTip .ht-price{font-size:14px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px}
+#hoverTip .ht-disc{background:#e60000;color:#fff;font-size:11px;padding:1px 6px;border-radius:5px}
+#hoverTip .ht-act{font-size:11px;color:#cbd5e1;margin-top:3px}
 #toast{position:fixed;z-index:30;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:12px;margin:auto;max-width:420px;text-align:center;background:var(--p);color:#fff;padding:10px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
 /* ---------- شاشة البداية (Splash) ---------- */
 #load{
@@ -234,6 +240,7 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
   <button type="button" class="arr-plain" id="arrUp" aria-label="تحرك للأمام">▲</button>
   <button type="button" class="arr-plain" id="arrDn" aria-label="تحرك للخلف">▼</button>
 </div>
+<div id="hoverTip" role="tooltip"></div>
 <div id="toast"></div>
 <div class="modal" id="m"><div class="box" id="mb"></div></div>
 
@@ -269,31 +276,31 @@ const DEFAULT_CATS = ["الألبان والجبن","اللحوم والدواج
 const DEFAULT_ECAT = ["🧀","🥩","🥬","🧊","🥤","🧴","🌸","📱","🔌","🍞"];
 
 const SIZES = [
-  ["250 جم","500 جم","1 كجم"],["500 جم","1 كجم","2 كجم"],["500 جم","1 كجم","3 كجم"],
-  ["250 جم","450 جم","900 جم"],["330 مل","1 لتر","2 لتر"],["500 مل","1 لتر","3 لتر"],
-  ["50 مل","100 مل","200 مل"],["64 جيجا","128 جيجا","256 جيجا"],["صغير","متوسط","كبير"],["150 جم","300 جم","600 جم"]
+  ["15 بيضة / 250 جم","30 بيضة / 1 لتر","كرتونة كبيرة"],["500 جم","1 كجم","2 كجم"],["500 جم","1 كجم","3 كجم"],
+  ["250 جم","450 جم","900 جم"],["12 عبوة","24 عبوة / 6×2 لتر","عرض مزدوج"],["500 مل","1.5 لتر","4 كجم"],
+  ["50 مل","100 مل","200 مل"],["64 جيجا","128 جيجا","256 جيجا"],["صغير","متوسط","كبير"],["عائلي 185 جم","عبوة وسط","عرض 3 أكياس"]
 ];
 
 const NM = [
- ["🧀 جبنة رومي","🧀 جبنة شيدر","🥛 لبن كامل الدسم","🥛 لبن خالي الدسم","🍦 زبادي طبيعي","🧈 زبدة","🥚 بيض بلدي","🧀 جبنة فيتا"],
- ["🥩 ستيك بقري","🍗 بانيه دجاج","🥩 لحم مفروم","🍖 كفتة","🌭 سجق","🍔 برجر","🍗 دجاج كامل","🐟 سمك بلطي"],
- ["🍅 طماطم","🥒 خيار","🥔 بطاطس","🍎 تفاح","🍌 موز","🍊 برتقال","🥕 جزر","🫑 فلفل ألوان"],
- ["🍦 آيس كريم","🥦 بروكلي مجمد","🌽 ذرة مجمدة","🍟 بطاطس مجمدة","🫛 بسلة مجمدة","🥟 سمبوسة","🍕 بيتزا","🐟 فيليه سمك"],
- ["🧃 عصير برتقال","🧃 عصير مانجو","🥤 مشروب غازي","💧 مياه معدنية","🍵 شاي","☕ قهوة","⚡ مشروب طاقة","🍎 عصير تفاح"],
- ["🧴 منظف أرضيات","🧴 سائل أطباق","🧺 مسحوق غسيل","🌸 ملطف جو","🧼 صابون سائل","🧽 إسفنج","🧻 مناديل","🧪 كلور"],
- ["🌹 عطر رجالي","🌸 عطر حريمي","🧴 كريم مرطب","🧴 شامبو","🪥 معجون أسنان","💄 أحمر شفاه","🧴 مزيل عرق","🪒 أدوات حلاقة"],
- ["📱 موبايل سامسونج","📱 آيفون","💻 لاب توب","🎧 سماعات","📺 شاشة ذكية","🔌 شاحن سريع","⌚ ساعة ذكية","🎮 يد ألعاب"],
- ["🔥 بوتاجاز 5 شعلة","❄️ ثلاجة","🧺 غسالة","🍳 قلاية هوائية","☕ ماكينة قهوة","🌀 مروحة","🍞 محمصة","🥤 خلاط"],
- ["🍞 عيش فينو","🥐 كرواسون","🍰 تورتة","🍪 بسكويت","🍫 شوكولاتة","🍩 دونتس","🍯 عسل","🥜 مكسرات"]
+ ["🥚 كرتونة بيض أحمر 30 بيضة","🥚 كرتونة بيض أبيض 30 بيضة","🥚 كرتونة بيض بلدي 30 بيضة","🥛 لبن جهينة كامل الدسم","🧀 جبنة شيدر مستوردة","🧀 جبنة رومي قديمة","🍦 زبادي طبيعي","🧈 زبدة طبيعي"],
+ ["🥩 ستيك بقري بلدي","🍗 بانيه دجاج طازج","🥩 لحم مفروم ممتاز","🍖 كفتة مشوية","🌭 سجق بلدي","🍔 برجر لحم عائلي","🍗 دجاج طازج كامل","🐟 سمك بلطي طازج"],
+ ["🍅 طماطم طازجة","🥒 خيار بلدي","🥔 بطاطس تحمير","🍎 تفاح أحمر مستورد","🍌 موز مستورد","🍊 برتقال عصير","🥕 جزر طازج","🫑 فلفل ألوان"],
+ ["🍦 آيس كريم عائلي","🥦 بروكلي مجمد","🌽 ذرة حلوة مجمدة","🍟 بطاطس فارم فريتس","🫛 بسلة وجزر مجمدة","🥟 سمبوسة لحم","🍕 بيتزا إيطالي مجمدة","🐟 فيليه سمك مجمد"],
+ ["🥤 باليتة كولا كانز 24 عبوة","🥤 باليتة ليمون كانز 24 عبوة","🥤 باليتة برتقال كانز 24 عبوة","🍾 باليتة كولا 2 لتر (6 زجاجات)","💧 باليتة مياه 2 لتر (6 زجاجات)","🍾 باليتة ليمون 2 لتر (6 زجاجات)","🧃 عصير مانجو عائلي 1 لتر","☕ نسكافيه جولد كلاسيك"],
+ ["🧺 أريال مسحوق غسيل 4 كجم","🧴 بريل سائل أطباق 2 لتر","🧴 منظف أرضيات ديتول","🌸 داوني منعم ملابس","🧼 صابون سائل لليد","🧻 مناديل فاين 550 منديل","🧪 كلوركس أبيض 2 لتر","🧽 إسفنج مطبخ"],
+ ["🌹 عطر رجالي فاخر","🌸 عطر نسائي فاخر","🧴 كريم مرطب نيفيا","🧴 شامبو هيد آند شولدرز","🪥 معجون أسنان سيجنال","🪒 ماكينة حلاقة جيليت","🧴 مزيل عرق رول أون","🧴 غسول وجه يومي"],
+ ["📱 موبايل سامسونج جالاكسي","📱 آيفون برو ماكس","💻 لاب توب احترافي","🎧 سماعات بلوتوث","📺 شاشة سمارت 4K","🔌 شاحن سريع 65 واط","⌚ ساعة ذكية سبورت","🎮 ذراع تحكم ألعاب"],
+ ["🔥 بوتاجاز 5 شعلة ستانلس","❄️ ثلاجة نو فروست ديجيتال","🧺 غسالة أوتوماتيك 9 كجم","🍳 قلاية هوائية ديجيتال","☕ ماكينة إسبريسو منزلية","🌀 مروحة ستاند","🍞 محمصة توست","🥤 خلاط مطبخ قوي"],
+ ["🥔 شيبسي عائلي ملح وخل","🧀 شيبسي جبنة متبلة عائلي","🌮 دوريتوس ناتشو شيدر","🔥 شيتوس كرانشي حار","🍪 بسكويت أوريو عائلي","🍫 شوكولاتة جالكسي","🥐 كرواسون بالزبدة","🍯 عسل نحل طبيعي"]
 ];
-const BASE = [60,150,25,70,22,60,150,6000,8000,40];
-const PACK = ["1 قطعة","1 علبة","كيس","1 علبة","1 زجاجة","1 زجاجة","1 زجاجة","1 جهاز","1 جهاز","1 قطعة"];
+const BASE = [165,180,30,85,185,95,180,6500,8500,35];
+const PACK = ["كرتونة 30 بيضة","1 كجم","1 كجم","1 عبوة","باليتة كاملة","عبوة عائلية","1 زجاجة","1 جهاز","1 جهاز","كيس عائلي"];
 const PRODUCTS = [];
 NM.forEach((a, ci) => a.forEach((n, k) => {
   const i = n.indexOf(" ");
   PRODUCTS.push({
     id: ci * 10 + k + 1, e: n.slice(0, i), name: n.slice(i + 1), cat: ci,
-    price: Math.max(5, Math.round(BASE[ci] * (.7 + ((k * 37 + ci * 11) % 9) / 10) / 5) * 5),
+    price: Math.max(15, Math.round(BASE[ci] * (.7 + ((k * 37 + ci * 11) % 9) / 10) / 5) * 5),
     size: SIZES[ci][1], pack: PACK[ci], disc: k % 4 == 1 ? 15 : 0, stock: true,
     img: ""
   });
@@ -312,7 +319,12 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&a
 const MUL = [.6, 1, 1.8];
 let CATS = load("_cats", null); if (!Array.isArray(CATS) || !CATS.length) CATS = [...DEFAULT_CATS];
 let ECAT = load("_ecat", null); if (!Array.isArray(ECAT) || !ECAT.length) ECAT = [...DEFAULT_ECAT];
-let P = load("_p4", null); if (!Array.isArray(P) || !P.length) P = PRODUCTS.map(p => ({ ...p }));
+let P = load("_p5", null);
+if (!Array.isArray(P) || !P.length) {
+  const oldP = load("_p4", null);
+  const customOnly = Array.isArray(oldP) ? oldP.filter(x => x && x.mine) : [];
+  P = [...PRODUCTS.map(p => ({ ...p })), ...customOnly];
+}
 let cart = load("_c4", {}), orders = load("_o", []);
 
 const getSizes = ci => SIZES[ci % SIZES.length];
@@ -344,7 +356,7 @@ nmEl.addEventListener("pointerup", cancelHold);
 nmEl.addEventListener("pointerleave", cancelHold);
 nmEl.addEventListener("pointercancel", cancelHold);
 
-/* ---------- العارض والإضاءة بدون أي هالات أو خطوط على الأرضية ---------- */
+/* ---------- العارض والإضاءة الواقعية لمتجر حديث بمستوى بصري احترافي ---------- */
 const COARSE = matchMedia("(pointer:coarse)").matches;
 const HQ = CONFIG.REFLECTIONS == "on" || (CONFIG.REFLECTIONS == "auto" && !COARSE);
 const cv = $("cv");
@@ -354,46 +366,60 @@ catch (e) { $("load").innerHTML = "<h1>⚠</h1><div>المتصفح أو الجه
 R.setPixelRatio(Math.min(devicePixelRatio, COARSE ? 1.5 : 2));
 R.outputEncoding = THREE.sRGBEncoding;
 R.toneMapping = THREE.ACESFilmicToneMapping;
-R.toneMappingExposure = 1.22;
-/* ظلال ناعمة سينمائية */
+R.toneMappingExposure = 1.14;
+R.physicallyCorrectLights = false;
 R.shadowMap.enabled = true;
 R.shadowMap.type = THREE.PCFSoftShadowMap;
 const MAXA = Math.min(8, R.capabilities.getMaxAnisotropy());
 const sc = new THREE.Scene();
-sc.background = new THREE.Color(0x0b0b0e);
-sc.fog = new THREE.Fog(0x0b0b0e, 38, 145);
-const EYE_Y = 1.72; // ارتفاع نظر الشخص الأول (م) — يجعل المتسوقين في حجمهم الطبيعي
-const FOV_LAND = 60, FOV_PORT = 70; // زاوية رؤية أضيق = تقريب بسيط (Zoom-In) بمنظور أول شخص
+sc.background = new THREE.Color(0x161922);
+sc.fog = new THREE.Fog(0x161922, 46, 175);
+const EYE_Y = 1.72;
+const FOV_LAND = 60, FOV_PORT = 70;
 const cam = new THREE.PerspectiveCamera(FOV_LAND, 1, .1, 260);
 
-/* بيئة انعكاس ناعمة بدون أي خطوط طويلة */
+/* بيئة انعكاس استوديو هايبرماركت واقعية (أشرطة سقف مضيئة + جدران محايدة + أرضية دافئة) */
 (function () {
   const pm = new THREE.PMREMGenerator(R), e = new THREE.Scene();
-  e.add(new THREE.Mesh(new THREE.BoxGeometry(40, 16, 90), new THREE.MeshBasicMaterial({ color: 0x383a40, side: THREE.BackSide })));
-  sc.environment = pm.fromScene(e, .04).texture; pm.dispose();
+  e.add(new THREE.Mesh(new THREE.BoxGeometry(48, 18, 96), new THREE.MeshBasicMaterial({ color: 0x3b404c, side: THREE.BackSide })));
+  const floorBounce = new THREE.Mesh(new THREE.PlaneGeometry(46, 94), new THREE.MeshBasicMaterial({ color: 0x5c5b58 }));
+  floorBounce.rotation.x = -Math.PI / 2; floorBounce.position.y = -8.8; e.add(floorBounce);
+  const ceilDark = new THREE.Mesh(new THREE.PlaneGeometry(46, 94), new THREE.MeshBasicMaterial({ color: 0x20232b }));
+  ceilDark.rotation.x = Math.PI / 2; ceilDark.position.y = 8.8; e.add(ceilDark);
+  const softBoxMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 2.38, 2.32) });
+  const warmAccentMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.35, 0.9) });
+  [-12, -6, 0, 6, 12].forEach(lx => {
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 86), softBoxMat);
+    strip.rotation.x = Math.PI / 2; strip.position.set(lx, 8.72, 0); e.add(strip);
+  });
+  [-22, 22].forEach(wx => {
+    const band = new THREE.Mesh(new THREE.PlaneGeometry(80, 1.6), warmAccentMat);
+    band.rotation.y = wx < 0 ? Math.PI / 2 : -Math.PI / 2;
+    band.position.set(wx, 4.5, 0); e.add(band);
+  });
+  sc.environment = pm.fromScene(e, .032).texture; pm.dispose();
 })();
-sc.add(new THREE.HemisphereLight(0xffffff, 0xbab4aa, .95));
+sc.add(new THREE.HemisphereLight(0xf5f8ff, 0x7c7468, .78));
 
-/* ---------- إضاءة سينمائية كرتونية: مفتاح دافئ + تعبئة باردة + إضاءة خلفية ---------- */
-const keyLight = new THREE.DirectionalLight(0xfff1dc, 1.35);
-keyLight.position.set(9, 17, 14);
+/* إضاءة معمارية متوازنة: رئيسية دافئة بظلال دقيقة + تعبئة سماوية + إضاءة حواف */
+const keyLight = new THREE.DirectionalLight(0xfff5e6, 1.12);
+keyLight.position.set(10, 18, 14);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048);
-keyLight.shadow.camera.near = 2; keyLight.shadow.camera.far = 80;
-keyLight.shadow.camera.left = -26; keyLight.shadow.camera.right = 26;
-keyLight.shadow.camera.top = 36; keyLight.shadow.camera.bottom = -28;
-keyLight.shadow.bias = -0.0004; keyLight.shadow.normalBias = 0.03;
+keyLight.shadow.camera.near = 2; keyLight.shadow.camera.far = 75;
+keyLight.shadow.camera.left = -24; keyLight.shadow.camera.right = 24;
+keyLight.shadow.camera.top = 32; keyLight.shadow.camera.bottom = -26;
+keyLight.shadow.bias = -0.00035; keyLight.shadow.normalBias = 0.025;
 sc.add(keyLight); sc.add(keyLight.target);
 
-const fillLight = new THREE.DirectionalLight(0xbfd4ff, .42);
-fillLight.position.set(-10, 9, 8);
+const fillLight = new THREE.DirectionalLight(0xc9ddff, .42);
+fillLight.position.set(-12, 10, 8);
 sc.add(fillLight);
 
-const rimLight = new THREE.DirectionalLight(0xffd9a0, .5);
-rimLight.position.set(0, 5, -20);
+const rimLight = new THREE.DirectionalLight(0xffe0b5, .36);
+rimLight.position.set(0, 6, -24);
 sc.add(rimLight);
 
-/* تفعيل الظلال على عناصر المشهد (الأرفف والثلاجات والمنتجات) */
 function castShadows(root, cast, receive) {
   root.traverse(o => {
     if (!o.isMesh) return;
@@ -402,54 +428,171 @@ function castShadows(root, cast, receive) {
   });
 }
 
-/* ---------- أدوات الرسم والهندسة الديناميكية حسب عدد الأقسام ---------- */
-const SEC0 = -6, SECD = 12, secZ = i => SEC0 - i * SECD;
+/* ---------- أدوات الرسم، الخامات المعمارية واللافتات الواضحة ---------- */
+const SEC0 = -6.4, SECD = 12, rowZ = r => SEC0 - r * SECD, secZ = i => rowZ(Math.floor(i / 2));
 const AISLES = [-12.15, -6.45, 0, 6.45, 12.15];
-let ZMIN = -123, ZBACK = -127;
+let ZMIN = -63, ZBACK = -67;
 
-function tx(w, h, fn) { const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"); x.direction = "rtl"; x.textAlign = "center"; fn(x, w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = MAXA; t.encoding = THREE.sRGBEncoding; return t }
-const M = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: .55, metalness: .08 }, o || {}));
+function tx(w, h, fn, linear) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.direction = "rtl"; x.textAlign = "center";
+  fn(x, w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.anisotropy = MAXA;
+  if (!linear) t.encoding = THREE.sRGBEncoding;
+  return t;
+}
+const M = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: .52, metalness: .08 }, o || {}));
 function box(w, h, d, m, x, y, z, g) { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); (g || sc).add(b); return b }
-function fit(c, t, maxW, fs, wt) { c.font = (wt || "bold") + " " + fs + "px Cairo,Tahoma,sans-serif"; while (c.measureText(t).width > maxW && fs > 14) { fs -= 3; c.font = (wt || "bold") + " " + fs + "px Cairo,Tahoma,sans-serif" } return fs }
+function fit(c, t, maxW, fs, wt) { c.font = (wt || "bold") + " " + fs + "px Cairo,Tahoma,sans-serif"; while (c.measureText(t).width > maxW && fs > 14) { fs -= 2; c.font = (wt || "bold") + " " + fs + "px Cairo,Tahoma,sans-serif" } return fs }
+
 const BT = {};
 function banner(t, sub, bg, fg, ar) {
   const k = [t, sub, bg, fg, ar.toFixed(2)].join("|"); if (BT[k]) return BT[k];
-  const W = 1024, H = Math.round(W / ar);
+  const W = 1024, H = Math.max(160, Math.round(W / ar));
   return BT[k] = tx(W, H, (c) => {
     c.fillStyle = bg; c.fillRect(0, 0, W, H);
-    const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(255,255,255,.22)"); g.addColorStop(.5, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(0,0,0,.3)"); c.fillStyle = g; c.fillRect(0, 0, W, H);
-    c.strokeStyle = fg; c.globalAlpha = .88; c.lineWidth = Math.max(4, H * .03); c.strokeRect(H * .06, H * .06, W - H * .12, H - H * .12); c.globalAlpha = 1;
+    const g = c.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, "rgba(255,255,255,.16)");
+    g.addColorStop(.45, "rgba(255,255,255,.02)");
+    g.addColorStop(1, "rgba(0,0,0,.32)");
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    // خطوط معمارية علوية وسفلية أنيقة بدون توهّج ضبابي
+    c.fillStyle = fg; c.globalAlpha = .92;
+    c.fillRect(H * .08, H * .07, W - H * .16, Math.max(3, H * .022));
+    c.fillRect(H * .08, H - H * .09, W - H * .16, Math.max(3, H * .022));
+    c.globalAlpha = .14;
+    for (let sx = 0; sx < W; sx += 36) c.fillRect(sx, 0, 1, H);
+    c.globalAlpha = 1;
     c.fillStyle = fg; c.textBaseline = "middle";
-    const hs = sub ? .42 : .5; const fs = fit(c, t, W * .86, H * hs); c.shadowColor = "#0009"; c.shadowBlur = 8; c.shadowOffsetY = 3;
+    const hs = sub ? .40 : .48;
+    fit(c, t, W * .84, H * hs, "800");
+    c.fillStyle = "rgba(0,0,0,.45)";
+    c.fillText(t, W / 2 + 2, (sub ? H * .36 : H / 2) + 3);
+    c.fillStyle = fg;
     c.fillText(t, W / 2, sub ? H * .36 : H / 2);
-    if (sub) { fit(c, sub, W * .82, H * .23, "700"); c.globalAlpha = .95; c.fillText(sub, W / 2, H * .74) }
+    if (sub) {
+      fit(c, sub, W * .80, H * .21, "700");
+      c.globalAlpha = .94;
+      c.fillText(sub, W / 2, H * .73);
+      c.globalAlpha = 1;
+    }
   });
 }
-function plane(map, w, h, x, y, z, ry, g) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map })); m.position.set(x, y, z); m.rotation.y = ry || 0; (g || sc).add(m); return m }
-const sign = (t, w, h, bg, fg, x, y, z, ry, sub, g) => plane(banner(t, sub || "", bg, fg, w / h), w, h, x, y, z, ry, g);
-const ROD = M(0x18181a, { metalness: .8 });
-function hang(t, sub, w, h, bg, fg, x, y, z, g) {
-  sign(t, w, h, bg, fg, x, y, z + .04, 0, sub, g); sign(t, w, h, bg, fg, x, y, z - .04, Math.PI, sub, g);
-  const L = 7.9 - (y + h / 2); [-w * .38, w * .38].forEach(dx => box(.04, L, .04, ROD, x + dx, y + h / 2 + L / 2, z, g));
+const SIGN_FRAME_M = M(0x1c2028, { metalness: .72, roughness: .28 });
+const SIGN_TRIM_M = M(0xbcc4d0, { metalness: .88, roughness: .22, envMapIntensity: 1.4 });
+function signMat(map) {
+  return new THREE.MeshStandardMaterial({
+    map, emissiveMap: map, emissive: 0xffffff, emissiveIntensity: .68,
+    roughness: .28, metalness: .04
+  });
+}
+function plane(map, w, h, x, y, z, ry, g) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), signMat(map));
+  m.position.set(x, y, z); m.rotation.y = ry || 0;
+  (g || sc).add(m); return m;
+}
+function sign(t, w, h, bg, fg, x, y, z, ry, sub, g, doubleSided) {
+  const grp = new THREE.Group();
+  grp.position.set(x, y, z);
+  grp.rotation.y = ry || 0;
+  (g || sc).add(grp);
+  const tex = banner(t, sub || "", bg, fg, w / h);
+  const sm = signMat(tex);
+  box(w + .10, h + .10, .055, SIGN_FRAME_M, 0, 0, -.018, grp);
+  box(w + .13, .035, .07, SIGN_TRIM_M, 0, h / 2 + .045, -.015, grp);
+  box(w + .13, .035, .07, SIGN_TRIM_M, 0, -h / 2 - .045, -.015, grp);
+  const front = new THREE.Mesh(new THREE.PlaneGeometry(w, h), sm);
+  front.position.z = .016;
+  grp.add(front);
+  if (doubleSided) {
+    const back = new THREE.Mesh(new THREE.PlaneGeometry(w, h), sm);
+    back.position.z = -.052;
+    back.rotation.y = Math.PI;
+    grp.add(back);
+  }
+  return grp;
+}
+const ROD = M(0x2b303a, { metalness: .85, roughness: .26 });
+function hang(t, sub, w, h, bg, fg, x, y, z, g, rodSpan) {
+  const grp = new THREE.Group();
+  grp.position.set(x, y, z);
+  (g || sc).add(grp);
+  const tex = banner(t, sub || "", bg, fg, w / h);
+  const sm = signMat(tex);
+  // صندوق إضاءة ألومنيوم أنيق مانع للتداخل والرعشة
+  box(w + .12, h + .12, .08, SIGN_FRAME_M, 0, 0, 0, grp);
+  box(w + .16, .04, .10, SIGN_TRIM_M, 0, h / 2 + .055, 0, grp);
+  box(w + .16, .04, .10, SIGN_TRIM_M, 0, -h / 2 - .055, 0, grp);
+  [-1, 1].forEach(s => box(.04, h + .12, .10, SIGN_TRIM_M, s * (w / 2 + .06), 0, 0, grp));
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(w, h), sm); f.position.z = .048; grp.add(f);
+  const b = new THREE.Mesh(new THREE.PlaneGeometry(w, h), sm); b.position.z = -.048; b.rotation.y = Math.PI; grp.add(b);
+  const topCeil = 7.92, L = Math.max(.2, topCeil - (y + h / 2 + .06));
+  const rx = rodSpan || w * .42;
+  [-rx, rx].forEach(dx => {
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(.016, .016, L, 8), ROD);
+    rod.position.set(dx, h / 2 + .06 + L / 2, 0);
+    grp.add(rod);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .04, 10), SIGN_TRIM_M);
+    cap.position.set(dx, h / 2 + .08, 0);
+    grp.add(cap);
+  });
+  return grp;
 }
 
-/* ---------- الأرضية الرمادية الصافية + الأسهم الصفراء المتقطعة فقط (بدون أي هالات) ---------- */
-const floorT = tx(512, 512, (c, W, H) => {
-  c.fillStyle = "#3a3d45"; c.fillRect(0, 0, W, H);
-  for (let i = 0; i < 8000; i++) {
-    c.fillStyle = `rgba(${rnd(i) > .5 ? "255,255,255" : "45,48,55"},${.04 + rnd(i + 3) * .05})`;
-    c.fillRect(rnd(i + 1) * W, rnd(i + 2) * H, 2, 2);
+/* ---------- أرضية البورسلين المعمارية المصقولة + خريطة الخشونة + علامات الممرات ---------- */
+const floorT = tx(1024, 1024, (c, W, H) => {
+  c.fillStyle = "#5c616c"; c.fillRect(0, 0, W, H);
+  const n = 2, ts = W / n;
+  for (let ty = 0; ty < n; ty++) {
+    for (let tx0 = 0; tx0 < n; tx0++) {
+      const shade = 86 + ((tx0 * 7 + ty * 13) % 9);
+      c.fillStyle = `rgb(${shade},${shade + 4},${shade + 11})`;
+      c.fillRect(tx0 * ts + 3, ty * ts + 3, ts - 6, ts - 6);
+    }
   }
-  c.strokeStyle = "rgba(85,88,96,.42)"; c.lineWidth = 3; c.strokeRect(0, 0, W, H);
+  // عروق تيرازو وحجر رخامي ناعم واقعي
+  for (let i = 0; i < 6500; i++) {
+    const sz = 1 + rnd(i + 4) * 2.5;
+    c.fillStyle = `rgba(${rnd(i) > .52 ? "230,234,242" : "40,44,52"},${.035 + rnd(i + 3) * .055})`;
+    c.fillRect(rnd(i + 1) * W, rnd(i + 2) * H, sz, sz);
+  }
+  // فواصل البلاط الداكنة
+  c.strokeStyle = "#32363e"; c.lineWidth = 6;
+  for (let k = 0; k <= n; k++) {
+    c.beginPath(); c.moveTo(k * ts, 0); c.lineTo(k * ts, H); c.stroke();
+    c.beginPath(); c.moveTo(0, k * ts); c.lineTo(W, k * ts); c.stroke();
+  }
 });
 floorT.wrapS = floorT.wrapT = THREE.RepeatWrapping;
 
+const floorRoughT = tx(512, 512, (c, W, H) => {
+  c.fillStyle = "#3c3c3c"; c.fillRect(0, 0, W, H);
+  const n = 2, ts = W / n;
+  for (let i = 0; i < 1800; i++) {
+    const v = 42 + Math.floor(rnd(i + 9) * 32);
+    c.fillStyle = `rgb(${v},${v},${v})`;
+    c.fillRect(rnd(i + 1) * W, rnd(i + 2) * H, 8, 8);
+  }
+  c.strokeStyle = "#d8d8d8"; c.lineWidth = 6;
+  for (let k = 0; k <= n; k++) {
+    c.beginPath(); c.moveTo(k * ts, 0); c.lineTo(k * ts, H); c.stroke();
+    c.beginPath(); c.moveTo(0, k * ts); c.lineTo(W, k * ts); c.stroke();
+  }
+}, true);
+floorRoughT.wrapS = floorRoughT.wrapT = THREE.RepeatWrapping;
+
 const arrowSingleT = tx(128, 128, (c, W, H) => {
   c.clearRect(0, 0, W, H);
+  c.fillStyle = "rgba(0,0,0,.22)";
+  c.beginPath();
+  c.moveTo(64, 18); c.lineTo(110, 64); c.lineTo(86, 64); c.lineTo(86, 116);
+  c.lineTo(42, 116); c.lineTo(42, 64); c.lineTo(18, 64);
+  c.closePath(); c.fill();
   c.fillStyle = "#f2c200";
   c.beginPath();
-  c.moveTo(64, 14); c.lineTo(108, 62); c.lineTo(84, 62); c.lineTo(84, 114);
-  c.lineTo(44, 114); c.lineTo(44, 62); c.lineTo(20, 62);
+  c.moveTo(64, 14); c.lineTo(106, 60); c.lineTo(82, 60); c.lineTo(82, 112);
+  c.lineTo(46, 112); c.lineTo(46, 60); c.lineTo(22, 60);
   c.closePath(); c.fill();
 });
 const arrowTurnT = tx(128, 128, (c, W, H) => {
@@ -460,125 +603,602 @@ const arrowTurnT = tx(128, 128, (c, W, H) => {
   c.lineTo(90, 90); c.lineTo(90, 74); c.lineTo(38, 74); c.lineTo(38, 90);
   c.closePath(); c.fill();
 });
-const arrowMat = new THREE.MeshBasicMaterial({ map: arrowSingleT, transparent: true, polygonOffset: true, polygonOffsetFactor: -2 });
-const arrowTurnMat = new THREE.MeshBasicMaterial({ map: arrowTurnT, transparent: true, polygonOffset: true, polygonOffsetFactor: -2 });
+const arrowMat = new THREE.MeshBasicMaterial({ map: arrowSingleT, transparent: true, opacity: .88, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false });
+const arrowTurnMat = new THREE.MeshBasicMaterial({ map: arrowTurnT, transparent: true, opacity: .88, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false });
 
-/* ---------- الشخصيات الواقعية المركبة ---------- */
-function createRealisticPerson(shirtColor, hasBeard, isFemale) {
+/* ---------- شخصيات بشرية واقعية بمستوى GTA V (ألوان ملابس واضحة ومشبعة + شعر بني طبيعي + نسيج قماش واقعي) ---------- */
+const SKIN_PALETTE = [0xf2cbb0, 0xe4b28a, 0xd0946a, 0xf7dbc3, 0xc2875f];
+const PANTS_PALETTE = [0x1c273b, 0x242830, 0x423023, 0x161920, 0x2e3f54, 0x6b5642];
+const HIJAB_PALETTE = [0xb91c1c, 0x1e3a8a, 0xf1e8d6, 0x0f766e, 0x881337, 0xb45309];
+const HAIR_PALETTE = [0x452614, 0x57331c, 0x331c0e, 0x663c22, 0x3b2113];
+const CLOTH_TEX = tx(128, 128, (c, W, H) => {
+  c.fillStyle = "#ffffff"; c.fillRect(0, 0, W, H);
+  for (let y = 0; y < H; y += 2) {
+    c.fillStyle = y % 4 ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)";
+    c.fillRect(0, y, W, 1);
+  }
+  for (let x = 0; x < W; x += 2) {
+    c.fillStyle = x % 4 ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.035)";
+    c.fillRect(x, 0, 1, H);
+  }
+  for (let i = 0; i < 320; i++) {
+    c.fillStyle = `rgba(0,0,0,${.012 + rnd(i) * .02})`;
+    c.fillRect(rnd(i + 1) * W, rnd(i + 2) * H, 2, 2);
+  }
+});
+CLOTH_TEX.wrapS = CLOTH_TEX.wrapT = THREE.RepeatWrapping; CLOTH_TEX.repeat.set(3, 3);
+
+const LIMB_SEG_THIGH = new THREE.LatheGeometry([
+  new THREE.Vector2(0, 0), new THREE.Vector2(.074, -.02), new THREE.Vector2(.086, -.14),
+  new THREE.Vector2(.077, -.30), new THREE.Vector2(.063, -.42), new THREE.Vector2(0, -.43)
+], 16);
+const LIMB_SEG_CALF = new THREE.LatheGeometry([
+  new THREE.Vector2(0, 0), new THREE.Vector2(.061, -.01), new THREE.Vector2(.066, -.13),
+  new THREE.Vector2(.055, -.28), new THREE.Vector2(.045, -.39), new THREE.Vector2(0, -.40)
+], 16);
+const ARM_UPPER_GEO = new THREE.LatheGeometry([
+  new THREE.Vector2(0, 0), new THREE.Vector2(.068, -.01), new THREE.Vector2(.064, -.14),
+  new THREE.Vector2(.053, -.28), new THREE.Vector2(0, -.29)
+], 14);
+const ARM_FORE_GEO = new THREE.LatheGeometry([
+  new THREE.Vector2(0, 0), new THREE.Vector2(.051, -.01), new THREE.Vector2(.047, -.12),
+  new THREE.Vector2(.037, -.26), new THREE.Vector2(0, -.27)
+], 14);
+const TORSO_MALE_GEO = new THREE.LatheGeometry([
+  new THREE.Vector2(0, 0), new THREE.Vector2(.175, 0), new THREE.Vector2(.185, .12),
+  new THREE.Vector2(.198, .28), new THREE.Vector2(.238, .48), new THREE.Vector2(.226, .60),
+  new THREE.Vector2(.10, .66), new THREE.Vector2(0, .66)
+], 20);
+const TORSO_FEMALE_GEO = new THREE.LatheGeometry([
+  new THREE.Vector2(0, 0), new THREE.Vector2(.188, 0), new THREE.Vector2(.16, .14),
+  new THREE.Vector2(.155, .28), new THREE.Vector2(.198, .48), new THREE.Vector2(.185, .58),
+  new THREE.Vector2(.09, .64), new THREE.Vector2(0, .64)
+], 20);
+
+function createRealisticPerson(shirtColor, hasBeard, isFemale, opts) {
+  opts = opts || {};
   const g = new THREE.Group();
-  const skinMat = M(isFemale ? 0xebc2a0 : 0xd9a67e, { roughness: .52 });
-  const pantsMat = M(0x1b2230, { roughness: .75 });
-  const shirtMat = M(shirtColor, { roughness: .6 });
-  const hairMat = M(0x161412, { roughness: .8 });
-  const shoeMat = M(0x0d0d0f, { roughness: .4 });
+  const seed = Math.abs(Math.round((shirtColor || 0) * 13 + (isFemale ? 7 : 3) + (opts.seed || 0)));
+  const skinCol = opts.skin || SKIN_PALETTE[seed % SKIN_PALETTE.length];
+  const pantsCol = opts.pants || PANTS_PALETTE[(seed + 2) % PANTS_PALETTE.length];
+  const hasJacket = !opts.apron && !opts.isChild && (seed % 2 === 0);
+  const innerCol = opts.innerShirt || (seed % 3 === 0 ? 0xfaf8f5 : 0x1e293b);
+  const skinMat = M(skinCol, { roughness: .42, metalness: .02 });
+  const pantsMat = M(pantsCol, { map: CLOTH_TEX, roughness: .58, metalness: .04 });
+  const shirtMat = M(shirtColor, { map: CLOTH_TEX, roughness: hasJacket ? .45 : .54, metalness: .05 });
+  const innerMat = M(innerCol, { map: CLOTH_TEX, roughness: .58, metalness: .03 });
+  const trimMat = M(0x16181d, { roughness: .44, metalness: .16 });
+  const hairMat = M(opts.hair || HAIR_PALETTE[seed % HAIR_PALETTE.length], { roughness: .58, metalness: .06 });
+  const shoeMat = M(opts.shoe || (seed % 4 === 0 ? 0x3b2316 : 0x16181f), { roughness: .34, metalness: .08 });
+  const soleMat = M(0xf4f5f7, { roughness: .50, metalness: .02 });
+  const beltMat = M(0x1b1511, { roughness: .30, metalness: .16 });
+  const buckleMat = M(0xe2e8f0, { roughness: .18, metalness: .90 });
+  const watchMat = M(0xb4bcc8, { roughness: .20, metalness: .88 });
 
+  // الساقان بمفاصل متناسقة وأحذية رياضية/جلدية واقعية
   const legL = new THREE.Group(), legR = new THREE.Group();
-  legL.position.set(-.13, .88, 0); legR.position.set(.13, .88, 0);
-  [legL, legR].forEach(leg => {
-    const thigh = new THREE.Mesh(new THREE.CylinderGeometry(.095, .078, .85, 14), pantsMat);
-    thigh.position.y = -.42; leg.add(thigh);
-    const shoe = new THREE.Mesh(new THREE.BoxGeometry(.12, .08, .24), shoeMat);
-    shoe.position.set(0, -.84, -.04); leg.add(shoe);
+  const kneeL = new THREE.Group(), kneeR = new THREE.Group();
+  const hipW = isFemale ? .105 : .118;
+  legL.position.set(-hipW, .86, 0); legR.position.set(hipW, .86, 0);
+
+  [[legL, kneeL], [legR, kneeR]].forEach(([leg, knee]) => {
+    const hipBall = new THREE.Mesh(new THREE.SphereGeometry(.075, 12, 10), pantsMat);
+    leg.add(hipBall);
+    const thigh = new THREE.Mesh(LIMB_SEG_THIGH, pantsMat);
+    leg.add(thigh);
+    knee.position.set(0, -.41, 0);
+    const kneeCap = new THREE.Mesh(new THREE.SphereGeometry(.059, 12, 10), pantsMat);
+    knee.add(kneeCap);
+    const calf = new THREE.Mesh(LIMB_SEG_CALF, pantsMat);
+    knee.add(calf);
+    const cuff = new THREE.Mesh(new THREE.CylinderGeometry(.048, .051, .042, 12), pantsMat);
+    cuff.position.set(0, -.37, 0); knee.add(cuff);
+    // الحذاء الرياضي المفصل (نعل مطاطي + جسم الحذاء + كعب خلفي)
+    const shoeGrp = new THREE.Group();
+    shoeGrp.position.set(0, -.40, -.025);
+    const sole = new THREE.Mesh(new THREE.BoxGeometry(.110, .025, .250), soleMat);
+    sole.position.set(0, -.035, -.022); shoeGrp.add(sole);
+    const upper = new THREE.Mesh(new THREE.BoxGeometry(.104, .054, .228), shoeMat);
+    upper.position.set(0, -.004, -.016); shoeGrp.add(upper);
+    const heel = new THREE.Mesh(new THREE.BoxGeometry(.106, .066, .070), shoeMat);
+    heel.position.set(0, .006, .062); shoeGrp.add(heel);
+    const toe = new THREE.Mesh(new THREE.SphereGeometry(.052, 10, 8), shoeMat);
+    toe.scale.set(1, .52, 1.18); toe.position.set(0, -.012, -.112); shoeGrp.add(toe);
+    knee.add(shoeGrp);
+    leg.add(knee);
     g.add(leg);
   });
 
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(.25, .21, .76, 16), shirtMat);
-  torso.scale.set(1.15, 1, .75); torso.position.y = 1.26; g.add(torso);
-  const collar = new THREE.Mesh(new THREE.CylinderGeometry(.11, .13, .08, 12), skinMat);
-  collar.position.y = 1.67; g.add(collar);
+  // الحوض والجذع بتفاصيل جاكيت مفتوح / تيشيرت / مريول وحزام
+  const torsoGrp = new THREE.Group();
+  torsoGrp.position.set(0, .86, 0);
+  g.add(torsoGrp);
 
-  const armL = new THREE.Group(), armR = new THREE.Group();
-  armL.position.set(-.33, 1.58, 0); armR.position.set(.33, 1.58, 0);
-  [armL, armR].forEach(arm => {
-    const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(.075, .065, .26, 12), shirtMat);
-    sleeve.position.y = -.13; arm.add(sleeve);
-    const forearm = new THREE.Mesh(new THREE.CylinderGeometry(.06, .048, .42, 12), skinMat);
-    forearm.position.y = -.44; arm.add(forearm);
-    const hand = new THREE.Mesh(new THREE.SphereGeometry(.055, 10, 10), skinMat);
-    hand.position.y = -.67; arm.add(hand);
-    g.add(arm);
-  });
+  const pelvis = new THREE.Mesh(new THREE.SphereGeometry(.192, 16, 12), pantsMat);
+  pelvis.scale.set(isFemale ? 1.02 : .98, .56, .74);
+  pelvis.position.y = -.01;
+  torsoGrp.add(pelvis);
 
-  const headGroup = new THREE.Group();
-  headGroup.position.set(0, 1.88, 0);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(.19, 20, 18), skinMat);
-  head.scale.set(.92, 1.08, .98); headGroup.add(head);
+  const belt = new THREE.Mesh(new THREE.CylinderGeometry(.183, .183, .042, 16), beltMat);
+  belt.scale.set(1.02, 1, .74); belt.position.y = .045; torsoGrp.add(belt);
+  const buckle = new THREE.Mesh(new THREE.BoxGeometry(.056, .046, .02), buckleMat);
+  buckle.position.set(0, .045, -.137); torsoGrp.add(buckle);
 
-  const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  const eyePupil = new THREE.MeshBasicMaterial({ color: 0x111111 });
-  [-.065, .065].forEach(ex => {
-    const ew = new THREE.Mesh(new THREE.SphereGeometry(.024, 10, 8), eyeWhite);
-    ew.position.set(ex, .02, -.165); headGroup.add(ew);
-    const ep = new THREE.Mesh(new THREE.SphereGeometry(.013, 8, 8), eyePupil);
-    ep.position.set(ex, .02, -.184); headGroup.add(ep);
-    const brow = new THREE.Mesh(new THREE.BoxGeometry(.055, .012, .015), hairMat);
-    brow.position.set(ex, .055, -.172); headGroup.add(brow);
-  });
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(.022, .06, 8), skinMat);
-  nose.rotation.x = -Math.PI / 2; nose.position.set(0, -.01, -.185); headGroup.add(nose);
+  const torsoMesh = new THREE.Mesh(isFemale ? TORSO_FEMALE_GEO : TORSO_MALE_GEO, shirtMat);
+  torsoMesh.scale.set(1.06, 1, .73);
+  torsoMesh.position.y = .04;
+  torsoGrp.add(torsoMesh);
 
-  const hair = new THREE.Mesh(new THREE.SphereGeometry(.198, 20, 14, 0, Math.PI * 2, 0, isFemale ? 2.1 : 1.35), hairMat);
-  hair.scale.set(.94, 1.08, 1.02); hair.position.set(0, .02, .01); headGroup.add(hair);
-
-  if (hasBeard && !isFemale) {
-    const beard = new THREE.Mesh(new THREE.SphereGeometry(.194, 18, 12, 0, Math.PI * 2, 1.75, 1.25), hairMat);
-    beard.scale.set(.94, 1.05, 1.01); beard.position.set(0, -.02, -.005); headGroup.add(beard);
+  if (opts.apron) {
+    const apronMat = M(opts.apronColor || 0x16181e, { map: CLOTH_TEX, roughness: .72 });
+    const apron = new THREE.Mesh(new THREE.BoxGeometry(.29, .54, .032), apronMat);
+    apron.position.set(0, .30, -.140); torsoGrp.add(apron);
+    const pocket = new THREE.Mesh(new THREE.BoxGeometry(.16, .12, .016), M(0xe60000, { roughness: .55 }));
+    pocket.position.set(0, .20, -.157); torsoGrp.add(pocket);
+    const badge = new THREE.Mesh(new THREE.BoxGeometry(.072, .042, .012), M(0xf2c94c, { roughness: .28, metalness: .35 }));
+    badge.position.set(.08, .48, -.157); torsoGrp.add(badge);
+  } else if (hasJacket) {
+    // تيشيرت داخلي + ياقة جاكيت مفتوح بمظهر GTA واقعي
+    const innerTee = new THREE.Mesh(new THREE.BoxGeometry(.14, .49, .04), innerMat);
+    innerTee.position.set(0, .39, -.136); torsoGrp.add(innerTee);
+    [-1, 1].forEach(s => {
+      const lapel = new THREE.Mesh(new THREE.BoxGeometry(.055, .44, .026), trimMat);
+      lapel.position.set(s * .072, .41, -.146);
+      lapel.rotation.z = s * -.06;
+      torsoGrp.add(lapel);
+    });
+    const hem = new THREE.Mesh(new THREE.CylinderGeometry(.20, .205, .065, 18), trimMat);
+    hem.scale.set(1.06, 1, .74); hem.position.y = .065; torsoGrp.add(hem);
+  } else {
+    const placket = new THREE.Mesh(new THREE.BoxGeometry(.032, .38, .018), trimMat);
+    placket.position.set(0, .43, -.144); torsoGrp.add(placket);
   }
 
-  g.add(headGroup);
-  g.userData = { legL, legR, armL, armR, headGroup };
+  // حقيبة ظهر صغيرة أنيقة للأطفال
+  if (opts.isChild) {
+    const packMat = M(seed % 2 ? 0x1d4ed8 : 0xb91c1c, { map: CLOTH_TEX, roughness: .54 });
+    const pack = new THREE.Mesh(new THREE.BoxGeometry(.25, .32, .14), packMat);
+    pack.position.set(0, .36, .18); torsoGrp.add(pack);
+    const pocketB = new THREE.Mesh(new THREE.BoxGeometry(.19, .15, .04), trimMat);
+    pocketB.position.set(0, .29, .26); torsoGrp.add(pocketB);
+  }
+
+  const collarRing = new THREE.Mesh(new THREE.TorusGeometry(.094, .021, 8, 16), shirtMat);
+  collarRing.rotation.x = Math.PI / 2; collarRing.position.set(0, .675, -.005); torsoGrp.add(collarRing);
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(.063, .078, .135, 14), skinMat);
+  neck.position.set(0, .71, -.005); torsoGrp.add(neck);
+
+  // الذراعان بمفصل كتف + كوع + أكمام + ساعة يد + كف
+  const armL = new THREE.Group(), armR = new THREE.Group();
+  const elbowL = new THREE.Group(), elbowR = new THREE.Group();
+  const shX = isFemale ? .248 : .278;
+  armL.position.set(-shX, .61, 0); armR.position.set(shX, .61, 0);
+  const fullSleeve = opts.longSleeve || hasJacket;
+
+  [[armL, elbowL, 0], [armR, elbowR, 1]].forEach(([arm, elbow, sideIdx]) => {
+    const shBall = new THREE.Mesh(new THREE.SphereGeometry(.070, 12, 10), shirtMat);
+    arm.add(shBall);
+    const upperArm = new THREE.Mesh(ARM_UPPER_GEO, shirtMat);
+    arm.add(upperArm);
+    elbow.position.set(0, -.28, 0);
+    const elBall = new THREE.Mesh(new THREE.SphereGeometry(.049, 10, 8), fullSleeve ? shirtMat : skinMat);
+    elbow.add(elBall);
+    const foreArm = new THREE.Mesh(ARM_FORE_GEO, fullSleeve ? shirtMat : skinMat);
+    elbow.add(foreArm);
+    if (fullSleeve) {
+      const wrCuff = new THREE.Mesh(new THREE.CylinderGeometry(.039, .041, .035, 10), trimMat);
+      wrCuff.position.set(0, -.245, 0); elbow.add(wrCuff);
+    } else if (sideIdx === 0 && !opts.isChild) {
+      const watch = new THREE.Mesh(new THREE.CylinderGeometry(.040, .040, .022, 12), watchMat);
+      watch.position.set(0, -.235, 0); elbow.add(watch);
+    }
+    const hand = new THREE.Group();
+    hand.position.set(0, -.285, 0);
+    const palm = new THREE.Mesh(new THREE.BoxGeometry(.045, .072, .062), skinMat);
+    hand.add(palm);
+    const fingers = new THREE.Mesh(new THREE.BoxGeometry(.040, .044, .054), skinMat);
+    fingers.position.set(0, -.048, -.004); hand.add(fingers);
+    elbow.add(hand);
+    arm.add(elbow);
+    torsoGrp.add(arm);
+  });
+
+  // الرأس والملامح البشرية الدقيقة والشعر البني الطبيعي أو الحجاب
+  const headGroup = new THREE.Group();
+  headGroup.position.set(0, .86, -.008);
+  torsoGrp.add(headGroup);
+
+  const cranium = new THREE.Mesh(new THREE.SphereGeometry(.146, 24, 20), skinMat);
+  cranium.scale.set(.90, 1.08, .98);
+  headGroup.add(cranium);
+
+  const jaw = new THREE.Mesh(new THREE.CylinderGeometry(.098, .068, .105, 16), skinMat);
+  jaw.scale.set(.95, 1, .92); jaw.position.set(0, -.085, -.022); headGroup.add(jaw);
+
+  [-1, 1].forEach(s => {
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(.029, 10, 8), skinMat);
+    ear.scale.set(.44, 1.05, .78); ear.position.set(s * .131, -.005, .005); headGroup.add(ear);
+  });
+
+  const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf9fafb, roughness: .20 });
+  const irisMat = new THREE.MeshStandardMaterial({ color: seed % 3 === 0 ? 0x3b281c : 0x1d2633, roughness: .16 });
+  const pupilMat = new THREE.MeshBasicMaterial({ color: 0x09090b });
+  const lipMat = M(isFemale ? 0xa85552 : 0x9c6151, { roughness: .42 });
+
+  [-.048, .048].forEach(ex => {
+    const ew = new THREE.Mesh(new THREE.SphereGeometry(.018, 10, 8), eyeWhiteMat);
+    ew.scale.set(1.15, .74, .55); ew.position.set(ex, .016, -.127); headGroup.add(ew);
+    const ei = new THREE.Mesh(new THREE.SphereGeometry(.011, 8, 8), irisMat);
+    ei.scale.set(1, 1, .5); ei.position.set(ex, .016, -.135); headGroup.add(ei);
+    const ep = new THREE.Mesh(new THREE.SphereGeometry(.006, 8, 8), pupilMat);
+    ep.scale.set(1, 1, .5); ep.position.set(ex, .016, -.139); headGroup.add(ep);
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(.045, .010, .015), hairMat);
+    brow.position.set(ex, .043, -.131);
+    brow.rotation.z = ex < 0 ? .06 : -.06;
+    headGroup.add(brow);
+  });
+
+  const noseBridge = new THREE.Mesh(new THREE.BoxGeometry(.021, .048, .032), skinMat);
+  noseBridge.position.set(0, -.008, -.139); noseBridge.rotation.x = .22; headGroup.add(noseBridge);
+  const noseTip = new THREE.Mesh(new THREE.SphereGeometry(.015, 8, 8), skinMat);
+  noseTip.position.set(0, -.026, -.149); headGroup.add(noseTip);
+  const mouth = new THREE.Mesh(new THREE.BoxGeometry(.048, .010, .012), lipMat);
+  mouth.position.set(0, -.068, -.129); headGroup.add(mouth);
+
+  // الشعر البني الطبيعي المفصّل أو الحجاب الأنيق
+  if (isFemale && (opts.hijab || seed % 2 === 0)) {
+    const hijabCol = HIJAB_PALETTE[seed % HIJAB_PALETTE.length];
+    const hijabMat = M(hijabCol, { map: CLOTH_TEX, roughness: .56 });
+    const wrap = new THREE.Mesh(new THREE.SphereGeometry(.159, 24, 18, 0, Math.PI * 2, 0, 2.35), hijabMat);
+    wrap.scale.set(.96, 1.09, 1.04); wrap.position.set(0, .012, .016); headGroup.add(wrap);
+    const frontFold = new THREE.Mesh(new THREE.TorusGeometry(.125, .022, 8, 20), hijabMat);
+    frontFold.position.set(0, .015, -.042); frontFold.rotation.x = .15; headGroup.add(frontFold);
+    const drape = new THREE.Mesh(new THREE.CylinderGeometry(.115, .178, .24, 18), hijabMat);
+    drape.scale.set(.95, 1, .88); drape.position.set(0, -.12, .018); headGroup.add(drape);
+  } else if (isFemale) {
+    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(.155, 24, 16, 0, Math.PI * 2, 0, 1.75), hairMat);
+    hairTop.scale.set(.95, 1.09, 1.04); hairTop.position.set(0, .018, .015); headGroup.add(hairTop);
+    const fringe = new THREE.Mesh(new THREE.SphereGeometry(.11, 14, 10), hairMat);
+    fringe.scale.set(1.18, .42, .56); fringe.position.set(0, .105, -.058); headGroup.add(fringe);
+    const backLocks = new THREE.Mesh(new THREE.CylinderGeometry(.125, .148, .26, 16), hairMat);
+    backLocks.scale.set(.94, 1, .68); backLocks.position.set(0, -.09, .072); headGroup.add(backLocks);
+  } else {
+    const hairCrown = new THREE.Mesh(new THREE.SphereGeometry(.153, 22, 16, 0, Math.PI * 2, 0, 1.35), hairMat);
+    hairCrown.scale.set(.94, 1.08, 1.03); hairCrown.position.set(0, .024, .012); headGroup.add(hairCrown);
+    const hairFront = new THREE.Mesh(new THREE.BoxGeometry(.18, .042, .085), hairMat);
+    hairFront.position.set(0, .112, -.068); hairFront.rotation.x = -.18; headGroup.add(hairFront);
+    const hairBack = new THREE.Mesh(new THREE.CylinderGeometry(.138, .122, .115, 16), hairMat);
+    hairBack.scale.set(.91, 1, .74); hairBack.position.set(0, -.01, .048); headGroup.add(hairBack);
+    [-1, 1].forEach(s => {
+      const sideBurn = new THREE.Mesh(new THREE.BoxGeometry(.024, .075, .046), hairMat);
+      sideBurn.position.set(s * .124, .022, -.026); headGroup.add(sideBurn);
+    });
+    if (hasBeard) {
+      const beardJaw = new THREE.Mesh(new THREE.CylinderGeometry(.104, .074, .086, 16), hairMat);
+      beardJaw.scale.set(.96, 1, .94); beardJaw.position.set(0, -.092, -.020); headGroup.add(beardJaw);
+      const stache = new THREE.Mesh(new THREE.BoxGeometry(.058, .013, .016), hairMat);
+      stache.position.set(0, -.052, -.133); headGroup.add(stache);
+    }
+  }
+
+  g.userData = { legL, legR, kneeL, kneeR, armL, armR, elbowL, elbowR, torsoGrp, headGroup };
   return g;
 }
 
-/* ---------- واجهة المحل والمدخل ---------- */
-const GOLD = M(0xd4a62a, { metalness: .9, roughness: .25 }), FACE = M(0x14110e, { roughness: .4, metalness: .2 });
-[[18.8, .2], [17.6, .4], [16.4, .6]].forEach(a => box(15, a[1], 1.3, M(0xcfc6b4, { roughness: .3 }), 0, a[1] / 2 - .05, a[0]));
+/* ---------- واجهة المحل ومدخل الزجاج الأوتوماتيكي ---------- */
+const GOLD = M(0xd6a73a, { metalness: .88, roughness: .22, envMapIntensity: 1.4 });
+const FACE = M(0x1b1e26, { roughness: .38, metalness: .28 });
+const STONE_STEP = M(0xc8c2b6, { roughness: .42, metalness: .04 });
+[[18.8, .2], [17.6, .4], [16.4, .6]].forEach(a => box(15, a[1], 1.3, STONE_STEP, 0, a[1] / 2 - .05, a[0]));
 box(11.5, 8.2, .8, FACE, -9.25, 4.1, 14); box(11.5, 8.2, .8, FACE, 9.25, 4.1, 14); box(8, 3.2, .8, FACE, 0, 6.6, 14);
-[-4.2, 4.2].forEach(x => { const c = new THREE.Mesh(new THREE.CylinderGeometry(.55, .65, 8, 24), GOLD); c.position.set(x, 4, 15); sc.add(c); box(1.5, .35, 1.5, GOLD, x, 8.1, 15); box(1.5, .35, 1.5, GOLD, x, .17, 15) });
-sign(CONFIG.STORE_NAME, 13, 2.8, "#14110e", CONFIG.ACCENT_COLOR, 0, 6.9, 13.55);
-sign("عروض الأسبوع — خصم حتى 50%", 7, 2.6, CONFIG.PRIMARY_COLOR, "#fff", -9.5, 4.2, 13.55);
-sign("توصيل سريع لباب البيت", 7, 2.6, CONFIG.ACCENT_COLOR, "#14110e", 9.5, 4.2, 13.55);
-const GL = new THREE.MeshPhysicalMaterial({ color: 0xbfe3ff, transparent: true, opacity: .26, roughness: .05, metalness: .1 });
-const dL = box(2, 5, .1, GL, -1, 2.5, 14), dR = box(2, 5, .1, GL, 1, 2.5, 14);
+[-4.2, 4.2].forEach(x => {
+  const c = new THREE.Mesh(new THREE.CylinderGeometry(.55, .65, 8, 24), GOLD);
+  c.position.set(x, 4, 15); sc.add(c);
+  box(1.5, .35, 1.5, GOLD, x, 8.1, 15); box(1.5, .35, 1.5, GOLD, x, .17, 15);
+});
+// لافتات الواجهة الأمامية (تظهر بوضوح من الداخل والخارج بلا تداخل)
+sign(CONFIG.STORE_NAME, 12.6, 2.5, "#14161c", CONFIG.ACCENT_COLOR, 0, 6.85, 13.52, Math.PI, "تجربة تسوق متكاملة", sc, false);
+sign(CONFIG.STORE_NAME, 12.6, 2.5, "#14161c", CONFIG.ACCENT_COLOR, 0, 6.85, 14.48, 0, "عيش التجربة", sc, false);
+sign("عروض الأسبوع — خصم حتى 50%", 6.6, 2.3, CONFIG.PRIMARY_COLOR, "#fff", -9.5, 4.2, 13.52, Math.PI, "", sc, false);
+sign("توصيل سريع لباب البيت", 6.6, 2.3, CONFIG.ACCENT_COLOR, "#14110e", 9.5, 4.2, 13.52, Math.PI, "", sc, false);
 
-const greeters = [];
-[-3.2, 3.2].forEach((x, i) => {
-  const gp = createRealisticPerson(0xb00020, i === 0, i === 1);
+// أبواب زجاجية منزلقة بإطار ألومنيوم ومستشعر حركة علوي ودواسة استقبال
+const GL = new THREE.MeshPhysicalMaterial({ color: 0xcbe8ff, transparent: true, opacity: .28, roughness: .06, metalness: .1, clearcoat: .9, envMapIntensity: 1.4 });
+const ALU_M = M(0xadb5c2, { metalness: .86, roughness: .22, envMapIntensity: 1.4 });
+function makeSlidingDoor(x0) {
+  const grp = new THREE.Group(); grp.position.set(x0, 2.5, 14); sc.add(grp);
+  box(2, 5, .06, GL, 0, 0, 0, grp);
+  box(2.04, .08, .09, ALU_M, 0, 2.46, 0, grp);
+  box(2.04, .16, .09, ALU_M, 0, -2.42, 0, grp);
+  [-.98, .98].forEach(dx => box(.06, 5, .09, ALU_M, dx, 0, 0, grp));
+  box(1.92, .05, .07, M(0xc8102e, { roughness: .35 }), 0, -.35, 0, grp);
+  return grp;
+}
+const dL = makeSlidingDoor(-1), dR = makeSlidingDoor(1);
+box(4.6, .22, .35, M(0x16181f, { roughness: .35, metalness: .5 }), 0, 5.1, 14);
+box(.42, .08, .12, M(0x0c0d10), 0, 5.1, 13.8);
+box(4.4, .02, 2.2, M(0x262930, { roughness: .92 }), 0, .01, 13.1); // سجادة مدخل داكنة مانعة للانزلاق
+
+const greeters = [], staffNpc = [];
+[-3.1, 3.1].forEach((x, i) => {
+  const gp = createRealisticPerson(0xb00020, i === 0, i === 1, { apron: true, apronColor: 0x151820, longSleeve: true, seed: 21 + i });
   gp.position.set(x, 0, 12.2);
   gp.rotation.y = Math.PI + (i ? -.35 : .35);
   sc.add(gp);
   greeters.push(gp);
 });
 
-/* ---------- الكاشير وعربيات التسوق (مقبض أحمر مدمج بالمشهد) ---------- */
-const CHR = M(0xffffff, { metalness: 1, roughness: .1, envMapIntensity: 1.5 });
-const RED = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.5, .12, .1) });
-const LED = new THREE.MeshBasicMaterial({ color: new THREE.Color(3.2, 3.1, 2.9) });
-const POST = tx(256, 160, (c, W, H) => { const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0fb5e8"); g.addColorStop(1, "#0a5d8c"); c.fillStyle = "#04202e"; c.fillRect(0, 0, W, H); c.fillStyle = g; c.fillRect(8, 8, W - 16, H - 16); c.fillStyle = "#fff"; c.textBaseline = "middle"; c.font = "bold 30px Cairo,Tahoma"; c.fillText("جاهز للدفع", W / 2, 42); c.font = "bold 44px Cairo,Tahoma"; c.fillText("0.00 ج.م", W / 2, 95); c.fillStyle = "#7dffb0"; c.fillRect(30, 128, W - 60, 10) });
-const BELT = tx(64, 128, (c, W, H) => { c.fillStyle = "#1b1b1d"; c.fillRect(0, 0, W, H); c.fillStyle = "#34343a"; for (let i = 0; i < 8; i++) c.fillRect(0, i * 16, W, 5) }); BELT.wrapS = BELT.wrapT = THREE.RepeatWrapping; BELT.repeat.set(1, 6);
+/* ---------- الكاشير وبار القهوة والاستقبال وعربيات التسوق ---------- */
+const CHR = M(0xe6ebf2, { metalness: .94, roughness: .14, envMapIntensity: 1.6 });
+const RED = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, .14, .12) });
+const LED = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.9, 2.88, 2.8) });
+const POST = tx(256, 160, (c, W, H) => {
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0ea5e9"); g.addColorStop(1, "#064e78");
+  c.fillStyle = "#081726"; c.fillRect(0, 0, W, H);
+  c.fillStyle = g; c.fillRect(8, 8, W - 16, H - 16);
+  c.fillStyle = "#fff"; c.textBaseline = "middle"; c.font = "bold 26px Cairo,Tahoma"; c.fillText("جاهز للدفع • ESD POS", W / 2, 38);
+  c.font = "bold 44px Cairo,Tahoma"; c.fillText("0.00 ج.م", W / 2, 92);
+  c.fillStyle = "#6ee7b7"; c.fillRect(28, 128, W - 56, 10);
+});
+const BELT = tx(128, 256, (c, W, H) => {
+  c.fillStyle = "#191b20"; c.fillRect(0, 0, W, H);
+  c.fillStyle = "#2b2f38";
+  for (let i = 0; i < 12; i++) c.fillRect(0, i * 21, W, 6);
+  c.fillStyle = "#c8102e"; c.fillRect(4, 0, 4, H); c.fillRect(W - 8, 0, 4, H);
+});
+BELT.wrapS = BELT.wrapT = THREE.RepeatWrapping; BELT.repeat.set(1, 5);
 
 function cashier(z, n) {
-  const g = new THREE.Group(); g.position.set(9, 0, z); sc.add(g); const blk = M(0x111114, { roughness: .25, metalness: .5 }), dk = M(0x1a1a1c, { roughness: .3 }), gr = new THREE.MeshBasicMaterial({ color: 0x66ff99 });
-  box(1.3, 1.05, 4, blk, 0, .52, 0, g); box(1.42, .06, 4.1, M(0x1e1f24, { roughness: .1, metalness: .6 }), 0, 1.08, 0, g); box(1.36, .04, 4.04, CHR, 0, 1.03, 0, g); box(1.36, .05, 4.04, RED, 0, .1, 0, g); box(.03, .5, 3.8, RED, -.66, .6, 0, g);
-  const bt = new THREE.Mesh(new THREE.PlaneGeometry(.7, 2), new THREE.MeshStandardMaterial({ map: BELT, roughness: .6 })); bt.rotation.x = -Math.PI / 2; bt.position.set(-.25, 1.12, .9); g.add(bt);
-  box(.04, .07, 2.1, CHR, -.62, 1.15, .9, g); box(.04, .07, 2.1, CHR, .12, 1.15, .9, g);
-  for (let i = 0; i < 4; i++) box(.25, .3, .2, M(new THREE.Color().setHSL(i * .23, .7, .5)), -.25 + (i % 2 - .5) * .2, 1.3, .2 + i * .45, g);
-  box(.55, .1, .42, dk, .4, 1.16, -1.2, g); box(.08, .3, .08, CHR, .4, 1.35, -1.2, g); box(.04, .38, .58, dk, .4, 1.62, -1.2, g);
-  [-1, 1].forEach(q => { const m = new THREE.Mesh(new THREE.PlaneGeometry(.52, .33), new THREE.MeshBasicMaterial({ map: POST })); m.position.set(.4 + q * .03, 1.62, -1.2); m.rotation.y = q * Math.PI / 2; g.add(m) });
-  box(.2, .08, .14, dk, -.35, 1.15, -.7, g); box(.12, .01, .07, gr, -.35, 1.2, -.7, g); box(.4, .02, .25, dk, -.25, 1.12, -.1, g); box(.36, .012, .02, new THREE.MeshBasicMaterial({ color: 0xff2020 }), -.25, 1.13, -.1, g);
-  const cp = createRealisticPerson(0xc8102e, n === 1, n === 2);
-  cp.position.set(1.45, 0, -.9); cp.rotation.y = Math.PI / 2; g.add(cp);
-  const cs = [0xe53935, 0xfdd835, 0x43a047, 0x8e24aa, 0x6d4c41, 0x1e88e5, 0xff8f00];
-  [-1.6, 1.7].forEach(z0 => {
-    box(.6, 1.9, .06, M(0x2a0a10), -1.15, .95, z0 - .28, g); box(.62, .06, .5, dk, -1.15, .08, z0, g);
-    for (let r = 0; r < 5; r++) { const sh = box(.6, .03, .5, CHR, -1.15, .3 + r * .36, z0, g); sh.rotation.x = -.18; for (let k = 0; k < 6; k++) { const it = box(.08, .13, .17, M(cs[(r * 2 + k) % 7], { roughness: .3 }), -1.38 + k * .09, .4 + r * .36, z0 - .02, g); it.rotation.x = -.18 } }
-    sign("حلويات وشوكولاتة", .8, .26, "#c8102e", "#fff", 9 - 1.15, 2.05, z + z0, -Math.PI / 2);
+  const g = new THREE.Group(); g.position.set(9, 0, z); sc.add(g);
+  const bodyM = M(0x1d212a, { roughness: .42, metalness: .28 });
+  const topM = M(0x2a2e38, { roughness: .22, metalness: .35, envMapIntensity: 1.1 });
+  const dk = M(0x14161c, { roughness: .35, metalness: .4 });
+  const gr = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
+  // هيكل كاونتر الكاشير + حافة ستانلس + شريط إضاءة سفلي أنيق
+  box(1.36, 1.02, 4.1, bodyM, 0, .51, 0, g);
+  box(1.46, .06, 4.2, topM, 0, 1.05, 0, g);
+  box(1.40, .035, 4.14, CHR, 0, 1.01, 0, g);
+  box(1.38, .08, 4.12, M(0x0f1116, { roughness: .5 }), 0, .04, 0, g);
+  box(.03, .05, 3.9, RED, -.69, .96, 0, g);
+  // السير المتحرك + حواجز ستانلس + فاصل العملاء
+  const bt = new THREE.Mesh(new THREE.PlaneGeometry(.72, 2.05), new THREE.MeshStandardMaterial({ map: BELT, roughness: .55, metalness: .08 }));
+  bt.rotation.x = -Math.PI / 2; bt.position.set(-.25, 1.085, .88); g.add(bt);
+  box(.035, .07, 2.15, CHR, -.63, 1.11, .88, g); box(.035, .07, 2.15, CHR, .13, 1.11, .88, g);
+  box(.58, .05, .06, M(0xc8102e, { roughness: .35 }), -.25, 1.11, .15, g); // حاجز العميل التالي
+  // ماسح باركود مدمج + جهاز دفع بالبطاقة (EMV) + شاشة لمس مزدوجة
+  box(.42, .025, .28, dk, -.25, 1.09, -.22, g);
+  box(.36, .012, .025, new THREE.MeshBasicMaterial({ color: 0xff2b2b }), -.25, 1.105, -.22, g);
+  box(.14, .06, .18, dk, -.52, 1.11, -.68, g); // ماكينة فيزا
+  box(.10, .015, .09, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }), -.52, 1.145, -.66, g);
+  box(.52, .09, .42, dk, .38, 1.12, -1.18, g);
+  box(.07, .34, .07, CHR, .38, 1.33, -1.18, g);
+  box(.05, .36, .58, dk, .38, 1.62, -1.18, g);
+  [-1, 1].forEach(q => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(.52, .32), new THREE.MeshBasicMaterial({ map: POST }));
+    m.position.set(.38 + q * .032, 1.62, -1.18); m.rotation.y = q * Math.PI / 2; g.add(m);
   });
-  sign("كاشير " + n, 2, .55, "#c8102e", "#fff", 9, 3.5, z, -Math.PI / 2); box(.05, .05, 2, LED, 8.4, 5.2, z);
+  // حامل أكياس التسوق في نهاية السير
+  box(.04, .65, .04, CHR, -.22, 1.38, -1.78, g);
+  box(.42, .03, .04, CHR, -.22, 1.68, -1.78, g);
+  box(.36, .34, .08, M(0xf8fafc, { roughness: .75 }), -.22, 1.48, -1.78, g);
+
+  const cp = createRealisticPerson(0xc8102e, n === 1, n === 2, { apron: true, apronColor: 0x161820, longSleeve: true, seed: 10 + n });
+  cp.position.set(1.42, 0, -.9); cp.rotation.y = Math.PI / 2;
+  cp.userData.armL.rotation.x = .34; cp.userData.elbowL.rotation.x = .72;
+  cp.userData.armR.rotation.x = .28; cp.userData.elbowR.rotation.x = .65;
+  g.add(cp);
+  staffNpc.push({ p: cp, phase: n * 1.7, baseYaw: Math.PI / 2 });
+
+  // أرفف حلويات وشوكولاتة وعلكة أمام الكاشير بتفاصيل 3D ملونة
+  const cs = [0xdc2626, 0xfacc15, 0x16a34a, 0x7c3aed, 0x6d4c41, 0x0284c7, 0xea580c];
+  [-1.6, 1.7].forEach(z0 => {
+    box(.62, 1.88, .05, M(0x1f242d, { roughness: .4 }), -1.15, .94, z0 - .28, g);
+    box(.64, .06, .52, dk, -1.15, .06, z0, g);
+    for (let r = 0; r < 5; r++) {
+      const sh = box(.6, .028, .48, CHR, -1.15, .28 + r * .35, z0, g); sh.rotation.x = -.18;
+      for (let k = 0; k < 6; k++) {
+        const it = box(.075, .13, .16, M(cs[(r * 2 + k) % 7], { roughness: .28, metalness: .08 }), -1.38 + k * .09, .38 + r * .35, z0 - .02, g);
+        it.rotation.x = -.18;
+      }
+    }
+    sign("شوكولاتة وحلويات", .84, .25, "#c8102e", "#fff", 9 - 1.15, 2.02, z + z0, -Math.PI / 2);
+  });
+  // فانوس رقم الكاشير المضاء مزدوج الوجه
+  const beacon = hang("كاشير " + n, "متاح الآن", 2.1, .62, "#c8102e", "#fff", 9, 3.55, z, sc, .75);
+  beacon.rotation.y = -Math.PI / 2;
+  const openLed = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .14, 14), gr);
+  openLed.position.set(9, 4.02, z); sc.add(openLed);
 }
 cashier(7, 1); cashier(1, 2);
 
-/* ---------- عربة تسوق معدنية واقعية: شبكة أسلاك + إطار كروم + عجلات دوّارة + مقبض أحمر ---------- */
+/* ---------- ركن الكافيه وبار المشروبات (الجهة اليسرى فور دخول المتجر بعد عربات التسوق) ---------- */
+const cafeAnimated = [];
+(function createServiceBar() {
+  const cafeRoot = new THREE.Group();
+  sc.add(cafeRoot);
+
+  const woodM = M(0x4e301d, { roughness: .56, metalness: .05 });
+  const floorDeckM = M(0x2d241e, { roughness: .62, metalness: .06 });
+  const brassM = M(0xc89d42, { roughness: .26, metalness: .82, envMapIntensity: 1.3 });
+  const marbleM = M(0xedeae2, { roughness: .16, metalness: .06, envMapIntensity: 1.25 });
+  const darkM = M(0x181a20, { roughness: .35, metalness: .45 });
+  const cupMat = M(0xf8fafc, { roughness: .22, metalness: .05 });
+  const coffeeMat = M(0x2f180b, { roughness: .15, metalness: .05 });
+  const chairMat = M(0x6e202c, { roughness: .55, metalness: .06 });
+  const glassM = new THREE.MeshPhysicalMaterial({ color: 0xdff4ff, transparent: true, opacity: .24, roughness: .05, clearcoat: .9 });
+
+  // أرضية خشبية دافئة محددة لركن الكافيه بإطار ذهبي أنيق
+  box(5.4, .016, 10.2, floorDeckM, -12.15, .008, 6.5, cafeRoot);
+  box(.06, .022, 10.2, brassM, -9.45, .011, 6.5, cafeRoot);
+  box(5.4, .022, .06, brassM, -12.15, .011, 1.4, cafeRoot);
+
+  // بار القهوة (Coffee Bar) على اليسار بمواجهة الصالة
+  const bx = -13.85, bz = 9.0;
+  const g = new THREE.Group(); g.position.set(bx, 0, bz); cafeRoot.add(g);
+  box(1.55, 1.02, 4.6, darkM, 0, .51, 0, g);
+  for (let s = -2.15; s <= 2.15; s += .18) box(.04, .92, .08, woodM, .78, .50, s, g);
+  box(1.75, .07, 4.76, marbleM, .08, 1.055, 0, g);
+  box(.04, .06, 4.65, RED, .88, .10, 0, g);
+
+  // ماكينة إسبريسو احترافية + أكواب + فاترينة زجاجية للكرواسون والحلويات
+  box(.55, .48, .72, CHR, -.22, 1.33, -.95, g);
+  box(.58, .08, .74, darkM, -.22, 1.59, -.95, g);
+  [-1, 1].forEach(d => box(.06, .15, .06, CHR, .08, 1.23, -.95 + d * .18, g));
+  for (let ci = 0; ci < 3; ci++) {
+    const scup = new THREE.Mesh(new THREE.CylinderGeometry(.042, .034, .08, 12), cupMat);
+    scup.position.set(.18, 1.13, -1.15 + ci * .20); g.add(scup);
+  }
+  box(.68, .52, 1.25, glassM, .24, 1.35, .65, g);
+  box(.68, .04, 1.25, CHR, .24, 1.11, .65, g);
+  box(.66, .03, 1.22, CHR, .24, 1.36, .65, g);
+  for (let k = 0; k < 5; k++) {
+    const pastry = new THREE.Mesh(new THREE.SphereGeometry(.092, 12, 10), M(k % 2 ? 0xc97b32 : 0x7b3f1d, { roughness: .48 }));
+    pastry.scale.set(1.2, .62, .9); pastry.position.set(.24, 1.17 + (k % 2) * .25, .18 + k * .23); g.add(pastry);
+  }
+
+  // 3 لمبات/إضاءات معلقة مميزة فوق البาร์
+  [-1.45, 0, 1.45].forEach((lz, li) => {
+    const cord = new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, 2.2, 8), darkM);
+    cord.position.set(.72, 3.68, lz); g.add(cord);
+    const shade = new THREE.Mesh(new THREE.ConeGeometry(.25, .24, 18), M(0x1f2229, { metalness: .65, roughness: .28 }));
+    shade.position.set(.72, 2.52, lz); g.add(shade);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(.245, .015, 8, 20), brassM);
+    ring.rotation.x = Math.PI / 2; ring.position.set(.72, 2.40, lz); g.add(ring);
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(.075, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffd79b }));
+    bulb.position.set(.72, 2.43, lz); g.add(bulb);
+    if (li !== 1) {
+      const barLight = new THREE.PointLight(0xffcf94, .65, 11, 2);
+      barLight.position.set(bx + .82, 2.38, bz + lz); sc.add(barLight);
+    }
+  });
+
+  // عامل يحضر القهوة خلف البار
+  const barista = createRealisticPerson(0x1f242d, true, false, { apron: true, apronColor: 0x5a3822, longSleeve: true, seed: 44 });
+  barista.position.set(-.45, 0, -.35); barista.rotation.y = -Math.PI / 2;
+  barista.userData.armL.rotation.x = .42; barista.userData.elbowL.rotation.x = .82;
+  barista.userData.armR.rotation.x = .36; barista.userData.elbowR.rotation.x = .74;
+  g.add(barista);
+  staffNpc.push({ p: barista, phase: 3.1, baseYaw: -Math.PI / 2, isBarista: true });
+
+  // دالة مساعدة لإنشاء كوب قهوة + صحن صغير
+  function makeCoffeeCup(parent, x, y, z) {
+    const cg = new THREE.Group(); cg.position.set(x, y, z);
+    const saucer = new THREE.Mesh(new THREE.CylinderGeometry(.078, .058, .016, 14), cupMat);
+    cg.add(saucer);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(.048, .036, .085, 14), cupMat);
+    body.position.y = .048; cg.add(body);
+    const liquid = new THREE.Mesh(new THREE.CylinderGeometry(.043, .043, .008, 12), coffeeMat);
+    liquid.position.y = .088; cg.add(liquid);
+    parent.add(cg);
+    return cg;
+  }
+
+  // كراسي بار طويلة (3 كراسي) مع جلوس بعض الأشخاص عليها
+  const stoolPeople = [
+    { lz: -1.45, shirt: 0x1d4ed8, beard: true, female: false, seed: 61 },
+    { lz: 0, empty: true },
+    { lz: 1.45, shirt: 0x9f1239, beard: false, female: true, hijab: true, seed: 62 }
+  ];
+  stoolPeople.forEach((sp, si) => {
+    const sx = 1.24, sz = sp.lz;
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(.034, .034, .72, 12), CHR);
+    leg.position.set(sx, .36, sz); g.add(leg);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.22, .24, .03, 16), CHR);
+    base.position.set(sx, .015, sz); g.add(base);
+    const footRing = new THREE.Mesh(new THREE.TorusGeometry(.16, .014, 8, 18), CHR);
+    footRing.rotation.x = Math.PI / 2; footRing.position.set(sx, .24, sz); g.add(footRing);
+    const seat = new THREE.Mesh(new THREE.CylinderGeometry(.20, .18, .07, 16), chairMat);
+    seat.position.set(sx, .74, sz); g.add(seat);
+    makeCoffeeCup(g, .62, 1.095, sz);
+    if (!sp.empty) {
+      const guest = createRealisticPerson(sp.shirt, sp.beard, sp.female, { hijab: !!sp.hijab, seed: sp.seed });
+      guest.position.set(sx + .04, -.10, sz);
+      guest.rotation.y = Math.PI / 2; // يواجه البار (-X)
+      const ud = guest.userData;
+      ud.legL.rotation.x = 1.24; ud.legR.rotation.x = 1.24;
+      ud.kneeL.rotation.x = -1.36; ud.kneeR.rotation.x = -1.36;
+      ud.armL.rotation.x = .46; ud.elbowL.rotation.x = .82;
+      ud.armR.rotation.x = .52; ud.elbowR.rotation.x = .88;
+      g.add(guest);
+      cafeAnimated.push({ p: guest, phase: si * 1.9 + .5, baseYaw: Math.PI / 2 });
+    }
+  });
+
+  // دالة إنشاء ترابيزة دائرية مع كراسي وأفراد جالسين يشربون القهوة
+  function createCafeTable(tx, tz, radius, seats) {
+    const tg = new THREE.Group(); tg.position.set(tx, 0, tz); cafeRoot.add(tg);
+    const ped = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .72, 14), darkM);
+    ped.position.y = .36; tg.add(ped);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.28, .31, .035, 20), darkM);
+    base.position.y = .018; tg.add(base);
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, .045, 28), marbleM);
+    top.position.y = .74; tg.add(top);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, .015, 8, 28), brassM);
+    rim.rotation.x = Math.PI / 2; rim.position.y = .74; tg.add(rim);
+
+    seats.forEach((st, idx) => {
+      const ang = st.ang, cd = radius + .26;
+      const cg = new THREE.Group();
+      cg.position.set(Math.sin(ang) * cd, 0, Math.cos(ang) * cd);
+      cg.rotation.y = ang; // محلياً -Z يتجه إلى مركز الترابيزة
+      tg.add(cg);
+
+      // كرسي كافيه عصري
+      box(.38, .055, .38, chairMat, 0, .44, 0, cg);
+      box(.38, .36, .045, chairMat, 0, .63, .17, cg);
+      [[-.16, -.16], [.16, -.16], [-.16, .16], [.16, .16]].forEach(l => {
+        const cl = new THREE.Mesh(new THREE.CylinderGeometry(.018, .016, .43, 8), darkM);
+        cl.position.set(l[0], .215, l[1]); cg.add(cl);
+      });
+
+      // كوب قهوة أمام الجالس على الترابيزة
+      const cupD = radius * .58;
+      makeCoffeeCup(tg, Math.sin(ang) * cupD, .77, Math.cos(ang) * cupD);
+
+      // الشخص الجالس على الكرسي
+      const scF = st.scale || 1;
+      const p = createRealisticPerson(st.shirt, !!st.beard, !!st.female, { hijab: !!st.hijab, seed: st.seed, isChild: scF < .8 });
+      p.scale.setScalar(scF);
+      p.position.set(0, scF < .8 ? -.06 : -.38, .02);
+      const ud = p.userData;
+      ud.legL.rotation.x = 1.46; ud.legR.rotation.x = 1.46;
+      ud.kneeL.rotation.x = -1.46; ud.kneeR.rotation.x = -1.46;
+      ud.armL.rotation.x = .48; ud.elbowL.rotation.x = .92;
+      ud.armR.rotation.x = .54; ud.elbowR.rotation.x = .98;
+      const handCup = new THREE.Mesh(new THREE.CylinderGeometry(.042, .032, .078, 12), cupMat);
+      handCup.position.set(0, -.30, -.04);
+      ud.elbowR.add(handCup);
+      cg.add(p);
+      cafeAnimated.push({ p, phase: idx * 1.4 + tx * .3 + tz * .2, baseYaw: 0 });
+    });
+  }
+
+  // 3 ترابيزات دائرية بجوار البار بألوان واضحة أنيقة:
+  // 1) ترابيزة (أب + أم + طفل = 3 أفراد)
+  createCafeTable(-10.55, 8.2, .52, [
+    { ang: 0.4, shirt: 0x1e3a8a, beard: true, female: false, seed: 71 },
+    { ang: 2.5, shirt: 0xb91c1c, beard: false, female: true, hijab: true, seed: 72 },
+    { ang: 4.6, shirt: 0x15803d, beard: false, female: false, scale: .68, seed: 73 }
+  ]);
+  // 2) ترابيزة (أب + أم + ولد + بنت = 4 أفراد)
+  createCafeTable(-10.45, 5.3, .56, [
+    { ang: 0.3, shirt: 0x0f766e, beard: true, female: false, seed: 74 },
+    { ang: 1.85, shirt: 0xf3f4f6, beard: false, female: true, hijab: true, seed: 75 },
+    { ang: 3.45, shirt: 0xb45309, beard: false, female: false, scale: .68, seed: 76 },
+    { ang: 5.05, shirt: 0x9f1239, beard: false, female: true, hijab: false, scale: .65, seed: 77 }
+  ]);
+  // 3) ترابيزة (فردين: رجل وامرأة)
+  createCafeTable(-10.55, 2.5, .48, [
+    { ang: 0.9, shirt: 0x18181b, beard: true, female: false, seed: 78 },
+    { ang: 4.05, shirt: 0x0369a1, beard: false, female: true, hijab: false, seed: 79 }
+  ]);
+
+  // لافتة البار والكافيه
+  sign("كافيه وبار ESD", 3.4, .68, "#3e2414", "#f2c94c", bx + .05, 3.05, bz, Math.PI / 2, "قهوة ومخبوزات طازجة", cafeRoot, false);
+  hang("ركن الكافيه والمشروبات", "استمتع بقهوتك الطازجة", 3.6, .85, "#2d1a0f", "#f2c94c", -11.4, 4.15, 6.2, cafeRoot, 1.5);
+})();
+
+/* ---------- عربة تسوق معدنية واقعية: شبكة أسلاك + إطار كروم + واقيات زوايا + عجلات دوّارة ---------- */
 function mergeGeos(list) {
   const parts = { position: [], normal: [], uv: [] };
   list.forEach(g => {
@@ -602,72 +1222,64 @@ function barGeo(a, b, r, seg) {
   g.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
   return g;
 }
-const CART_STEEL = M(0xd3dae3, { metalness: .82, roughness: .22, envMapIntensity: 1.5 });
-const CART_DARK = M(0x1a1c22, { metalness: .3, roughness: .55 });
-const CART_RED = M(0xff3b36, { metalness: .08, roughness: .3, emissive: 0x3a0404 });
-const CART_PLAS = M(0xaeb8c2, { metalness: .06, roughness: .42 });
+const CART_STEEL = M(0xdce2ea, { metalness: .90, roughness: .16, envMapIntensity: 1.8 });
+const CART_DARK = M(0x181a20, { metalness: .35, roughness: .52 });
+const CART_RED = M(0xd81b2a, { metalness: .08, roughness: .32, emissive: 0x240406 });
+const CART_PLAS = M(0x4b5563, { metalness: .10, roughness: .45 });
 let CG = null;
 function cartGeo() {
   if (CG) return CG;
-  const sr = (t, p) => Math.sign(t) * Math.pow(Math.abs(t), 2 / (p || 4)); // زوايا مستديرة كعربة حقيقية
+  const sr = (t, p) => Math.sign(t) * Math.pow(Math.abs(t), 2 / (p || 4));
   const B = { w: .335, z0: -.575, z1: .525, y: .62 }, T = { w: .42, z0: -.71, z1: .62, y: 1.20 };
   const czB = (B.z0 + B.z1) / 2, czT = (T.z0 + T.z1) / 2, bz = (B.z1 - B.z0) / 2, tz = (T.z1 - T.z0) / 2;
   const at = h => { const t = (h - B.y) / (T.y - B.y); return { w: B.w + (T.w - B.w) * t, z: bz + (tz - bz) * t, c: czB + (czT - czB) * t } };
   const P = (t, k) => { const a = t * Math.PI * 2; return { x: sr(Math.cos(a), 4) * k.w, z: k.c + sr(Math.sin(a), 4) * k.z } };
   const steel = [], dark = [], red = [], plas = [];
-  // أسلاك السلة الرأسية (تتسع للأعلى مثل العربة الحقيقية)
   const NW = 66;
   for (let i = 0; i < NW; i++) {
     const t = (i + .5) / NW;
     const a = P(t, at(B.y + .01)), b = P(t, at(T.y - .012));
     steel.push(barGeo(new THREE.Vector3(a.x, B.y + .01, a.z), new THREE.Vector3(b.x, T.y - .012, b.z), .0052));
   }
-  // حلقات أفقية + إطار الفتحة العلوي
   const ring = (h, r, rad) => { const k = at(h), pts = []; for (let i = 0; i < 40; i++) { const p = P(i / 40, k); pts.push(new THREE.Vector3(p.x, h, p.z)) } return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 96, rad, 6, true) };
   for (let k = 0; k <= 7; k++) steel.push(ring(B.y + (T.y - B.y) * k / 8, 0, .0051));
-  steel.push(ring(T.y - .045, 0, .0085));   // إطار علوي مسنود
-  steel.push(ring(T.y, 0, .0125));          // حافة السلة
-  // الهيكل السفلي (كروم)
+  steel.push(ring(T.y - .045, 0, .0088));
+  steel.push(ring(T.y, 0, .013));
   [-1, 1].forEach(s => {
-    steel.push(barGeo(new THREE.Vector3(s * .285, .33, -.50), new THREE.Vector3(s * .285, .33, .58), .014));
-    // قوائم قصيرة ترفع قاع السلة فوق الهيكل
-    steel.push(barGeo(new THREE.Vector3(s * .285, .33, -.47), new THREE.Vector3(s * .34, B.y - .015, -.555), .012));
-    steel.push(barGeo(new THREE.Vector3(s * .285, .33, .55), new THREE.Vector3(s * .34, B.y - .015, .515), .012));
-    // جانبا قاع السلة
-    steel.push(barGeo(new THREE.Vector3(s * .34, B.y - .015, -.555), new THREE.Vector3(s * .34, B.y - .015, .515), .011));
-    // دعامة المقبض من حافة السلة الخلفية
-    steel.push(barGeo(new THREE.Vector3(s * .40, T.y - .05, .60), new THREE.Vector3(s * .385, 1.35, .79), .014));
+    steel.push(barGeo(new THREE.Vector3(s * .285, .33, -.50), new THREE.Vector3(s * .285, .33, .58), .015));
+    steel.push(barGeo(new THREE.Vector3(s * .285, .33, -.47), new THREE.Vector3(s * .34, B.y - .015, -.555), .0125));
+    steel.push(barGeo(new THREE.Vector3(s * .285, .33, .55), new THREE.Vector3(s * .34, B.y - .015, .515), .0125));
+    steel.push(barGeo(new THREE.Vector3(s * .34, B.y - .015, -.555), new THREE.Vector3(s * .34, B.y - .015, .515), .0115));
+    steel.push(barGeo(new THREE.Vector3(s * .40, T.y - .05, .60), new THREE.Vector3(s * .385, 1.35, .79), .015));
     steel.push(barGeo(new THREE.Vector3(s * .385, 1.35, .79), new THREE.Vector3(s * .33, 1.35, .80), .016));
+    // واقيات زوايا أمامية مطاطية واقعية
+    const cg = new THREE.BoxGeometry(.05, .14, .06); cg.translate(s * .39, T.y - .07, T.z0 + .03); dark.push(cg);
+    const hg = new THREE.CylinderGeometry(.032, .032, .055, 12); hg.rotateZ(Math.PI / 2); hg.translate(s * .34, 1.355, .80); dark.push(hg);
   });
-  steel.push(barGeo(new THREE.Vector3(-.285, .33, -.50), new THREE.Vector3(.285, .33, -.50), .014));
-  steel.push(barGeo(new THREE.Vector3(-.285, .33, .58), new THREE.Vector3(.285, .33, .58), .014));
-
+  steel.push(barGeo(new THREE.Vector3(-.285, .33, -.50), new THREE.Vector3(.285, .33, -.50), .015));
+  steel.push(barGeo(new THREE.Vector3(-.285, .33, .58), new THREE.Vector3(.285, .33, .58), .015));
   steel.push(barGeo(new THREE.Vector3(0, .325, -.52), new THREE.Vector3(0, .325, .59), .012));
   steel.push(barGeo(new THREE.Vector3(-.285, .33, -.50), new THREE.Vector3(.285, .33, .58), .011));
   steel.push(barGeo(new THREE.Vector3(.285, .33, -.50), new THREE.Vector3(-.285, .33, .58), .011));
-  // شبكة سفلية لحمل المشتريات الثقيلة (مثل العربة الحقيقية)
-  for (let i = 0; i <= 6; i++) { const x = -.24 + i * .08; steel.push(barGeo(new THREE.Vector3(x, .245, -.45), new THREE.Vector3(x, .245, .52), .0038)) }
-  for (let i = 0; i <= 4; i++) { const z = -.43 + i * .235; steel.push(barGeo(new THREE.Vector3(-.25, .245, z), new THREE.Vector3(.25, .245, z), .0038)) }
+  for (let i = 0; i <= 6; i++) { const x = -.24 + i * .08; steel.push(barGeo(new THREE.Vector3(x, .245, -.45), new THREE.Vector3(x, .245, .52), .004)) }
+  for (let i = 0; i <= 4; i++) { const z = -.43 + i * .235; steel.push(barGeo(new THREE.Vector3(-.25, .245, z), new THREE.Vector3(.25, .245, z), .004)) }
   [-1, 1].forEach(s => steel.push(barGeo(new THREE.Vector3(s * .25, .245, -.45), new THREE.Vector3(s * .26, .33, -.50), .006)));
-  // عجلات دوّارة في الأركان الأربعة مع شوكة تثبيت حقيقية
   [[-.285, -.50], [.285, -.50], [-.285, .58], [.285, .58]].forEach(p => {
     const wx = p[0], wz = p[1], wy = .072;
-    const w = new THREE.CylinderGeometry(.066, .066, .046, 20); w.rotateZ(Math.PI / 2); w.translate(wx, wy, wz); dark.push(w);
-    const tread = new THREE.TorusGeometry(.054, .011, 8, 20); tread.rotateY(Math.PI / 2); tread.translate(wx, wy, wz); dark.push(tread);
-    const hub = new THREE.CylinderGeometry(.025, .025, .058, 14); hub.rotateZ(Math.PI / 2); hub.translate(wx, wy, wz); steel.push(hub);
-    [-1, 1].forEach(s => { const f = new THREE.BoxGeometry(.008, .092, .05); f.translate(wx + s * .031, wy + .046, wz); dark.push(f) });
-    steel.push(barGeo(new THREE.Vector3(wx, wy + .085, wz), new THREE.Vector3(wx, .34, wz), .012));
+    const w = new THREE.CylinderGeometry(.066, .066, .048, 20); w.rotateZ(Math.PI / 2); w.translate(wx, wy, wz); dark.push(w);
+    const tread = new THREE.TorusGeometry(.055, .012, 8, 20); tread.rotateY(Math.PI / 2); tread.translate(wx, wy, wz); dark.push(tread);
+    const hub = new THREE.CylinderGeometry(.027, .027, .06, 14); hub.rotateZ(Math.PI / 2); hub.translate(wx, wy, wz); steel.push(hub);
+    [-1, 1].forEach(s => { const f = new THREE.BoxGeometry(.009, .095, .054); f.translate(wx + s * .032, wy + .047, wz); dark.push(f) });
+    steel.push(barGeo(new THREE.Vector3(wx, wy + .085, wz), new THREE.Vector3(wx, .34, wz), .013));
   });
-  // مقبض أحمر بغطاءين
-  const grip = new THREE.CylinderGeometry(.029, .029, .62, 16); grip.rotateZ(Math.PI / 2); grip.translate(0, 1.355, .80); red.push(grip);
-  [-.31, .31].forEach(s => { const cap = new THREE.SphereGeometry(.032, 12, 10); cap.translate(s, 1.355, .80); red.push(cap) });
-  // مقعد الأطفال في الخلف (بلاستيك)
-  const seat = new THREE.BoxGeometry(.30, .016, .17); seat.rotateX(-.14); seat.translate(0, 1.045, .555); plas.push(seat);
-  const back = new THREE.BoxGeometry(.32, .17, .01); back.rotateX(-.14); back.translate(0, 1.105, .605); plas.push(back);
-  // غطاء مفصلي مائل في مؤخرة السلة (فتحة مقعد الطفل)
-  const flap = new THREE.BoxGeometry(.29, .01, .13); flap.rotateX(-.38); flap.translate(0, 1.15, .55); plas.push(flap);
-  // شريط بلاستيك واقٍ على حافة السلة الأمامية
-  const bump = new THREE.BoxGeometry(.30, .022, .03); bump.translate(0, T.y - .015, T.z0 + .02); plas.push(bump);
+  const grip = new THREE.CylinderGeometry(.030, .030, .62, 16); grip.rotateZ(Math.PI / 2); grip.translate(0, 1.355, .80); red.push(grip);
+  [-.31, .31].forEach(s => { const cap = new THREE.SphereGeometry(.033, 12, 10); cap.translate(s, 1.355, .80); red.push(cap) });
+  // لوحة شعار على المقبض + مقعد الطفل + واقي التصادم الأمامي
+  const badge = new THREE.BoxGeometry(.22, .055, .026); badge.translate(0, 1.355, .815); red.push(badge);
+  const seat = new THREE.BoxGeometry(.30, .018, .17); seat.rotateX(-.14); seat.translate(0, 1.045, .555); plas.push(seat);
+  const back = new THREE.BoxGeometry(.32, .17, .012); back.rotateX(-.14); back.translate(0, 1.105, .605); plas.push(back);
+  const flap = new THREE.BoxGeometry(.29, .012, .13); flap.rotateX(-.38); flap.translate(0, 1.15, .55); plas.push(flap);
+  const bump = new THREE.BoxGeometry(.34, .028, .036); bump.translate(0, T.y - .015, T.z0 + .018); red.push(bump);
   return CG = { steel: mergeGeos(steel), dark: mergeGeos(dark), red: mergeGeos(red), plas: mergeGeos(plas) };
 }
 function makeCart() {
@@ -679,27 +1291,24 @@ function makeCart() {
   return g;
 }
 const rowCarts = []; for (let i = 0; i < 8; i++) { const c = makeCart(); c.rotation.y = Math.PI / 2; c.position.set(-5.2 - i * .5, 0, 10.8); sc.add(c); rowCarts.push(c) }
-sign("خد عربية", 2, .6, "#14110e", CONFIG.ACCENT_COLOR, -6.5, 3, 12.5);
-/* عربة التسوق: مشهد HUD منفصل + كاميرا ثابتة — تُرسم كطبقة واجهة ثابتة فوق المشهد
-   ولا تتأثر أبداً بدوران كاميرا المشهد (Pitch / Look Up & Down): لا ترتفع للسقف ولا تغوص في الأرض */
+hang("خد عربية", "عربيات التسوق", 2.2, .65, "#16181f", CONFIG.ACCENT_COLOR, -6.5, 3.05, 11.2, sc, .85);
+/* عربة التسوق: مشهد HUD منفصل + كاميرا ثابتة — تُرسم كطبقة واجهة ثابتة فوق المشهد */
 sc.add(cam);
 const hudScene = new THREE.Scene();
 hudScene.environment = sc.environment;
-hudScene.add(new THREE.HemisphereLight(0xffffff, 0xbab4aa, .95));
-/* إضاءة تفاعلية ناعمة للعربة الثابتة */
-const hudKey = new THREE.DirectionalLight(0xfff1dc, 1.2);
+hudScene.add(new THREE.HemisphereLight(0xf6f8ff, 0x7c7468, .92));
+const hudKey = new THREE.DirectionalLight(0xfff4e4, 1.18);
 hudKey.position.set(2, 3, 3);
 hudScene.add(hudKey);
-const hudFill = new THREE.DirectionalLight(0xbfd4ff, .55);
+const hudFill = new THREE.DirectionalLight(0xc9ddff, .58);
 hudFill.position.set(-2, 1, 2);
 hudScene.add(hudFill);
 const hudCam = new THREE.PerspectiveCamera(FOV_LAND, 1, .1, 50);
 const myCart = makeCart(); myCart.visible = false; hudScene.add(myCart);
 function centerMyCart() {
-  const base = 1.2;               // أوسع وأعمق: تغطي مساحة مريحة من حواف الشاشة يميناً ويساراً
+  const base = 1.2;
   myCart.userData.baseScale = base;
   myCart.scale.setScalar(base);
-  // موضع ثابت في مشهد الـ HUD: أسفل مركز الشاشة مع انخفاض إضافي حتى تبقى العربة والأسهم في الأسفل رغم كبر الحجم
   myCart.position.set(0, -2.6, -2.85);
 }
 centerMyCart();
@@ -720,261 +1329,575 @@ function placeCartArrows() {
 }
 const cartItems = new THREE.Group(); myCart.add(cartItems);
 
-/* ---------- مجسمات المنتجات 3D ---------- */
+/* ---------- مجسمات المنتجات 3D الواقعية وتغليفها الاحترافي ---------- */
 const SH = [
-  [.34, .54, .28, 0], [.46, .24, .34, 2], [.44, .32, .36, 2], [.38, .56, .28, 2],
-  [.12, .68, .12, 1], [.14, .74, .14, 1], [.09, .44, .09, 3], [.32, .48, .16, 0],
-  [.76, .92, .58, 0], [.40, .38, .22, 2]
+  [.32, .50, .24, 0], [.44, .26, .34, 4], [.44, .28, .34, 4], [.36, .46, .26, 2],
+  [.11, .64, .11, 1], [.12, .68, .12, 1], [.09, .42, .09, 3], [.34, .48, .16, 0],
+  [.64, .76, .48, 0], [.26, .35, .13, 2]
 ];
 const getShape = ci => SH[ci % SH.length];
-const GEO = {};
+const GEO = {}, PROD_GEO = {};
+
+function mergeGeosGroups(groups) {
+  const parts = { position: [], normal: [], uv: [] };
+  const gInfo = [];
+  let vOff = 0;
+  groups.forEach(grp => {
+    const start = vOff;
+    grp.geos.forEach(g => {
+      const n = g.index ? g.toNonIndexed() : g;
+      parts.position.push(n.attributes.position.array);
+      parts.normal.push(n.attributes.normal.array);
+      parts.uv.push(n.attributes.uv ? n.attributes.uv.array : new Float32Array(n.attributes.position.count * 2));
+      vOff += n.attributes.position.count;
+    });
+    gInfo.push([start, vOff - start, grp.matIndex]);
+  });
+  const cat = k => { let len = 0; parts[k].forEach(a => len += a.length); const o = new Float32Array(len); let off = 0; parts[k].forEach(a => { o.set(a, off); off += a.length }); return o };
+  const out = new THREE.BufferGeometry();
+  out.setAttribute("position", new THREE.BufferAttribute(cat("position"), 3));
+  out.setAttribute("normal", new THREE.BufferAttribute(cat("normal"), 3));
+  out.setAttribute("uv", new THREE.BufferAttribute(cat("uv"), 2));
+  gInfo.forEach(gi => out.addGroup(gi[0], gi[1], gi[2]));
+  return out;
+}
+
+function fixLatheLinearUV(g, h) {
+  const pos = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setY(i, Math.max(0, Math.min(1, (pos.getY(i) + h / 2) / h)));
+  uv.needsUpdate = true;
+  return g;
+}
+
 function makeBottleGeo(r, h) {
   const pts = [
-    new THREE.Vector2(0, -h / 2), new THREE.Vector2(r, -h / 2), new THREE.Vector2(r * 1.03, -h * .15),
-    new THREE.Vector2(r * .98, h * .18), new THREE.Vector2(r * .42, h * .34), new THREE.Vector2(r * .42, h * .46),
-    new THREE.Vector2(r * .48, h * .46), new THREE.Vector2(r * .48, h * .5), new THREE.Vector2(0, h * .5)
+    new THREE.Vector2(0, -h / 2), new THREE.Vector2(r * .92, -h / 2), new THREE.Vector2(r, -h * .44),
+    new THREE.Vector2(r * 1.03, -h * .16), new THREE.Vector2(r * .92, 0), new THREE.Vector2(r * .99, h * .16),
+    new THREE.Vector2(r * .86, h * .24), new THREE.Vector2(r * .44, h * .34), new THREE.Vector2(r * .38, h * .40),
+    new THREE.Vector2(r * .45, h * .41), new THREE.Vector2(r * .45, h * .495), new THREE.Vector2(0, h * .5)
   ];
-  return new THREE.LatheGeometry(pts, 20);
+  return fixLatheLinearUV(new THREE.LatheGeometry(pts, 20, -Math.PI, Math.PI * 2), h);
 }
+
+function makeCanJarGeo(r, h) {
+  const pts = [
+    new THREE.Vector2(0, -h / 2), new THREE.Vector2(r * .90, -h / 2), new THREE.Vector2(r, -h * .44),
+    new THREE.Vector2(r, h * .38), new THREE.Vector2(r * .90, h * .43), new THREE.Vector2(r * .92, h * .46),
+    new THREE.Vector2(r * .92, h * .50), new THREE.Vector2(0, h * .50)
+  ];
+  return fixLatheLinearUV(new THREE.LatheGeometry(pts, 20, -Math.PI, Math.PI * 2), h);
+}
+
 function makePouchGeo(w, h, d) {
-  const g = new THREE.BoxGeometry(w, h, d, 4, 6, 3);
+  // كيس شيبسي منتفخ واقعي بحواف لحام علوية وسفلية مبططة
+  const g = new THREE.BoxGeometry(w, h, d, 6, 9, 4);
   const pos = g.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
     const ny = y / (h / 2), nx = x / (w / 2);
-    const bulge = Math.cos(ny * Math.PI * .46) * Math.cos(nx * Math.PI * .35);
-    pos.setZ(i, z * (0.35 + bulge * 1.15));
-    pos.setX(i, x * (1 - Math.abs(ny) * .06));
+    const bulge = Math.cos(ny * Math.PI * .46) * Math.cos(nx * Math.PI * .36);
+    const isSeal = Math.abs(ny) > .87;
+    pos.setZ(i, isSeal ? z * .12 : z * (.30 + bulge * 1.18));
+    pos.setX(i, x * (isSeal ? 1.02 : (1 - Math.abs(ny) * .04)));
   }
   g.computeVertexNormals();
   return g;
 }
+
+function makeCrateGeo(w, h, d) {
+  const trayH = h * .42, yBot = -h / 2;
+  const base = new THREE.BoxGeometry(w, .022, d); base.translate(0, yBot + .011, 0);
+  const fWall = new THREE.BoxGeometry(w, trayH, .022); fWall.translate(0, yBot + trayH / 2, d / 2 - .011);
+  const bWall = new THREE.BoxGeometry(w, trayH, .022); bWall.translate(0, yBot + trayH / 2, -d / 2 + .011);
+  const lWall = new THREE.BoxGeometry(.022, trayH, d - .044); lWall.translate(-w / 2 + .011, yBot + trayH / 2, 0);
+  const rWall = new THREE.BoxGeometry(.022, trayH, d - .044); rWall.translate(w / 2 - .011, yBot + trayH / 2, 0);
+  const items = [];
+  const rad = Math.min(w, d) * .22;
+  for (let r = -1; r <= 1; r += 2) {
+    for (let c = -1; c <= 1; c++) {
+      const it = new THREE.SphereGeometry(rad, 12, 10);
+      it.scale(1.05, .82, 1.05);
+      it.translate(c * w * .26, yBot + trayH * .78 + (c === 0 ? rad * .22 : 0), r * d * .21);
+      items.push(it);
+    }
+  }
+  const topMid = new THREE.SphereGeometry(rad * .96, 12, 10);
+  topMid.scale(1.05, .85, 1.05);
+  topMid.translate(0, yBot + trayH + rad * .55, 0);
+  items.push(topMid);
+  return mergeGeosGroups([
+    { geos: [base, fWall, bWall, lWall, rWall], matIndex: 0 },
+    { geos: items, matIndex: 1 }
+  ]);
+}
+
+function makeEggCartonGeo(w, h, d) {
+  // كرتونة بيض 30 بيضة واقعية (صينية كرتون مقولبة + 30 بيضة 3D ظاهرة)
+  const yBot = -h / 2, trayH = h * .46;
+  const trayGeos = [];
+  const base = new THREE.BoxGeometry(w, .024, d); base.translate(0, yBot + .012, 0); trayGeos.push(base);
+  const fw = new THREE.BoxGeometry(w, trayH, .016); fw.translate(0, yBot + trayH / 2, d / 2 - .008); trayGeos.push(fw);
+  const bw = new THREE.BoxGeometry(w, trayH, .016); bw.translate(0, yBot + trayH / 2, -d / 2 + .008); trayGeos.push(bw);
+  const lw = new THREE.BoxGeometry(.016, trayH, d - .032); lw.translate(-w / 2 + .008, yBot + trayH / 2, 0); trayGeos.push(lw);
+  const rw = new THREE.BoxGeometry(.016, trayH, d - .032); rw.translate(w / 2 - .008, yBot + trayH / 2, 0); trayGeos.push(rw);
+  const eggs = [];
+  const cols = 6, rows = 5;
+  const rx = (w - .04) / (cols * 2.15), rz = (d - .04) / (rows * 2.15), er = Math.min(rx, rz);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const eg = new THREE.SphereGeometry(er * 1.04, 10, 8);
+      eg.scale(.92, 1.32, .92);
+      eg.translate((c - (cols - 1) / 2) * ((w - .04) / cols), yBot + trayH * .95 + er * .36, (r - (rows - 1) / 2) * ((d - .04) / rows));
+      eggs.push(eg);
+    }
+  }
+  return mergeGeosGroups([
+    { geos: trayGeos, matIndex: 0 },
+    { geos: eggs, matIndex: 1 }
+  ]);
+}
+
+function makeCanPalletGeo(w, h, d) {
+  // باليتة كانز كاملة (صينية كرتون مطبوعة + 12 عبوة كانز معدنية بأغطية فضية)
+  const yBot = -h / 2, trayH = h * .38;
+  const tray = new THREE.BoxGeometry(w, trayH, d);
+  tray.translate(0, yBot + trayH / 2, 0);
+  const cans = [], tops = [];
+  const cols = 4, rows = 3;
+  const cr = Math.min((w - .03) / (cols * 2.15), (d - .03) / (rows * 2.15));
+  const ch = h - .02;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cx = (c - (cols - 1) / 2) * ((w - .025) / cols);
+      const cz = (r - (rows - 1) / 2) * ((d - .025) / rows);
+      const body = new THREE.CylinderGeometry(cr, cr, ch, 12);
+      body.translate(cx, yBot + ch / 2 + .005, cz);
+      cans.push(body);
+      const lid = new THREE.CylinderGeometry(cr * .92, cr * .98, .014, 12);
+      lid.translate(cx, yBot + ch + .006, cz);
+      tops.push(lid);
+    }
+  }
+  return mergeGeosGroups([
+    { geos: [tray], matIndex: 0 },
+    { geos: cans, matIndex: 1 },
+    { geos: tops, matIndex: 2 }
+  ]);
+}
+
+function makeBottlePalletGeo(w, h, d) {
+  // باليتة زجاجات 2 لتر (صينية سفلية + 6 زجاجات 2 لتر بأغطية ملونة)
+  const yBot = -h / 2, trayH = h * .24;
+  const tray = new THREE.BoxGeometry(w, trayH, d);
+  tray.translate(0, yBot + trayH / 2, 0);
+  const bots = [], caps = [];
+  const cols = 3, rows = 2;
+  const br = Math.min((w - .02) / (cols * 2.15), (d - .02) / (rows * 2.15));
+  const bh = h - .025;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cx = (c - (cols - 1) / 2) * ((w - .02) / cols);
+      const cz = (r - (rows - 1) / 2) * ((d - .02) / rows);
+      const bBody = new THREE.CylinderGeometry(br * .88, br, bh * .72, 12);
+      bBody.translate(cx, yBot + bh * .36 + .01, cz);
+      bots.push(bBody);
+      const bNeck = new THREE.CylinderGeometry(br * .34, br * .86, bh * .22, 12);
+      bNeck.translate(cx, yBot + bh * .83, cz);
+      bots.push(bNeck);
+      const cap = new THREE.CylinderGeometry(br * .36, br * .36, bh * .07, 10);
+      cap.translate(cx, yBot + bh * .96, cz);
+      caps.push(cap);
+    }
+  }
+  return mergeGeosGroups([
+    { geos: [tray], matIndex: 0 },
+    { geos: bots, matIndex: 1 },
+    { geos: caps, matIndex: 2 }
+  ]);
+}
+
 function geo(c) {
   const idx = c % SH.length;
   if (GEO[idx]) return GEO[idx];
   const s = SH[idx];
   if (s[3] === 1) return GEO[idx] = makeBottleGeo(s[0], s[1]);
   if (s[3] === 2) return GEO[idx] = makePouchGeo(s[0], s[1], s[2]);
-  if (s[3] === 3) return GEO[idx] = new THREE.CylinderGeometry(s[0], s[0] * 1.04, s[1], 20);
+  if (s[3] === 3) return GEO[idx] = makeCanJarGeo(s[0], s[1]);
+  if (s[3] === 4) return GEO[idx] = makeCrateGeo(s[0], s[1], s[2]);
   return GEO[idx] = new THREE.BoxGeometry(s[0], s[1], s[2]);
 }
 
-const hv = p => (p.cat * 37 + (p.id * 53) % 360) % 360;
+function prodShapeType(p) {
+  const ci = p.cat % 10, n = p.name || "";
+  if (/بيض/.test(n)) return 5;
+  if (/باليتة.*كانز|كانز/.test(n)) return 6;
+  if (/باليتة.*لتر|2\s*لتر/.test(n)) return 7;
+  if (/شيبسي|دوريتوس|شيتوس|مناديل|مسحوق/.test(n)) return 2;
+  if (ci === 4) {
+    if (/عصير/.test(n)) return 0;
+    if (/نسكافيه|شاي|قهوة/.test(n)) return 3;
+    return 1;
+  }
+  if (ci === 5) return /إسفنج/.test(n) ? 0 : 1;
+  if (ci === 6) return /معجون|ماكينة/.test(n) ? 0 : 1;
+  if (ci === 0 && /لبن/.test(n)) return 0;
+  if (ci === 0 && /زبادي/.test(n)) return 3;
+  if (ci === 9 && /عسل/.test(n)) return 3;
+  if (ci === 9 && /بسكويت|شوكولاتة|كرواسون/.test(n)) return 0;
+  return getShape(ci)[3];
+}
+function prodGeo(p) {
+  const st = prodShapeType(p), s = getShape(p.cat), k = (p.cat % 10) + "_" + st;
+  if (PROD_GEO[k]) return PROD_GEO[k];
+  if (st === 5) return PROD_GEO[k] = makeEggCartonGeo(.38, .135, .34);
+  if (st === 6) return PROD_GEO[k] = makeCanPalletGeo(.36, .165, .27);
+  if (st === 7) return PROD_GEO[k] = makeBottlePalletGeo(.35, .31, .24);
+  if (st === 1) return PROD_GEO[k] = makeBottleGeo(s[0] > .18 ? .11 : s[0], s[1] < .5 ? .56 : s[1]);
+  if (st === 2) return PROD_GEO[k] = makePouchGeo(ciIsSnack(p.cat, p.name) ? .26 : s[0], ciIsSnack(p.cat, p.name) ? .34 : s[1], ciIsSnack(p.cat, p.name) ? .13 : s[2]);
+  if (st === 3) return PROD_GEO[k] = makeCanJarGeo(s[0] > .16 ? .11 : s[0], s[1] > .52 ? .44 : s[1]);
+  if (st === 4) return PROD_GEO[k] = makeCrateGeo(s[0], s[1], s[2]);
+  return PROD_GEO[k] = new THREE.BoxGeometry(s[0], s[1], s[2]);
+}
+function ciIsSnack(ci, name) {
+  return ci === 9 || /شيبسي|دوريتوس|شيتوس/.test(name || "");
+}
+
+const hv = p => {
+  const n = p.name || "";
+  if (/طماطم/.test(n)) return 4;
+  if (/تفاح/.test(n)) return 356;
+  if (/برتق|جزر|مانجو|شيتوس/.test(n)) return 24;
+  if (/موز|ذرة|شيبسي جبنة|دوريتوس/.test(n)) return 44;
+  if (/خيار|بروكلي|بسلة|ليمون/.test(n)) return 126;
+  if (/بطاطس/.test(n)) return 38;
+  if (/ملح وخل|كانز.*كولا|كولا|بيبسي/.test(n)) return 352;
+  if (/مياه/.test(n)) return 205;
+  if (/حليب|لبن/.test(n)) return 212;
+  if (/قهوة|نسكافيه|شوكولاتة|كرواسون/.test(n)) return 26;
+  return (p.cat * 37 + (p.id * 53) % 360) % 360;
+};
 function rr(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); x.fill() }
+
+function paintCylinderWrap(x, W, H, p, isCan, img) {
+  const h = hv(p), FN = "Cairo,Tahoma,sans-serif", n = p.name || "";
+  const isWater = /مياه/.test(n), isCola = /غازي|كولا/.test(n);
+  const bodyCol = isWater ? "#bfe6ff" : isCola ? "#1f0909" : `hsl(${h},74%,38%)`;
+  const capCol = isCan ? "#d8dde6" : isWater ? "#0284c7" : isCola ? "#e60000" : `hsl(${(h + 25) % 360},82%,45%)`;
+  const bg = x.createLinearGradient(0, 0, W, 0);
+  bg.addColorStop(0, bodyCol); bg.addColorStop(.5, isWater ? "#e8f6ff" : bodyCol); bg.addColorStop(1, bodyCol);
+  x.fillStyle = bg; x.fillRect(0, 0, W, H);
+  x.fillStyle = capCol; x.fillRect(0, 0, W, H * (isCan ? .11 : .14));
+  x.fillStyle = "rgba(0,0,0,.22)";
+  for (let rx = 0; rx < W; rx += 14) x.fillRect(rx, 0, 5, H * (isCan ? .09 : .12));
+  if (isCan) { x.fillStyle = "#cfd5de"; x.fillRect(0, H * .89, W, H * .11); }
+  const lw = W * .62, lx = (W - lw) / 2, ly = H * .17, lh = H * .68;
+  x.fillStyle = isCola ? "#e60000" : isWater ? "#0369a1" : `hsl(${h},74%,32%)`;
+  x.fillRect(0, ly, W, lh);
+  x.fillStyle = "#f8fafc"; rr(x, lx + 8, ly + 8, lw - 16, lh * .58, 12);
+  if (img) {
+    x.save(); x.beginPath(); x.rect(lx + 12, ly + 12, lw - 24, lh * .54); x.clip();
+    const s = Math.max((lw - 24) / img.width, (lh * .54) / img.height);
+    x.drawImage(img, W / 2 - img.width * s / 2, ly + 12 + lh * .27 - img.height * s / 2, img.width * s, img.height * s);
+    x.restore();
+  } else {
+    art(x, W / 2, ly + lh * .31, lw - 32, lh * .48, p, h);
+  }
+  x.save(); x.direction = "rtl"; x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillStyle = "#ffffff"; fit(x, p.name, lw - 16, H * .072, "800"); x.fillText(p.name, W / 2, ly + lh * .76);
+  x.fillStyle = "#ffd24a"; x.font = `800 ${H * .078}px ${FN}`; x.fillText(eff(p) + " ج", W / 2, ly + lh * .91);
+  x.fillStyle = "rgba(255,255,255,.88)";
+  x.fillRect(W * .04, ly + lh * .25, W * .11, lh * .45);
+  x.fillStyle = "#111";
+  for (let i = 0; i < 12; i++) x.fillRect(W * .05 + i * 3.5, ly + lh * .30, i % 3 ? 1.5 : 2.5, lh * .34);
+  if (p.disc) {
+    x.fillStyle = "#facc15"; x.beginPath(); x.arc(lx + lw - 24, ly + 26, 22, 0, 7); x.fill();
+    x.fillStyle = "#111"; x.font = `900 ${H * .052}px ${FN}`; x.fillText("-" + p.disc + "%", lx + lw - 24, ly + 26);
+  }
+  x.restore();
+}
+
 function paint(x, W, H, p, cy, img) {
-  const h = hv(p), col = `hsl(${h},70%,36%)`, bw = cy ? W * .46 : W - 12, bx = (W - bw) / 2, FN = "Cairo,Tahoma,sans-serif";
+  const st = prodShapeType(p);
+  if (cy && (st === 1 || st === 3)) { paintCylinderWrap(x, W, H, p, st === 3, img); return; }
+  const h = hv(p), n = p.name || "";
+  const isChip = /شيبسي|دوريتوس|شيتوس/.test(n);
+  const isEgg = /بيض/.test(n);
+  const isPallet = /باليتة/.test(n);
+  const col = isChip
+    ? (/جبنة/.test(n) ? "#d97706" : /دوريتوس/.test(n) ? "#b91c1c" : /شيتوس/.test(n) ? "#ea580c" : "#0369a1")
+    : isEgg ? "#78350f"
+    : isPallet ? (/ليمون/.test(n) ? "#15803d" : /مياه/.test(n) ? "#0284c7" : /برتقال/.test(n) ? "#c2410c" : "#c8102e")
+    : p.cat === 7 ? "#141d2e" : p.cat === 8 ? "#28303d" : `hsl(${h},72%,34%)`;
+  const bw = W - 10, bx = 5, FN = "Cairo,Tahoma,sans-serif";
   x.save(); x.direction = "rtl"; x.textAlign = "center"; x.textBaseline = "middle";
   x.fillStyle = col; x.fillRect(0, 0, W, H);
-  const vg = x.createLinearGradient(0, 0, 0, H); vg.addColorStop(0, "rgba(255,255,255,.22)"); vg.addColorStop(.5, "rgba(255,255,255,0)"); vg.addColorStop(1, "rgba(0,0,0,.24)"); x.fillStyle = vg; x.fillRect(0, 0, W, H);
-  x.fillStyle = "rgba(0,0,0,.28)"; x.fillRect(bx, H * .04, bw, H * .15);
-  x.fillStyle = "#fff"; x.font = `bold ${H * .085}px ${FN}`; x.fillText(p.size || "", W / 2, H * .115);
-  const py = H * .215, ph = H * .37;
-  x.fillStyle = "rgba(255,255,255,.93)"; rr(x, bx + 6, py - H * .015, bw - 12, ph + H * .03, 10);
-  x.fillStyle = "rgba(255,255,255,.12)"; x.fillRect(bx + 4, 0, W * .045, H);
-  if (img) { x.save(); x.beginPath(); x.rect(bx + 8, py, bw - 16, ph); x.clip(); const s = Math.max((bw - 16) / img.width, ph / img.height); x.drawImage(img, W / 2 - img.width * s / 2, py + ph / 2 - img.height * s / 2, img.width * s, img.height * s); x.restore() }
-  else {
-    const rg = x.createRadialGradient(W / 2, py + ph / 2, 4, W / 2, py + ph / 2, ph * .75); rg.addColorStop(0, "#fff"); rg.addColorStop(1, `hsl(${h},75%,88%)`); x.fillStyle = rg; x.fillRect(bx + 8, py, bw - 16, ph);
-    art(x, W / 2, py + ph / 2, bw - 26, ph - 10, p, h)
+  // خلفية تدرج ضوئي احترافية للأغلفة الواقعية
+  const vg = x.createLinearGradient(0, 0, W, H);
+  vg.addColorStop(0, "rgba(255,255,255,.24)"); vg.addColorStop(.45, "rgba(255,255,255,0)"); vg.addColorStop(1, "rgba(0,0,0,.36)");
+  x.fillStyle = vg; x.fillRect(0, 0, W, H);
+  if (isChip) {
+    // خطوط ديناميكية لأكياس الشيبسي
+    x.fillStyle = "rgba(255,255,255,.15)";
+    x.beginPath(); x.moveTo(0, H * .16); x.lineTo(W, H * .08); x.lineTo(W, H * .26); x.lineTo(0, H * .34); x.closePath(); x.fill();
   }
-  x.fillStyle = "#fff"; fit(x, p.name, bw - 14, H * .092); x.fillText(p.name, W / 2, H * .70);
-  x.fillStyle = "#ffd24a"; x.font = `bold ${H * .12}px ${FN}`; x.fillText(eff(p) + " ج", W / 2, H * .845);
-  x.fillStyle = "rgba(255,255,255,.82)"; for (let i = 0; i < 22; i++) x.fillRect(bx + bw * .12 + i * 3, H * .93, i % 3 ? 1.5 : 2.5, H * .025);
-  if (p.disc) { x.fillStyle = "#ffcc00"; x.beginPath(); x.arc(bx + bw - H * .1, py + H * .08, H * .095, 0, 7); x.fill(); x.fillStyle = "#000"; x.font = `bold ${H * .068}px ${FN}`; x.fillText("-" + p.disc + "%", bx + bw - H * .1, py + H * .08) }
-  if (!cy) { const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "rgba(255,255,255,.32)"); g.addColorStop(.45, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H) }
+  x.fillStyle = "rgba(0,0,0,.42)"; x.fillRect(bx, H * .03, bw, H * .13);
+  x.fillStyle = "#f2c94c"; x.font = `900 ${H * .058}px ${FN}`; x.fillText(isChip ? "CHIPSY • CRISP" : isPallet ? "PACK 24 / 6×2L" : "ESD MARKET", W * .30, H * .095);
+  x.fillStyle = "#ffffff"; x.font = `bold ${H * .068}px ${FN}`; x.fillText(p.size || "", W * .78, H * .095);
+  const py = H * .185, ph = H * .44;
+  x.fillStyle = "rgba(255,255,255,.96)"; rr(x, bx + 6, py - H * .01, bw - 12, ph + H * .02, 12);
+  if (img) {
+    x.save(); x.beginPath(); x.rect(bx + 8, py, bw - 16, ph); x.clip();
+    const s = Math.max((bw - 16) / img.width, ph / img.height);
+    x.drawImage(img, W / 2 - img.width * s / 2, py + ph / 2 - img.height * s / 2, img.width * s, img.height * s);
+    x.restore();
+  } else {
+    const rg = x.createRadialGradient(W / 2, py + ph / 2, 4, W / 2, py + ph / 2, ph * .8);
+    rg.addColorStop(0, "#ffffff"); rg.addColorStop(1, isChip ? "#fef3c7" : isEgg ? "#fde68a" : `hsl(${h},65%,88%)`);
+    x.fillStyle = rg; x.fillRect(bx + 8, py, bw - 16, ph);
+    art(x, W / 2, py + ph / 2, bw - 20, ph - 8, p, h);
+  }
+  x.fillStyle = "#ffffff"; fit(x, p.name, bw - 14, H * .088, "800"); x.fillText(p.name, W / 2, H * .715);
+  x.fillStyle = "#ffd24a"; x.font = `900 ${H * .112}px ${FN}`; x.fillText(eff(p) + " ج", W / 2, H * .845);
+  x.fillStyle = "rgba(255,255,255,.88)";
+  for (let i = 0; i < 24; i++) x.fillRect(bx + bw * .14 + i * (bw * .72 / 24), H * .925, i % 3 ? 1.5 : 3, H * .032);
+  if (p.disc) {
+    x.fillStyle = "#facc15"; x.beginPath(); x.arc(bx + bw - H * .095, py + H * .075, H * .088, 0, 7); x.fill();
+    x.fillStyle = "#111"; x.font = `900 ${H * .064}px ${FN}`; x.fillText("-" + p.disc + "%", bx + bw - H * .095, py + H * .075);
+  }
+  const sheen = x.createLinearGradient(0, 0, W, H); sheen.addColorStop(0, "rgba(255,255,255,.22)"); sheen.addColorStop(.45, "rgba(255,255,255,0)");
+  x.fillStyle = sheen; x.fillRect(0, 0, W, H);
   x.restore();
 }
+
 function art(x, cx, cy, w, h, p, hu) {
-  const cidx = p.cat % 10;
-  const k = [0, 1, 2, 3, /غازي|مياه|طاقة/.test(p.name) ? 5 : /عصير/.test(p.name) ? 0 : 4, 5, 5, 6, 7, 3][cidx] || 0, t = cy - h / 2, b = cy + h / 2, l0 = cx - w / 2;
+  const n = p.name || "", cidx = p.cat % 10;
+  const t = cy - h / 2, b = cy + h / 2, l0 = cx - w / 2;
   const L = (a1, b1) => { const q = x.createLinearGradient(l0, 0, l0 + w, 0); q.addColorStop(0, a1); q.addColorStop(.45, b1); q.addColorStop(1, a1); return q };
-  const d = `hsl(${hu},75%,36%)`, l = `hsl(${hu},85%,60%)`, y = `hsl(${(hu + 45) % 360},95%,58%)`;
-  x.save(); x.shadowColor = "#0006"; x.shadowBlur = h * .05; x.shadowOffsetY = h * .03;
-  if (k == 0) { const bw = w * .62; x.fillStyle = L("#e8e8e8", "#fff"); rr(x, cx - bw / 2, t + h * .2, bw, h * .8, 5); x.beginPath(); x.moveTo(cx - bw / 2, t + h * .2); x.lineTo(cx, t); x.lineTo(cx + bw / 2, t + h * .2); x.fill(); x.shadowColor = "transparent"; x.fillStyle = L(d, l); x.fillRect(cx - bw / 2, t + h * .42, bw, h * .36); x.fillStyle = "rgba(255,255,255,.55)"; x.beginPath(); x.arc(cx, t + h * .6, h * .1, 0, 7); x.fill() }
-  else if (k == 1) { x.fillStyle = "#f6f6f6"; rr(x, l0, cy - h * .3, w, h * .6, 8); x.shadowColor = "transparent"; x.fillStyle = "#c62d3a"; x.beginPath(); x.ellipse(cx - w * .17, cy, w * .26, h * .17, .2, 0, 7); x.fill(); x.beginPath(); x.ellipse(cx + w * .2, cy + h * .03, w * .2, h * .14, -.2, 0, 7); x.fill(); x.fillStyle = "#fff5"; rr(x, l0 + 4, cy - h * .28, w - 8, h * .1, 6) }
-  else if (k == 2) { [[-.25, .12, .28], [.2, .1, .3], [0, -.18, .27]].forEach((a1, i) => { const px = cx + a1[0] * w, py = cy + a1[1] * h, gr = x.createRadialGradient(px - 6, py - 6, 2, px, py, a1[2] * w); gr.addColorStop(0, "#fff"); gr.addColorStop(.25, i % 2 ? y : l); gr.addColorStop(1, d); x.fillStyle = gr; x.beginPath(); x.arc(px, py, a1[2] * w, 0, 7); x.fill() }) }
-  else if (k == 3) { x.fillStyle = L(d, l); x.beginPath(); x.moveTo(l0, t + h * .07); for (let i = 0; i <= 12; i++) x.lineTo(l0 + w * i / 12, t + (i % 2 ? 0 : h * .07)); x.lineTo(l0 + w, b - h * .07); for (let i = 12; i >= 0; i--) x.lineTo(l0 + w * i / 12, b - (i % 2 ? 0 : h * .07)); x.closePath(); x.fill(); x.shadowColor = "transparent"; x.fillStyle = y; x.beginPath(); x.arc(cx, cy, h * .24, 0, 7); x.fill(); x.strokeStyle = "#fff"; x.lineWidth = 4; x.stroke(); x.fillStyle = "#fff4"; x.fillRect(l0 + w * .12, t + h * .1, w * .1, h * .8) }
-  else if (k == 4) { x.fillStyle = L(d, l); rr(x, cx - w * .3, t + h * .08, w * .6, h * .84, 6); x.shadowColor = "transparent"; x.fillStyle = "#d8d8dc"; x.fillRect(cx - w * .3, t + h * .04, w * .6, h * .07); x.fillRect(cx - w * .3, b - h * .1, w * .6, h * .06); x.fillStyle = y; x.fillRect(cx - w * .3, cy - h * .1, w * .6, h * .2) }
-  else if (k == 5) { x.fillStyle = L("#d6ecf8", "#fff"); rr(x, cx - w * .08, t, w * .16, h * .22, 4); rr(x, cx - w * .24, t + h * .16, w * .48, h * .84, 12); x.shadowColor = "transparent"; x.fillStyle = L(d, l); rr(x, cx - w * .22, cy - h * .05, w * .44, h * .5, 8); x.fillStyle = y; x.fillRect(cx - w * .08, t, w * .16, h * .07); x.fillStyle = "#fff"; rr(x, cx - w * .24 + 4, cy + h * .05, w * .4, h * .16, 4) }
-  else if (k == 6) { x.fillStyle = "#16181c"; rr(x, cx - w * .2, t, w * .4, h, 10); x.shadowColor = "transparent"; const q = x.createLinearGradient(0, t, 0, b); q.addColorStop(0, l); q.addColorStop(1, d); x.fillStyle = q; rr(x, cx - w * .17, t + h * .05, w * .34, h * .88, 6); x.fillStyle = "#000"; x.beginPath(); x.arc(cx, t + h * .1, 3, 0, 7); x.fill() }
-  else { x.fillStyle = L("#d0d0d4", "#fff"); rr(x, cx - w * .42, t + h * .05, w * .84, h * .9, 6); x.shadowColor = "transparent"; x.fillStyle = "#222"; rr(x, cx - w * .3, cy - h * .3, w * .6, h * .45, 4); [-.25, 0, .25].forEach(o => { x.beginPath(); x.arc(cx + o * w, b - h * .2, h * .06, 0, 7); x.fillStyle = d; x.fill() }) }
+  const d = `hsl(${hu},76%,36%)`, l = `hsl(${hu},84%,58%)`, y = `hsl(${(hu + 45) % 360},92%,56%)`;
+  x.save(); x.shadowColor = "rgba(0,0,0,.32)"; x.shadowBlur = h * .05; x.shadowOffsetY = h * .03;
+
+  // رسم واقعي لرقائق الشيبسي الذهبية المقرمشة
+  if (/شيبسي|دوريتوس|شيتوس/.test(n)) {
+    const isNacho = /دوريتوس/.test(n);
+    for (let i = 0; i < 7; i++) {
+      const ox = cx + ((i % 3) - 1) * w * .22 + Math.sin(i * 2.1) * w * .06;
+      const oy = cy + (Math.floor(i / 3) - .8) * h * .24;
+      const cg = x.createRadialGradient(ox - 4, oy - 4, 2, ox, oy, w * .18);
+      cg.addColorStop(0, "#fef08a"); cg.addColorStop(.6, isNacho ? "#ea580c" : "#f59e0b"); cg.addColorStop(1, "#b45309");
+      x.fillStyle = cg;
+      x.beginPath();
+      if (isNacho) {
+        x.moveTo(ox, oy - h * .14); x.lineTo(ox + w * .16, oy + h * .12); x.lineTo(ox - w * .16, oy + h * .12); x.closePath();
+      } else {
+        x.ellipse(ox, oy, w * .17, h * .12, (i - 3) * .35, 0, 7);
+      }
+      x.fill();
+      x.fillStyle = "rgba(120,53,15,.35)";
+      x.beginPath(); x.arc(ox + 3, oy + 2, 2.2, 0, 7); x.fill();
+    }
+    x.restore(); return;
+  }
+  // رسم واقعي لكرتونة بيض 30 بيضة
+  if (/بيض/.test(n)) {
+    const isWhiteEgg = /أبيض/.test(n);
+    x.fillStyle = "#9c7b52"; rr(x, cx - w * .44, cy - h * .34, w * .88, h * .72, 8);
+    x.shadowColor = "transparent";
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) {
+      const ex = cx + (c - 2) * w * .165, ey = cy + (r - 1) * h * .20;
+      const eg = x.createRadialGradient(ex - 2, ey - 3, 1, ex, ey, w * .08);
+      eg.addColorStop(0, "#ffffff"); eg.addColorStop(1, isWhiteEgg ? "#e7e5e4" : "#c67c4e");
+      x.fillStyle = eg; x.beginPath(); x.ellipse(ex, ey, w * .068, h * .095, 0, 0, 7); x.fill();
+    }
+    x.restore(); return;
+  }
+  // رسم واقعي لباليتة كانز أو باليتة 2 لتر
+  if (/باليتة/.test(n)) {
+    const is2L = /2\s*لتر/.test(n);
+    const canCol = /ليمون/.test(n) ? "#16a34a" : /مياه/.test(n) ? "#0284c7" : /برتقال/.test(n) ? "#ea580c" : "#dc2626";
+    const cols = is2L ? 3 : 4;
+    const cw = (w * .78) / cols;
+    for (let c = 0; c < cols; c++) {
+      const bx = cx - w * .39 + c * cw + cw * .08;
+      x.fillStyle = L(canCol, "#ffffff");
+      rr(x, bx, cy - h * (is2L ? .38 : .24), cw * .84, h * (is2L ? .68 : .48), 5);
+      if (is2L) { x.fillStyle = "#111"; rr(x, bx + cw * .22, cy - h * .46, cw * .4, h * .09, 2); }
+      else { x.fillStyle = "#e2e8f0"; x.fillRect(bx + 2, cy - h * .25, cw * .84 - 4, h * .05); }
+    }
+    x.shadowColor = "transparent"; x.fillStyle = "#1f2937"; x.fillRect(cx - w * .44, cy + h * .20, w * .88, h * .18);
+    x.restore(); return;
+  }
+
+  const k = [0, 1, 2, 3, /غازي|مياه|طاقة/.test(n) ? 5 : /عصير/.test(n) ? 0 : 4, 5, 5, 6, 7, 3][cidx] || 0;
+  if (k == 0) {
+    const bw = w * .58; x.fillStyle = L("#e8ecf2", "#ffffff"); rr(x, cx - bw / 2, t + h * .2, bw, h * .8, 5);
+    x.beginPath(); x.moveTo(cx - bw / 2, t + h * .2); x.lineTo(cx, t); x.lineTo(cx + bw / 2, t + h * .2); x.fill();
+    x.shadowColor = "transparent"; x.fillStyle = L(d, l); x.fillRect(cx - bw / 2, t + h * .42, bw, h * .36);
+    x.fillStyle = "rgba(255,255,255,.6)"; x.beginPath(); x.arc(cx, t + h * .6, h * .1, 0, 7); x.fill();
+  } else if (k == 1) {
+    x.fillStyle = "#f4f4f6"; rr(x, l0, cy - h * .3, w, h * .6, 8); x.shadowColor = "transparent";
+    x.fillStyle = "#b91c1c"; x.beginPath(); x.ellipse(cx - w * .17, cy, w * .26, h * .17, .2, 0, 7); x.fill();
+    x.beginPath(); x.ellipse(cx + w * .2, cy + h * .03, w * .2, h * .14, -.2, 0, 7); x.fill();
+    x.fillStyle = "rgba(255,255,255,.4)"; rr(x, l0 + 4, cy - h * .28, w - 8, h * .1, 6);
+  } else if (k == 2) {
+    [[-.24, .12, .27], [.2, .1, .28], [0, -.18, .26]].forEach((a1, i) => {
+      const px = cx + a1[0] * w, py = cy + a1[1] * h, gr = x.createRadialGradient(px - 6, py - 6, 2, px, py, a1[2] * w);
+      gr.addColorStop(0, "#fff"); gr.addColorStop(.28, i % 2 ? y : l); gr.addColorStop(1, d);
+      x.fillStyle = gr; x.beginPath(); x.arc(px, py, a1[2] * w, 0, 7); x.fill();
+    });
+  } else if (k == 3) {
+    x.fillStyle = L(d, l); rr(x, cx - w * .34, t + h * .08, w * .68, h * .84, 8); x.shadowColor = "transparent";
+    x.fillStyle = y; x.beginPath(); x.arc(cx, cy, h * .22, 0, 7); x.fill();
+    x.strokeStyle = "#fff"; x.lineWidth = 4; x.stroke();
+  } else if (k == 4) {
+    x.fillStyle = L(d, l); rr(x, cx - w * .3, t + h * .08, w * .6, h * .84, 6); x.shadowColor = "transparent";
+    x.fillStyle = "#d8d8dc"; x.fillRect(cx - w * .3, t + h * .04, w * .6, h * .07); x.fillRect(cx - w * .3, b - h * .1, w * .6, h * .06);
+    x.fillStyle = y; x.fillRect(cx - w * .3, cy - h * .1, w * .6, h * .2);
+  } else if (k == 5) {
+    x.fillStyle = L("#d6ecf8", "#fff"); rr(x, cx - w * .08, t, w * .16, h * .22, 4); rr(x, cx - w * .24, t + h * .16, w * .48, h * .84, 12);
+    x.shadowColor = "transparent"; x.fillStyle = L(d, l); rr(x, cx - w * .22, cy - h * .05, w * .44, h * .5, 8);
+    x.fillStyle = y; x.fillRect(cx - w * .08, t, w * .16, h * .07); x.fillStyle = "#fff"; rr(x, cx - w * .24 + 4, cy + h * .05, w * .4, h * .16, 4);
+  } else if (k == 6) {
+    x.fillStyle = "#16181c"; rr(x, cx - w * .22, t, w * .44, h, 10); x.shadowColor = "transparent";
+    const q = x.createLinearGradient(0, t, 0, b); q.addColorStop(0, l); q.addColorStop(1, d); x.fillStyle = q;
+    rr(x, cx - w * .18, t + h * .05, w * .36, h * .88, 6);
+    x.fillStyle = "#000"; x.beginPath(); x.arc(cx, t + h * .1, 3, 0, 7); x.fill();
+  } else {
+    x.fillStyle = L("#d0d4dc", "#fff"); rr(x, cx - w * .42, t + h * .05, w * .84, h * .9, 6); x.shadowColor = "transparent";
+    x.fillStyle = "#1f242d"; rr(x, cx - w * .3, cy - h * .3, w * .6, h * .45, 4);
+    [-.25, 0, .25].forEach(o => { x.beginPath(); x.arc(cx + o * w, b - h * .2, h * .06, 0, 7); x.fillStyle = d; x.fill() });
+  }
   x.restore();
 }
+
 function packTex(p, cy) {
-  const W = cy ? 512 : 256, H = 320, c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); paint(x, W, H, p, cy, null);
-  const t = new THREE.CanvasTexture(c); t.anisotropy = MAXA; t.encoding = THREE.sRGBEncoding; if (cy) { t.wrapS = THREE.RepeatWrapping; t.offset.x = .25 }
+  const W = cy ? 512 : 256, H = 320, c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
+  paint(x, W, H, p, cy, null);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = MAXA; t.encoding = THREE.sRGBEncoding;
   if (p.img) { const im = new Image(); im.crossOrigin = "anonymous"; im.onload = () => { paint(x, W, H, p, cy, im); t.needsUpdate = true }; im.src = p.img }
   return t;
 }
-function shot(p) { if (p.img) return p.img; const c = document.createElement("canvas"); c.width = 320; c.height = 400; paint(c.getContext("2d"), 320, 400, p, false, null); return c.toDataURL("image/png") }
-const MC = {};
-function mat(p) {
-  if (MC[p.id]) return MC[p.id];
-  const shapeType = getShape(p.cat)[3];
-  const isRound = (shapeType === 1 || shapeType === 3);
-  const L = new THREE.MeshStandardMaterial({ map: packTex(p, isRound), roughness: isRound ? .22 : .42, metalness: isRound ? .18 : .04 });
-  if (shapeType === 1) return MC[p.id] = L;
-  if (shapeType === 3) { const C = M(0xd4af37, { metalness: .8, roughness: .2 }); return MC[p.id] = [L, C, C] }
-  const S = M(new THREE.Color(`hsl(${hv(p)},52%,46%)`), { roughness: .38, metalness: .06 });
-  return MC[p.id] = [S, S, S, S, L, S];
-}
 
-/* ---------- صور المنتجات الشفافة على الرفوف (بدون أي بطاقات أو خلفيات ملونة) ---------- */
-const SPG = {}, SPC = {};
-function spriteGeo(ci) {
-  if (SPG[ci]) return SPG[ci];
-  const s = getShape(ci), round = (s[3] === 1 || s[3] === 3);
-  return SPG[ci] = new THREE.PlaneGeometry(round ? s[0] * 2 : s[0], s[1]);
-}
-function spriteHue(p) {
-  const n = p.name || "";
-  if (/غازي|كولا|بيبسي/.test(n)) return 0;
-  if (/مياه/.test(n)) return 205;
-  if (/طاقة/.test(n)) return 45;
-  if (/عصير/.test(n)) return 28;
-  if (/شاي/.test(n)) return 95;
-  if (/قهوة/.test(n)) return 25;
-  if (/حليب|لبن/.test(n)) return 210;
-  if (/فراولة/.test(n)) return 345;
-  if (/شوكولاتة/.test(n)) return 25;
-  if (/منظف|صابون|معقم|شامبو|بلسم|غسول/.test(n)) return 185;
-  return hv(p);
-}
-function spriteFill(ci, p) {
-  if (ci === 0) return 1.35;
-  if (ci === 1) return 1.02;
-  if (ci === 3) return 1.05;
-  if (ci === 4) return /غازي|مياه|طاقة/.test(p.name) ? 1.9 : /عصير/.test(p.name) ? 1.25 : 1.35;
-  if (ci === 5 || ci === 6) return 1.45;
-  if (ci === 7) return 1.8;
-  if (ci === 8) return 1.05;
-  if (ci === 9) return 1.15;
-  return 1;
-}
-function drawEggCarton(x, W, H, p, em) {
-  const cw = W * .88, ch = H * .40, cx = W / 2, cy = H * .55;
-  x.save();
-  x.shadowColor = "rgba(0,0,0,.25)"; x.shadowBlur = H * .035; x.shadowOffsetY = H * .02;
-  x.fillStyle = "#d8d2c4"; rr(x, cx - cw / 2, cy - ch / 2, cw, ch, H * .025);
-  x.shadowColor = "transparent";
-  x.fillStyle = "#efe9da";
-  for (let i = 0; i < 5; i++) {
-    const bx = cx - cw * .36 + i * cw * .18;
-    x.beginPath(); x.ellipse(bx, cy - ch * .15, cw * .073, ch * .21, 0, 0, 7); x.fill();
-    x.strokeStyle = "#c4bcaa"; x.lineWidth = Math.max(1, H * .004); x.stroke();
-  }
-  x.fillStyle = "#b58a4a"; rr(x, cx - cw * .34, cy + ch * .10, cw * .68, ch * .26, H * .015);
-  x.fillStyle = "#fff"; x.direction = "rtl"; x.textAlign = "center"; x.textBaseline = "middle";
-  x.font = `800 ${Math.max(9, H * .052)}px Cairo,Tahoma,sans-serif`;
-  x.fillText(p.name, cx, cy + ch * .23, cw * .62);
-  x.font = `${Math.min(W * .25, H * .15)}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
-  x.fillText(em, cx, cy - ch * .15);
-  x.restore();
-}
-function drawTechBox(x, W, H, p, em, ci) {
-  const bw = W * .86, bh = H * .82, bx = W / 2 - bw / 2, by = H * .07;
-  x.save();
-  x.shadowColor = "rgba(0,0,0,.28)"; x.shadowBlur = H * .03; x.shadowOffsetY = H * .02;
-  const g = x.createLinearGradient(bx, by, bx + bw, by + bh);
-  if (ci === 7) { g.addColorStop(0, "#2a3a55"); g.addColorStop(.55, "#111c2e"); g.addColorStop(1, "#070d16") }
-  else { g.addColorStop(0, "#fbfdff"); g.addColorStop(.55, "#e4eaf2"); g.addColorStop(1, "#c4cedb") }
-  x.fillStyle = g; rr(x, bx, by, bw, bh, H * .025);
-  x.shadowColor = "transparent";
-  x.fillStyle = "#c8102e"; x.fillRect(bx, by, bw, H * .065);
-  x.direction = "rtl"; x.textAlign = "center"; x.textBaseline = "middle";
-  x.fillStyle = "#fff"; x.font = `800 ${Math.max(9, H * .034)}px Cairo,Tahoma,sans-serif`;
-  x.fillText("ESD Market", W / 2, by + H * .033, W * .58);
-  const lw = bw * .78, lh = bh * .54, lx = W / 2 - lw / 2, ly = by + bh * .14;
-  x.fillStyle = "rgba(255,255,255,.95)"; rr(x, lx, ly, lw, lh, H * .02);
-  x.font = `${Math.min(lw * .46, lh * .5)}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
-  x.fillText(em, W / 2, ly + lh * .42);
-  x.fillStyle = "#20242c"; x.font = `800 ${Math.max(9, Math.min(W * .072, H * .043))}px Cairo,Tahoma,sans-serif`;
-  x.fillText(p.name, W / 2, ly + lh * .78, lw * .9);
-  x.fillStyle = ci === 7 ? "#0a3d91" : "#6b7481"; x.fillRect(bx, by + bh * .88, bw, H * .055);
-  x.fillStyle = "rgba(255,255,255,.8)";
-  for (let i = 0; i < 18; i++) x.fillRect(lx + lw * .15 + i * (lw * .7 / 18), by + bh * .895, Math.max(1, W * .004), H * .035);
-  x.restore();
-}
-function drawSprite(x, W, H, p) {
-  x.clearRect(0, 0, W, H);
-  const ci = p.cat % 10, em = p.e || "🛒", cx = W / 2, cy = H * .47;
-  x.save();
-  x.fillStyle = "rgba(0,0,0,.16)";
-  x.beginPath(); x.ellipse(cx, H * .965, W * .30, H * .022, 0, 0, 7); x.fill();
-  x.restore();
-
-  if (ci === 2) {
-    x.save();
-    x.shadowColor = "rgba(0,0,0,.28)"; x.shadowBlur = H * .035; x.shadowOffsetY = H * .02;
-    x.textAlign = "center"; x.textBaseline = "middle";
-    const fs = Math.min(W * .40, H * .60);
-    [[.22, .54, .92], [.50, .46, 1.08], [.78, .55, .90]].forEach(q => {
-      x.font = `${fs * q[2]}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
-      x.fillText(em, W * q[0], H * q[1]);
-    });
-    x.restore();
-    return;
-  }
-  if (/بيض/.test(p.name)) { drawEggCarton(x, W, H, p, em); return; }
-  if (ci === 7 || ci === 8) { drawTechBox(x, W, H, p, em, ci); return; }
-
-  x.save();
-  x.translate(cx, 0); x.scale(spriteFill(ci, p), 1); x.translate(-cx, 0);
-  art(x, cx, cy, W * .90, H * .86, p, spriteHue(p));
-  x.restore();
-
-  x.save();
-  x.direction = "rtl"; x.textAlign = "center"; x.textBaseline = "middle";
-  if (ci === 4 && /غازي|كولا|بيبسي/.test(p.name)) {
-    const lw = W * .66, lh = H * .26, ly = H * .54;
-    x.fillStyle = "#d71920"; rr(x, cx - lw / 2, ly - lh / 2, lw, lh, lh * .16);
-    x.fillStyle = "#fff"; x.font = `900 ${H * .10}px Cairo,Tahoma,sans-serif`; x.fillText("بيبسي", cx, ly - H * .01);
-    x.fillStyle = "#0a3d91"; x.fillRect(cx - lw / 2, ly + lh * .18, lw, lh * .16);
-  } else {
-    const fs = Math.min(W * .44, H * .30);
-    x.shadowColor = "rgba(0,0,0,.28)"; x.shadowBlur = H * .015; x.shadowOffsetY = H * .008;
-    x.font = `${fs}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
-    x.fillText(em, cx, cy);
-    x.shadowColor = "transparent";
-    const nfs = Math.max(9, Math.min(W * .080, H * .045));
-    x.font = `800 ${nfs}px Cairo,Tahoma,sans-serif`;
-    x.lineWidth = Math.max(2, H * .008); x.strokeStyle = "rgba(0,0,0,.62)"; x.lineJoin = "round";
-    x.strokeText(p.name, cx, H * .735, W * .86);
-    x.fillStyle = "#fff"; x.fillText(p.name, cx, H * .735, W * .86);
-  }
-  x.restore();
-}
-function spriteTex(p) {
-  const s = getShape(p.cat), round = (s[3] === 1 || s[3] === 3);
-  const w = round ? s[0] * 2 : s[0], h = s[1], aspect = w / h;
-  let W, H;
-  if (aspect >= 1) { W = 512; H = Math.max(64, Math.round(W / aspect)); }
-  else { H = 512; W = Math.max(64, Math.round(H * aspect)); }
-  const c = document.createElement("canvas"); c.width = W; c.height = H;
-  drawSprite(c.getContext("2d"), W, H, p);
-  const t = new THREE.CanvasTexture(c);
-  t.anisotropy = MAXA; t.encoding = THREE.sRGBEncoding;
-  return t;
-}
-function spriteMat(p) {
-  if (SPC[p.id]) return SPC[p.id];
-  return SPC[p.id] = new THREE.MeshStandardMaterial({
-    map: spriteTex(p), alphaTest: .34, side: THREE.DoubleSide,
-    roughness: .48, metalness: .04
+function produceItemTex(p) {
+  const h = hv(p), n = p.name || "";
+  const isBake = p.cat === 9 || /عيش|كرواسون|تورتة|دونتس/.test(n);
+  const isMeat = p.cat === 1;
+  return tx(256, 256, (c, W, H) => {
+    const base = isMeat ? "#9b1c24" : isBake ? "#c97c36" : `hsl(${h},78%,44%)`;
+    const hi = isMeat ? "#d86b70" : isBake ? "#f3be7a" : `hsl(${h},88%,72%)`;
+    const g = c.createRadialGradient(W * .35, H * .32, 12, W / 2, H / 2, W * .6);
+    g.addColorStop(0, hi); g.addColorStop(.55, base); g.addColorStop(1, "#1e120a");
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    for (let i = 0; i < 650; i++) {
+      c.fillStyle = `rgba(${rnd(i) > .5 ? "255,255,255" : "0,0,0"},${.04 + rnd(i + 3) * .06})`;
+      c.fillRect(rnd(i + 1) * W, rnd(i + 2) * H, 3, 3);
+    }
   });
 }
 
-/* ---------- الرفوف والهيكل الديناميكي (يتسع تلقائياً عند إضافة أقسام جديدة) ---------- */
-const BAY = 1.3, ROWW = [.14, .51, .88, 1.25, 1.62], ROWI = [.14, .5, .86, 1.22, 1.58], ISL = [-9.3, -3.6, 3.6, 9.3];
+const CRATE_WOOD_T = tx(256, 128, (c, W, H) => {
+  c.fillStyle = "#3a2516"; c.fillRect(0, 0, W, H);
+  for (let y = 0; y < H; y += 32) {
+    c.fillStyle = y % 64 ? "#4a301d" : "#3f2818";
+    c.fillRect(0, y + 2, W, 28);
+  }
+  c.fillStyle = "#24160d";
+  for (let i = 0; i < 400; i++) c.fillRect(rnd(i) * W, rnd(i + 5) * H, 18, 1);
+});
+const CRATE_MAT = new THREE.MeshStandardMaterial({ map: CRATE_WOOD_T, roughness: .78, metalness: .04 });
+const CAN_RIM_MAT = M(0xe2e8f0, { metalness: .92, roughness: .16, envMapIntensity: 1.5 });
+
+function shot(p) { if (p.img) return p.img; const c = document.createElement("canvas"); c.width = 320; c.height = 400; paint(c.getContext("2d"), 320, 400, p, false, null); return c.toDataURL("image/png") }
+
+const MC = {};
+function disposeMatCache(cache) {
+  for (const k in cache) {
+    const arr = Array.isArray(cache[k]) ? cache[k] : [cache[k]];
+    arr.forEach(m => { if (m && m !== CRATE_MAT && m !== CAN_RIM_MAT) { if (m.map) m.map.dispose(); m.dispose(); } });
+    delete cache[k];
+  }
+}
+
+function mat(p) {
+  if (MC[p.id]) return MC[p.id];
+  const st = prodShapeType(p), n = p.name || "";
+  const isRound = (st === 1 || st === 3);
+  if (st === 4) {
+    const itemMat = new THREE.MeshStandardMaterial({ map: produceItemTex(p), roughness: .36, metalness: .05 });
+    return MC[p.id] = [CRATE_MAT, itemMat];
+  }
+  if (st === 5) {
+    const isWhite = /أبيض/.test(n);
+    const pulpMat = M(isWhite ? 0xb89c78 : 0x9b7c56, { roughness: .88, metalness: .02 });
+    const eggMat = M(isWhite ? 0xf6f3ea : 0xc97b4c, { roughness: .36, metalness: .04 });
+    return MC[p.id] = [pulpMat, eggMat];
+  }
+  if (st === 6) {
+    const trayMat = new THREE.MeshStandardMaterial({ map: packTex(p, false), roughness: .32, metalness: .08 });
+    const canCol = /ليمون/.test(n) ? 0x15803d : /برتقال/.test(n) ? 0xd9480f : 0xc8102e;
+    const canMat = M(canCol, { metalness: .62, roughness: .22, envMapIntensity: 1.4 });
+    return MC[p.id] = [trayMat, canMat, CAN_RIM_MAT];
+  }
+  if (st === 7) {
+    const trayMat = new THREE.MeshStandardMaterial({ map: packTex(p, false), roughness: .34, metalness: .06 });
+    const isW = /مياه/.test(n), isL = /ليمون/.test(n);
+    const liqCol = isW ? 0x7dd3fc : isL ? 0x16a34a : 0x1e0908;
+    const botMat = M(liqCol, { metalness: .06, roughness: .12, envMapIntensity: 1.55 });
+    const capMat = M(isW ? 0x0284c7 : isL ? 0x15803d : 0xe60000, { roughness: .28, metalness: .08 });
+    return MC[p.id] = [trayMat, botMat, capMat];
+  }
+  const L = new THREE.MeshStandardMaterial({
+    map: packTex(p, isRound),
+    roughness: isRound ? .18 : st === 2 ? .24 : .34,
+    metalness: st === 3 ? .28 : st === 2 ? .18 : .06,
+    envMapIntensity: 1.2
+  });
+  if (isRound) return MC[p.id] = L;
+  const sideCol = new THREE.Color(p.cat === 7 ? 0x161f30 : p.cat === 8 ? 0x2a323e : `hsl(${hv(p)},58%,36%)`);
+  const S = M(sideCol, { roughness: .42, metalness: .06 });
+  const T = M(new THREE.Color(p.cat === 7 ? 0x222c3f : `hsl(${hv(p)},62%,42%)`), { roughness: .35, metalness: .08 });
+  return MC[p.id] = [S, S, T, S, L, L];
+}
+const prodMat = p => mat(p);
+function prodDims(p) {
+  const st = prodShapeType(p), s = getShape(p.cat);
+  if (st === 5) return { w: .38, h: .135, d: .34, st };
+  if (st === 6) return { w: .36, h: .165, d: .27, st };
+  if (st === 7) return { w: .35, h: .31, d: .24, st };
+  if (st === 2 && ciIsSnack(p.cat, p.name)) return { w: .26, h: .34, d: .13, st };
+  if (st === 1) { const r = s[0] > .18 ? .11 : s[0], h = s[1] < .5 ? .56 : s[1]; return { w: r * 2.08, h, d: r * 2.08, st }; }
+  if (st === 3) { const r = s[0] > .16 ? .11 : s[0], h = s[1] > .52 ? .44 : s[1]; return { w: r * 2.06, h, d: r * 2.06, st }; }
+  return { w: s[0], h: s[1], d: s[2], st };
+}
+
+/* ---------- الرفوف بلون أحمر فودافون + شرائط وسطى سوداء (5 صفوف بطول المتجر) ---------- */
+const BAY = 1.16, ROWW = [.14, .50, .86, 1.22, 1.58], ROWI = [.14, .50, .86, 1.22, 1.58], ISL = [-9.3, -3.6, 3.6, 9.3];
 const FACES = [{ x: -14.2, d: 1, wall: 1 }, { x: 14.2, d: -1, wall: 1 }]; ISL.forEach(c => { FACES.push({ x: c + .95, d: 1 }); FACES.push({ x: c - .95, d: -1 }) });
 const UB = new THREE.BoxGeometry(1, 1, 1);
-const ENV_G = new THREE.Group(), SG = new THREE.Group(), PG = new THREE.Group(), MG = new THREE.Group();
-MG.scale.y = -1;
+const ENV_G = new THREE.Group(), SG = new THREE.Group(), PG = new THREE.Group();
 sc.add(ENV_G, SG, PG);
-if (HQ) sc.add(MG);
 
-const SM = { board: M(0x0b0b0d, { metalness: .55, roughness: .36 }), rail: M(0x08080a, { roughness: .4, metalness: .3 }), up: M(0x5c0000, { metalness: 0, roughness: .74, emissive: 0x040000 }), back: M(0x0a0a0c, { roughness: .62 }), cap: M(0xffffff, { roughness: .62, metalness: 0 }), tag: M(0xf5f2e8, { roughness: .38, metalness: 0, emissive: 0x24221c }) };
-const ADC = ["#c8102e", "#15151a", "#c8102e", "#15151a", "#c8102e"];
-let STANDS = [], HS = [], SOL = [], SCRB = [], SCRS = [], dynLights = [];
+const tagT = tx(512, 32, (c, W, H) => {
+  c.fillStyle = "#111216"; c.fillRect(0, 0, W, H);
+  c.fillStyle = "#e60000"; c.fillRect(0, 0, W, 4);
+  for (let x = 8; x < W - 40; x += 64) {
+    c.fillStyle = "#facc15"; c.fillRect(x, 7, 28, 19);
+    c.fillStyle = "#f8fafc"; c.fillRect(x + 32, 10, 22, 6);
+    c.fillStyle = "#9ca3af"; c.fillRect(x + 32, 19, 16, 4);
+  }
+});
+tagT.wrapS = tagT.wrapT = THREE.RepeatWrapping;
+tagT.repeat.set(8, 1);
+
+const SM = {
+  board: M(0xd90000, { metalness: .24, roughness: .32, envMapIntensity: 1.15 }),
+  rail: M(0x111216, { roughness: .32, metalness: .48, envMapIntensity: 1.0 }),
+  up: M(0xe60000, { metalness: .28, roughness: .30, envMapIntensity: 1.25 }),
+  back: M(0xb80000, { roughness: .42, metalness: .18 }),
+  cap: M(0xe60000, { roughness: .30, metalness: .20 }),
+  tag: new THREE.MeshStandardMaterial({ map: tagT, roughness: .32, metalness: .04 })
+};
+const ADC = ["#e60000", "#111216", "#e60000", "#111216", "#e60000"];
+let STANDS = [], HS = [], SOL = [], SCRB = [], SCRS = [], dynLights = [], FRIDGE_ROWS = [];
 
 function clearGroup(g) {
   while (g.children.length) {
@@ -989,38 +1912,45 @@ function buildEnvironmentAndShelves() {
   clearGroup(SG);
   dynLights.forEach(l => sc.remove(l));
   dynLights = [];
-  STANDS = []; HS = []; SOL = []; SCRB = []; SCRS = [];
+  STANDS = []; HS = []; SOL = []; SCRB = []; SCRS = []; FRIDGE_ROWS = [];
 
-  const NSEC = CATS.length;
-  ZMIN = secZ(NSEC - 1) - 9;
+  const NROWS = Math.ceil(CATS.length / 2);
+  ZMIN = rowZ(NROWS - 1) - 8.6;
   ZBACK = ZMIN - 4;
   const hallLen = Math.abs(ZBACK - 20) + 12;
   const hallMidZ = (20 + ZBACK) / 2;
 
-  // إضاءة علوية موزعة بانتظام
-  for (let z = 10; z > ZBACK + 4; z -= 28) {
-    const l = new THREE.PointLight(0xfff9ed, 1.15, 52);
+  // إضاءة متوازنة دافئة في الممرات تبرز تفاصيل المنتجات والوجوه
+  for (let z = 11; z > ZBACK + 3; z -= 18) {
+    const l = new THREE.PointLight(0xfff6e9, .95, 48, 1.8);
     l.position.set(0, 7.1, z);
     sc.add(l);
     dynLights.push(l);
   }
 
-  // الأرضية الرمادية الصافية بدون أي هالات بيضاء
-  floorT.repeat.set(7.5, Math.round(hallLen / 4));
+  // أرضية بورسلين لامعة صلبة بخريطة خشونة وتفاوت لمعان واقعي بدون شبحية
+  const rptY = Math.round(hallLen / 4);
+  floorT.repeat.set(7.5, rptY);
+  floorRoughT.repeat.set(7.5, rptY);
   const fl = new THREE.Mesh(
     new THREE.PlaneGeometry(30, hallLen),
-    new THREE.MeshPhysicalMaterial({ map: floorT, roughness: .22, metalness: .08, clearcoat: .35, clearcoatRoughness: .25, envMapIntensity: .6, transparent: HQ, opacity: HQ ? .88 : 1 })
+    new THREE.MeshPhysicalMaterial({
+      map: floorT, roughnessMap: floorRoughT, bumpMap: floorRoughT, bumpScale: .004,
+      roughness: .24, metalness: .06, clearcoat: .52, clearcoatRoughness: .18, envMapIntensity: 1.2
+    })
   );
   fl.rotation.x = -Math.PI / 2;
   fl.position.set(0, 0, hallMidZ);
   fl.receiveShadow = true;
   ENV_G.add(fl);
 
-  // الأسهم الصفراء المتقطعة المستقلة فقط
+  // أسهم إرشاد الممرات الصفراء الواضحة بدون تداخل ارتفاع أو اصطدام
   AISLES.forEach(x => {
     for (let z = 10; z >= ZMIN + 3; z -= 3.8) {
       if (z > 6 && x == 6.45) continue;
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.15), arrowMat);
+      if (z > .5 && x == -12.15) continue;
+      if (z > 8.5 && x == -6.45) continue;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.08, 1.08), arrowMat);
       m.rotation.x = -Math.PI / 2;
       m.position.set(x, .016, z);
       m.userData.go = [x, z];
@@ -1028,10 +1958,11 @@ function buildEnvironmentAndShelves() {
       HS.push(m);
     }
   });
-  for (let k = 0; k <= NSEC; k++) {
-    const cz = -12 * k;
-    [-9.3, -3.2, 3.2, 9.3].forEach(cx => {
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.25, 1.25), arrowTurnMat);
+  for (let k = 0; k <= NROWS; k++) {
+    const cz = -.4 - SECD * k;
+    [-11.8, -6.45, 0, 6.45, 11.8].forEach(cx => {
+      if (k === 0 && cx === -11.8) return;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 1.18), arrowTurnMat);
       m.rotation.x = -Math.PI / 2;
       m.position.set(cx, .018, cz);
       m.userData.go = [cx, cz];
@@ -1040,82 +1971,145 @@ function buildEnvironmentAndShelves() {
     });
   }
 
-  // الجدران والسقف الأسود بالكامل + لمبات الإضاءة البيضاء
-  const WALLM = M(0x15171d, { roughness: .72 }), BLK = M(0x050507, { roughness: .75, metalness: .2 });
-  const CEIL_BLACK = M(0x050507, { roughness: .85 });
-  box(.3, 8.2, hallLen, WALLM, -15.1, 4.1, hallMidZ, ENV_G);
-  box(.3, 8.2, hallLen, WALLM, 15.1, 4.1, hallMidZ, ENV_G);
-  box(30.4, 8.2, .3, WALLM, 0, 4.1, ZBACK, ENV_G);
-  box(30, .3, hallLen, CEIL_BLACK, 0, 8.2, hallMidZ, ENV_G);
-  box(.2, .5, hallLen, M(0xe60000), -14.95, .25, hallMidZ, ENV_G);
-  box(.2, .5, hallLen, M(0xe60000), 14.95, .25, hallMidZ, ENV_G);
+  // الجدران المعمارية المزدوجة (سيراميك سفلي داكن + فاصل ألومنيوم + واجهة علوية حديثة + أعمدة)
+  const WALL_UP = M(0x282d38, { roughness: .68, metalness: .06 });
+  const WALL_LO = M(0x181b22, { roughness: .48, metalness: .18 });
+  const PIL_M = M(0x1e222c, { roughness: .42, metalness: .32 });
+  const BLK = M(0x10131a, { roughness: .62, metalness: .35 });
+  const CEIL_DARK = M(0x0d1016, { roughness: .82 });
+  const FIX_M = M(0x202530, { roughness: .35, metalness: .65 });
 
-  for (let z = 14; z > ZBACK; z -= 6) box(30, .38, .5, BLK, 0, 7.85, z, ENV_G);
-  [-14.5, -4.8, 4.8, 14.5].forEach(x => box(.6, .45, hallLen, BLK, x, 7.8, hallMidZ, ENV_G));
-  [-14.4, 14.4, -9.7, 9.7].forEach(x => box(.08, .08, hallLen, RED, x, 7.4, hallMidZ, ENV_G));
-  // لمبات الإضاءة الساطعة في السقف الأسود بدون هالات أرضية
-  for (let z = 14; z > ZBACK; z -= 6) {
-    box(30, .06, .14, LED, 0, 7.6, z + .28, ENV_G);
-    box(30, .06, .14, LED, 0, 7.6, z - .28, ENV_G);
+  box(.3, 6.5, hallLen, WALL_UP, -15.1, 4.95, hallMidZ, ENV_G);
+  box(.3, 6.5, hallLen, WALL_UP, 15.1, 4.95, hallMidZ, ENV_G);
+  box(.34, 1.65, hallLen, WALL_LO, -15.04, .825, hallMidZ, ENV_G);
+  box(.34, 1.65, hallLen, WALL_LO, 15.04, .825, hallMidZ, ENV_G);
+  box(.10, .08, hallLen, ALU_M, -14.88, 1.66, hallMidZ, ENV_G);
+  box(.10, .08, hallLen, ALU_M, 14.88, 1.66, hallMidZ, ENV_G);
+  box(30.4, 8.2, .3, WALL_UP, 0, 4.1, ZBACK, ENV_G);
+  box(30, .3, hallLen, CEIL_DARK, 0, 8.2, hallMidZ, ENV_G);
+  box(.18, .22, hallLen, M(0xe60000, { roughness: .35 }), -14.88, .11, hallMidZ, ENV_G);
+  box(.18, .22, hallLen, M(0xe60000, { roughness: .35 }), 14.88, .11, hallMidZ, ENV_G);
+
+  // أعمدة جانبية معمارية وجسور سقفية حديثة + وحدات إضاءة LED مؤطرة
+  for (let z = 12; z > ZBACK; z -= 12) {
+    [-14.84, 14.84].forEach(px => {
+      box(.26, 8.1, .48, PIL_M, px, 4.05, z, ENV_G);
+      box(.30, .14, .54, GOLD, px, 1.72, z, ENV_G);
+    });
   }
-  AISLES.forEach(x => box(.55, .09, hallLen - 10, LED, x, 7.62, hallMidZ, ENV_G));
+  for (let z = 14; z > ZBACK; z -= 6) {
+    box(30, .34, .46, BLK, 0, 7.9, z, ENV_G);
+    box(29.2, .09, .32, FIX_M, 0, 7.66, z, ENV_G);
+    box(29.0, .04, .14, LED, 0, 7.60, z, ENV_G);
+  }
+  [-14.5, -4.8, 4.8, 14.5].forEach(x => box(.55, .42, hallLen, BLK, x, 7.82, hallMidZ, ENV_G));
+  [-14.4, 14.4, -9.7, 9.7].forEach(x => box(.06, .06, hallLen, RED, x, 7.46, hallMidZ, ENV_G));
+  AISLES.forEach(x => {
+    box(.68, .10, hallLen - 10, FIX_M, x, 7.68, hallMidZ, ENV_G);
+    box(.46, .05, hallLen - 10, LED, x, 7.61, hallMidZ, ENV_G);
+  });
 
-  // الرفوف والستاندات
+  // الأرفف الحمراء (أحمر فودافون + شرائط وسطى سوداء + خلفية كاملة مغلقة + رفوف كاملة على الجدار الخلفي)
   const B = {}, add = (k, x, y, z, sx, sy, sz, col) => (B[k] = B[k] || []).push([x, y, z, sx, sy, sz, col]);
-  for (let i = 0; i < NSEC; i++) {
-    const z = secZ(i), cc = "#700000";
+  const wLen = 7 * BAY, iLen = 6 * BAY;
+  for (let r = 0; r < NROWS; r++) {
+    const z = rowZ(r), cc = "#e60000";
     [-1, 1].forEach(s => {
-      const fx = 14.2 * s; ROWW.forEach(y => { add("board", fx + s * .375, y, z, .75, .07, 10.4); add("rail", fx - s * .02, y + .035, z, .05, .12, 10.4); add("tag", fx - s * .06, y - .015, z, .015, .1, 10.4) });
-      add("back", s * 14.95, .97, z, .1, 1.94, 11.2); add("cap", s * 14.62, 1.99, z, .34, .16, 11.2, cc);
-      for (let b = 0; b <= 8; b++) add("up", fx, 1, z - 5.2 + b * BAY, .07, 2, .07);
+      const fx = 14.2 * s;
+      ROWW.forEach(y => {
+        add("board", fx + s * .375, y, z, .75, .065, wLen);
+        add("rail", fx - s * .01, y + .038, z, .042, .092, wLen);
+        add("tag", fx - s * .036, y - .015, z, .016, .085, wLen);
+      });
+      add("back", s * 14.94, .98, z, .12, 1.96, wLen + .6);
+      add("rail", s * 14.87, .98, z, .03, .14, wLen + .5);
+      add("cap", s * 14.62, 2.02, z, .36, .16, wLen + .6, cc);
+      for (let b = 0; b <= 7; b++) add("up", fx, 1, z - wLen / 2 + b * BAY, .07, 2.02, .07);
+      SOL.push([s > 0 ? 13.42 : -15.05, s > 0 ? 15.05 : -13.42, z - wLen / 2 - .1, z + wLen / 2 + .1]);
     });
     ISL.forEach(c => {
-      ROWI.forEach(y => { add("board", c, y, z, 1.9, .07, 7.8); add("rail", c - .95, y + .035, z, .05, .12, 7.8); add("rail", c + .95, y + .035, z, .05, .12, 7.8); add("tag", c - .97, y - .015, z, .015, .1, 7.8); add("tag", c + .97, y - .015, z, .015, .1, 7.8) });
-      add("back", c, .9, z, .1, 1.8, 7.8); add("cap", c, 1.84, z, 2.0, .16, 8.1, cc);
-      [-.95, .95].forEach(dx => { for (let b = 0; b <= 6; b++) add("up", c + dx, .925, z - 3.9 + b * BAY, .07, 1.85, .07) });
-      SOL.push([c - .95, c + .95, z - 3.9, z + 3.9]);
+      ROWI.forEach(y => {
+        add("board", c, y, z, 1.9, .065, iLen);
+        add("rail", c - .95, y + .038, z, .042, .092, iLen);
+        add("rail", c + .95, y + .038, z, .042, .092, iLen);
+        add("tag", c - .97, y - .015, z, .016, .085, iLen);
+        add("tag", c + .97, y - .015, z, .016, .085, iLen);
+      });
+      add("back", c, .97, z, .14, 1.94, iLen + .1);
+      add("rail", c, .97, z, .16, .14, iLen + .12);
+      add("cap", c, 1.96, z, 2.02, .16, iLen + .24, cc);
+      [-.95, .95].forEach(dx => { for (let b = 0; b <= 6; b++) add("up", c + dx, .97, z - iLen / 2 + b * BAY, .07, 1.94, .07) });
+      SOL.push([c - .98, c + .98, z - iLen / 2 - .08, z + iLen / 2 + .08]);
     });
   }
-  SOL.push([8.2, 10.6, 5, 9], [8.2, 10.6, -1, 3], [-9.2, -4.5, 10, 11.6]);
+
+  const zFridge = ZBACK + 1.4;
+
+  // تصادم الكاشير وأرفف الحلويات، الثلاجات الجانبية والخلفية، عربات المدخل، بار الكافيه، والـ 3 ترابيزات الدائرية
+  SOL.push(
+    [-14.95, 14.95, ZBACK, zFridge + .56],
+    [7.48, 10.85, 4.9, 9.1], [7.48, 10.85, -1.1, 3.1],
+    [13.75, 15.05, 4.3, 13.1],
+    [-9.2, -4.5, 10.0, 11.6],
+    [-14.95, -12.15, 6.5, 11.5],
+    [-11.52, -9.58, 7.18, 9.22],
+    [-11.46, -9.44, 4.25, 6.35],
+    [-11.48, -9.62, 1.55, 3.45]
+  );
 
   for (const k in B) {
     const im = new THREE.InstancedMesh(UB, SM[k], B[k].length), o = new THREE.Object3D(); im.frustumCulled = false;
     B[k].forEach((a, i) => { o.position.set(a[0], a[1], a[2]); o.scale.set(a[3], a[4], a[5]); o.updateMatrix(); im.setMatrixAt(i, o.matrix); if (a[6]) im.setColorAt(i, new THREE.Color(a[6])) });
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
     SG.add(im);
   }
-  for (let k = 0; k <= NSEC; k++) ISL.forEach((c, si) => {
-    if (k == 0 && si == 3) return;
-    const g = new THREE.Group(); g.position.set(c, 0, -12 * k);
-    STANDS.push({ x: c, z: -12 * k, ci: (k + si) % NSEC });
-    SOL.push([c - .85, c + .85, -12 * k - .85, -12 * k + .85]);
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 1.78, 8), SM.up); pole.position.y = .89; g.add(pole);
-    [.18, .72, 1.26].forEach(y => { const d = new THREE.Mesh(new THREE.CylinderGeometry(.82, .82, .07, 32), SM.board); d.position.y = y; g.add(d); const r = new THREE.Mesh(new THREE.CylinderGeometry(.84, .84, .05, 32), SM.rail); r.position.y = y + .04; g.add(r) });
-    const tp = new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, .24, 32), M(0xe60000)); tp.position.y = 1.66; g.add(tp); SG.add(g);
+  for (let k = 0; k <= NROWS; k++) ISL.forEach((c, si) => {
+    if (k == 0 && (si == 3 || si == 0)) return;
+    const cz = -.4 - SECD * k;
+    const g = new THREE.Group(); g.position.set(c, 0, cz);
+    // إبراز ستاندات الشيبسي والباليتات وكراتين البيض على الجناح الجانبي الأيمن والممرات
+    const standCi = (si === 3) ? [9, 4, 9, 0, 9][k % 5] : (k * 2 + si) % CATS.length;
+    STANDS.push({ x: c, z: cz, ci: standCi });
+    SOL.push([c - .85, c + .85, cz - .85, cz + .85]);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.56, .62, .12, 24), M(0x111216, { roughness: .42, metalness: .35 }));
+    base.position.y = .06; g.add(base);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, 1.78, 12), CHR); pole.position.y = .89; g.add(pole);
+    [.18, .72, 1.26].forEach(y => {
+      const d = new THREE.Mesh(new THREE.CylinderGeometry(.82, .82, .065, 32), SM.board); d.position.y = y; g.add(d);
+      const r = new THREE.Mesh(new THREE.CylinderGeometry(.835, .835, .048, 32), SM.rail); r.position.y = y + .035; g.add(r);
+    });
+    const tp = new THREE.Mesh(new THREE.CylinderGeometry(.88, .88, .22, 32), M(0xe60000, { roughness: .32, metalness: .16 })); tp.position.y = 1.66; g.add(tp);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(.88, .022, 8, 32), M(0x111216, { roughness: .35, metalness: .45 })); rim.rotation.x = Math.PI / 2; rim.position.y = 1.77; g.add(rim);
+    SG.add(g);
   });
 
-  // لافتات الأقسام والعروض
-  const PROMO = [["عروض الأسبوع", "خصم حتى 50%", "#c8102e"], ["وفّر أكتر", "أسعار تنافسية كل يوم", "#0a6e4f"], ["لفترة محدودة", "اشتري 2 واحصل على خصم", "#e07b00"], ["جديدنا", "منتجات طازجة يومياً", "#1d5fbf"], [CONFIG.STORE_NAME, "جودة وثقة وأمان", "#7a2bbf"]];
-  const ADS = ["لبن وجبن طازج كل يوم", "لحوم بلدي طازجة", "خضار وفاكهة من المزرعة", "مجمدات بأقل الأسعار", "عصائر ومشروبات منعشة", "نظافة بيتك بخصومات", "عطور أصلية بأسعار خاصة", "أحدث الموبايلات والإلكترونيات", "أجهزة منزلية بالتقسيط", "مخبوزات ساخنة طول اليوم"];
-  CATS.forEach((n, i) => {
-    const z = secZ(i);
-    hang(n, "القسم رقم " + (i + 1), 5.6, 1.4, "#14110e", CONFIG.ACCENT_COLOR, 0, 4.6, z, SG);
-    [-6.45, 6.45].forEach(x => hang(n, "", 3.2, .95, "#14110e", CONFIG.ACCENT_COLOR, x, 4.15, z + 1, SG));
-    [-12.15, 12.15].forEach(x => hang(n, "", 2.8, .8, ADC[i % 5], "#fff", x, 4.3, z, SG));
-    const P1 = PROMO[(i * 2) % 5], P2 = PROMO[(i * 2 + 1) % 5];
-    hang(P1[0], P1[1], 4.4, 1.2, P1[2], "#fff", -6.45, 4.95, z - 6, SG);
-    hang(P2[0], P2[1], 4.4, 1.2, P2[2], "#fff", 6.45, 4.95, z - 6, SG);
-    [-1, 1].forEach(s => sign(ADS[i % ADS.length], 7, 1.4, ADC[(i + (s > 0 ? 2 : 0)) % 5], "#fff", s * 14.9, 4.7, z, -s * Math.PI / 2, "", SG));
-    if (i % 3 == 1) hang(CONFIG.STORE_NAME, "تسوّق بذكاء", 5, 1.1, "#14110e", CONFIG.ACCENT_COLOR, 0, 5, z - 6, SG);
-  });
+  // لافتات الأقسام والعروض المعمارية (أجنحة جانبية منظمة + لافتة الثلاجات الخلفية)
+  const PROMO = [["عروض الأسبوع", "خصم حتى 50%", "#e60000"], ["وفّر أكتر", "أسعار تنافسية كل يوم", "#111216"], ["لفترة محدودة", "اشتري 2 واحصل على خصم", "#e60000"], ["جديدنا", "منتجات طازجة يومياً", "#1d4ed8"], [CONFIG.STORE_NAME, "جودة وثقة وأمان", "#111216"]];
+  const ADS = ["لبن وبيض طازج يومياً", "لحوم بلدي طازجة", "خضار وفاكهة من المزرعة", "مجمدات بأقل الأسعار", "كانز ومشروبات 2 لتر", "نظافة بيتك بخصومات", "عناية شخصية أصلية", "أحدث الموبايلات والإلكترونيات", "أجهزة منزلية بالتقسيط", "شيبسي وسناكس ومخبوزات — الجناح الأيمن"];
+  for (let r = 0; r < NROWS; r++) {
+    const z = rowZ(r);
+    const ciL = r * 2, ciR = Math.min(CATS.length - 1, r * 2 + 1);
+    const cL = CATS[ciL], cR = CATS[ciR];
+    hang(cL + "  |  " + cR, "أقسام الصف " + (r + 1), 6.2, 1.30, "#111216", CONFIG.ACCENT_COLOR, 0, 4.65, z, SG);
+    hang(cL, "قسم " + (ciL + 1), 3.15, .90, "#111216", CONFIG.ACCENT_COLOR, -6.45, 4.22, z + 1.0, SG);
+    hang(cR, "قسم " + (ciR + 1), 3.15, .90, "#111216", CONFIG.ACCENT_COLOR, 6.45, 4.22, z + 1.0, SG);
+    hang(cL, "", 2.75, .78, "#e60000", "#fff", -12.15, 4.28, z, SG);
+    hang(cR, "", 2.75, .78, "#e60000", "#fff", 12.15, 4.28, z, SG);
+    const P1 = PROMO[(r * 2) % 5], P2 = PROMO[(r * 2 + 1) % 5];
+    hang(P1[0], P1[1], 4.2, .98, P1[2], "#fff", -6.45, 3.92, z - 6, SG, 1.98);
+    hang(P2[0], P2[1], 4.2, .98, P2[2], "#fff", 6.45, 3.92, z - 6, SG, 1.98);
+    sign(ADS[ciL % ADS.length], 6.4, 1.28, "#e60000", "#fff", -14.86, 4.75, z, Math.PI / 2, "", SG, false);
+    sign(ADS[ciR % ADS.length], 6.4, 1.28, "#111216", "#fff", 14.86, 4.75, z, -Math.PI / 2, "", SG, false);
+  }
+  sign("ثلاجات المجمدات واللحوم والدواجن", 14, 1.32, "#e60000", "#ffffff", 0, 4.45, zFridge + .2, 0, "", ENV_G, false);
+  sign(CONFIG.STORE_NAME + " — تجربة تسوق استثنائية", 15, 1.35, "#111216", CONFIG.ACCENT_COLOR, 0, 5.95, zFridge + .22, 0, "", ENV_G, false);
 
-  // ثلاجات ولوحات الجدار الخلفي الديناميكية عند نهاية الأقسام
-  // ثلاجات عرض واقعية: إطار أسود، أرفف بيضاء، زجاج أمامي، ومنتجات 3D داخل الأرفف
-  const zFridge = ZBACK + 1.4;
-  const FBLACK = M(0x09090b, { metalness: .5, roughness: .34 });
-  const FWHITE = M(0xeef2f5, { roughness: .42, metalness: .04 });
-  const FGLASS = new THREE.MeshPhysicalMaterial({ color: 0xdff4ff, transparent: true, opacity: .14, roughness: .04, metalness: 0, side: THREE.DoubleSide });
-  const FLED = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.8, 2.9, 3.2) });
-  const FRIDGE_ROWS = [], fTiers = [.34, .7, 1.06, 1.42, 1.78];
+  // ثلاجات العرض الخلفية والجانبية بإطارات ستانلس وزجاج ومقابض وإضاءة باردة ومنتجات مجمدات ولحوم كاملة
+  const FBLACK = M(0x14171f, { metalness: .52, roughness: .32 });
+  const FWHITE = M(0xf0f4f8, { roughness: .38, metalness: .04 });
+  const FGLASS = new THREE.MeshPhysicalMaterial({ color: 0xdff4ff, transparent: true, opacity: .15, roughness: .04, metalness: 0, clearcoat: .8, side: THREE.DoubleSide });
+  const FLED = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.7, 2.85, 3.2) });
+  const fTiers = [.34, .7, 1.06, 1.42, 1.78];
   function multideck(cx, cz, ry, w) {
     const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = ry; ENV_G.add(g);
     const H = 2.2, D = .95, cs = Math.cos(ry), sn = Math.sin(ry);
@@ -1123,59 +2117,44 @@ function buildEnvironmentAndShelves() {
     box(w, .16, D, FBLACK, 0, H - .08, 0, g);
     [-1, 1].forEach(s => box(.1, H, D, FBLACK, s * (w / 2 - .05), H / 2, 0, g));
     box(w - .2, H - .5, .06, FWHITE, 0, H / 2 + .1, -D / 2 + .1, g);
-    fTiers.forEach(y => { box(w - .18, .05, D - .18, FWHITE, 0, y, 0, g); box(w - .18, .04, .05, FBLACK, 0, y - .045, D / 2 - .1, g) });
+    fTiers.forEach(y => { box(w - .18, .045, D - .18, FWHITE, 0, y, 0, g); box(w - .18, .04, .05, FBLACK, 0, y - .042, D / 2 - .1, g) });
     box(w - .26, .05, .1, FLED, 0, H - .32, D / 2 - .2, g);
     box(w - .18, H - .55, .02, FGLASS, 0, H / 2 + .04, D / 2 - .03, g);
     box(w, .2, .06, FBLACK, 0, H - .18, D / 2 + .005, g);
     box(w, .36, .05, FBLACK, 0, .18, D / 2 + .005, g);
-    [-1, 1].forEach(s => box(.06, H - .55, .06, FBLACK, s * (w / 2 - .09), H / 2 + .04, D / 2 - .02, g));
-    const zone = w - .5;
+    [-1, 1].forEach(s => box(.06, H - .55, .06, ALU_M, s * (w / 2 - .09), H / 2 + .04, D / 2 - .01, g));
+    [-w * .16, w * .16].forEach(mx => {
+      box(.035, H - .56, .05, ALU_M, mx, H / 2 + .04, D / 2 - .005, g);
+      box(.022, .48, .04, CHR, mx + (mx < 0 ? -.055 : .055), 1.15, D / 2 + .032, g);
+    });
+    const zone = w - .42;
     fTiers.forEach((y, t) => {
-      const n = Math.max(4, Math.floor(zone / .23));
+      const n = Math.max(5, Math.floor(zone / .22));
       for (let a = 0; a < n; a++) {
         const lx = -zone / 2 + (a + .5) * zone / n;
-        [.3, .6].forEach((lz, row) => {
-          FRIDGE_ROWS.push({ x: cx + lx * cs + lz * sn, y: y + .045, z: cz - lx * sn + lz * cs, ry, t, a: a + row * 101, s: row ? .9 : 1 });
+        [-.14, .16].forEach((lz, row) => {
+          FRIDGE_ROWS.push({ x: cx + lx * cs + lz * sn, y: y + .024, z: cz - lx * sn + lz * cs, ry, t, a: a + row * 101, s: row ? .94 : 1, isRear: Math.abs(ry) < .1 });
         });
       }
     });
   }
   for (let xf = -12.8; xf <= 12.8; xf += 3.2) multideck(xf, zFridge, 0, 3.02);
-  multideck(13.2, 8.7, -Math.PI / 2, 2.8);
-  multideck(13.2, 11.6, -Math.PI / 2, 2.8);
-  /* إضاءة LED داخلية ناعمة توهّجية للثلاجات (تضيء المنتجات بشكل سينمائي) */
-  [-6.4, 0, 6.4].forEach(gx => {
-    const glow = new THREE.PointLight(0xbfe6ff, .9, 26, 2);
-    glow.position.set(gx, 1.6, zFridge + 1.6);
-    ENV_G.add(glow);
+  [-6.4, 0, 6.4].forEach(lx => {
+    const l = new THREE.PointLight(0xcbe9ff, .78, 18, 1.8);
+    l.position.set(lx, 3.1, zFridge + 2.2);
+    sc.add(l);
+    dynLights.push(l);
   });
-  {
-    const by = {}, o2 = new THREE.Object3D();
-    const pool = [P.filter(p => p.cat == 0), P.filter(p => p.cat == 4), P.filter(p => p.cat == 3), P.filter(p => p.cat == 1), P.filter(p => p.cat == 5), P.filter(p => p.cat == 9)];
-    FRIDGE_ROWS.forEach(r => {
-      const L = pool[r.t % pool.length]; if (!L.length) return;
-      const p = L[(r.a * 3 + r.t * 5) % L.length], sh = getShape(p.cat);
-      const s2 = Math.min(.85, .24 / sh[1], .22 / sh[0]) * (r.s || 1);
-      (by[p.id] = by[p.id] || []).push([r.x, r.y, r.z, r.ry, s2]);
-    });
-    for (const id in by) {
-      const p = P.find(q => q.id == id), a = by[id], im = new THREE.InstancedMesh(spriteGeo(p.cat), spriteMat(p), a.length);
-      im.frustumCulled = false;
-      a.forEach((v, i) => { o2.position.set(v[0], v[1], v[2]); o2.rotation.set(0, v[3], 0); o2.scale.set(v[4], v[4], v[4]); o2.updateMatrix(); im.setMatrixAt(i, o2.matrix) });
-      ENV_G.add(im);
-    }
-  }
-  sign("ثلاجات المجمدات والمشروبات الباردة", 13.5, 1.25, "#0b3a5a", "#ffffff", 0, 4.5, zFridge + .55, 0, "", ENV_G);
-  sign(CONFIG.STORE_NAME + " — تجربة تسوق متكاملة", 15, 1.35, "#14110e", CONFIG.ACCENT_COLOR, 0, 5.9, zFridge + .57, 0, "", ENV_G);
-  sign("عروض حصرية", 5.5, 1.25, "#c8102e", "#ffffff", -10.8, 4.5, zFridge + .55, 0, "", ENV_G);
-  sign("أفضل الأسعار", 5.5, 1.25, "#c8102e", "#ffffff", 10.8, 4.5, zFridge + .55, 0, "", ENV_G);
+  multideck(14.35, 5.8, -Math.PI / 2, 2.8);
+  multideck(14.35, 8.7, -Math.PI / 2, 2.8);
+  multideck(14.35, 11.6, -Math.PI / 2, 2.8);
 
-  // شاشات العروض الحمراء
-  SCRB.push(mkScr(8, 4.5, 1024, 576, -14.85, 4.2, 5, Math.PI / 2, false, SG), mkScr(8, 4.5, 1024, 576, 14.85, 4.2, 5, -Math.PI / 2, false, SG));
-  for (let k = 1; k < NSEC; k += 2) [0, -6.45, 6.45].forEach(x => { const z = -12 * k; SCRS.push(mkScr(3.6, 2, 512, 288, x, 6.3, z, 0, true, SG)); [-1.5, 1.5].forEach(d => box(.04, .6, .04, ROD, x + d, 7.75, z, SG)) });
+  // شاشات العروض الرقمية
+  SCRB.push(mkScr(7.8, 4.4, 1024, 576, -14.84, 4.65, 5, Math.PI / 2, false, SG), mkScr(7.8, 4.4, 1024, 576, 14.84, 4.65, 5, -Math.PI / 2, false, SG));
+  for (let k = 1; k < NROWS; k += 2) [0, -6.45, 6.45].forEach(x => { const z = -.4 - SECD * k; SCRS.push(mkScr(3.5, 1.9, 512, 288, x, 6.35, z, 0, true, SG)); [-1.45, 1.45].forEach(d => box(.035, .6, .035, ROD, x + d, 7.72, z, SG)) });
 }
 
-/* ---------- البضائع وشاشات العروض الحمراء ---------- */
+/* ---------- البضائع 3D وشاشات العروض ---------- */
 const hit = [];
 let SL = [], scrK = -1, lastScr = 0; const packCache = new Map();
 function slideList() {
@@ -1186,20 +2165,23 @@ function slideList() {
 }
 function packImg(p) { const k = [p.id, p.img, p.price, p.disc].join("|"); if (!packCache.has(k)) { const c = document.createElement("canvas"); c.width = 320; c.height = 400; paint(c.getContext("2d"), 320, 400, p, false, null); packCache.set(k, c) } return packCache.get(k) }
 function drawScr(c, W, H, sl, t) {
-  const p = sl.p, g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#240308"); g.addColorStop(1, "#b80d27"); c.fillStyle = g; c.fillRect(0, 0, W, H);
-  const gx = W * (.5 + .35 * Math.sin(t * .8)), rg = c.createRadialGradient(gx, H * .4, 10, gx, H * .4, H * .9); rg.addColorStop(0, "rgba(255,110,120,.38)"); rg.addColorStop(1, "rgba(255,80,100,0)"); c.fillStyle = rg; c.fillRect(0, 0, W, H);
-  const ph = H * .76, pw = ph * .8; c.save(); c.shadowColor = "#000a"; c.shadowBlur = H * .05; c.drawImage(packImg(p), W * .07, H * .07 + Math.sin(t * 2) * H * .015, pw, ph); c.restore();
+  const p = sl.p, g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#1d0409"); g.addColorStop(.55, "#8f0a1e"); g.addColorStop(1, "#e60000"); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  const gx = W * (.5 + .32 * Math.sin(t * .8)), rg = c.createRadialGradient(gx, H * .4, 10, gx, H * .4, H * .88); rg.addColorStop(0, "rgba(255,140,130,.32)"); rg.addColorStop(1, "rgba(255,80,100,0)"); c.fillStyle = rg; c.fillRect(0, 0, W, H);
+  const ph = H * .75, pw = ph * .8; c.save(); c.shadowColor = "#000b"; c.shadowBlur = H * .05; c.drawImage(packImg(p), W * .07, H * .07 + Math.sin(t * 2) * H * .014, pw, ph); c.restore();
   c.save(); c.direction = "rtl"; c.textAlign = "center"; c.textBaseline = "middle"; const tx = W * .67;
-  c.fillStyle = "#ffd24a"; c.font = `800 ${H * .095}px Cairo,Tahoma`; c.fillText(sl.title, tx, H * .16); c.fillStyle = "#fff"; fit(c, p.name, W * .5, H * .13); c.fillText(p.name, tx, H * .34);
-  if (sl.disc) { c.fillStyle = "#ffcc00"; c.beginPath(); c.arc(tx, H * .58, H * .13, 0, 7); c.fill(); c.fillStyle = "#000"; c.font = `800 ${H * .11}px Cairo,Tahoma`; c.fillText("-" + sl.disc + "%", tx, H * .58) }
+  c.fillStyle = "#ffd24a"; c.font = `800 ${H * .092}px Cairo,Tahoma`; c.fillText(sl.title, tx, H * .16); c.fillStyle = "#fff"; fit(c, p.name, W * .5, H * .125); c.fillText(p.name, tx, H * .34);
+  if (sl.disc) { c.fillStyle = "#facc15"; c.beginPath(); c.arc(tx, H * .57, H * .125, 0, 7); c.fill(); c.fillStyle = "#111"; c.font = `900 ${H * .105}px Cairo,Tahoma`; c.fillText("-" + sl.disc + "%", tx, H * .57) }
   c.fillStyle = "#fff"; c.font = `800 ${H * .11}px Cairo,Tahoma`; c.fillText(Math.round(p.price * (1 - (sl.disc || 0) / 100)) + " " + CONFIG.CURRENCY, tx, H * .79); c.restore();
-  c.fillStyle = "#c8102e"; c.fillRect(0, H * .9, W, H * .1); c.fillStyle = "#fff"; c.direction = "ltr"; c.textAlign = "left"; c.textBaseline = "middle"; c.font = `700 ${H * .055}px Cairo,Tahoma`;
+  c.fillStyle = "#111216"; c.fillRect(0, H * .9, W, H * .1); c.fillStyle = "#f2c94c"; c.direction = "ltr"; c.textAlign = "left"; c.textBaseline = "middle"; c.font = `700 ${H * .054}px Cairo,Tahoma`;
   const tk = CONFIG.STORE_NAME + "   •   عروض خاصة   •   خصم خاص   •   ", tw = c.measureText(tk).width || 300; for (let x = -((t * 70) % tw); x < W; x += tw) c.fillText(tk, x, H * .95);
 }
 function mkScr(w, h, cw, ch, x, y, z, ry, two, par) {
   const cvs = document.createElement("canvas"); cvs.width = cw; cvs.height = ch; const tex = new THREE.CanvasTexture(cvs); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = MAXA; const mt = new THREE.MeshBasicMaterial({ map: tex });
-  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; (par || sc).add(g); box(w + .3, h + .3, .18, M(0x0f0f10), 0, 0, 0, g);
-  [1, -1].forEach(q => { if (q < 0 && !two) return; const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mt); m.position.z = .1 * q; m.rotation.y = q > 0 ? 0 : Math.PI; g.add(m) });
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; (par || sc).add(g);
+  box(w + .26, h + .26, .18, SIGN_FRAME_M, 0, 0, 0, g);
+  box(w + .30, .05, .21, SIGN_TRIM_M, 0, h / 2 + .14, 0, g);
+  box(w + .30, .05, .21, SIGN_TRIM_M, 0, -h / 2 - .14, 0, g);
+  [1, -1].forEach(q => { if (q < 0 && !two) return; const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mt); m.position.z = .105 * q; m.rotation.y = q > 0 ? 0 : Math.PI; g.add(m) });
   return { c: cvs.getContext("2d"), tex };
 }
 function refreshScr() { SL = slideList(); packCache.clear(); scrK = -1; tickScr(performance.now() / 1000, true) }
@@ -1209,87 +2191,109 @@ function tickScr(t, force) {
 }
 
 function build() {
-  for (const k in MC) delete MC[k];
-  for (const k in SPC) delete SPC[k];
+  disposeMatCache(MC);
   buildEnvironmentAndShelves();
   clearGroup(PG);
-  clearGroup(MG);
-  if (HQ) { const m = SG.clone(true); MG.add(m) }
   hit.length = 0; const o = new THREE.Object3D();
-  const SHELF_H = .29;                                  // المساحة الرأسية القابلة للاستخدام على كل رف
-  const STACK = [2, 2, 2, 2, 1, 1, 3, 2, 1, 2];        // عدد الحبات المكدسة رأسياً حسب القسم
-  CATS.forEach((cn, ci) => {
-    const L = P.filter(p => p.cat == ci).sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0)); if (!L.length) return;
-    const sh = getShape(ci), isRound = (sh[3] === 1 || sh[3] === 3);
-    const w = isRound ? sh[0] * 2 : sh[0];
-    const dep = isRound ? sh[0] * 2 : sh[2];
-    const h = sh[1];
-    const baySpan = BAY - .12;                          // نترك فقط مساحة القوائم المعدنية بين الأرفف
-    const units = Math.max(1, STACK[ci % STACK.length] || 1);
-    const sy = SHELF_H / (units * h);                   // مقياس موحّد يحافظ على أبعاد المنتج الطبيعية
-    const across = Math.max(1, Math.ceil(baySpan / (w * sy)));
-    const spacing = baySpan / across;
-    const depEff = dep * sy;
-    const mp = {};
+  const SHELF_H = .298;
+  const NROWS = Math.ceil(CATS.length / 2);
+  const mp = {};
+  const byCat = CATS.map((_, ci) => P.filter(p => p.cat == ci).sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0)));
+  const baySpan = BAY - .02;
 
-    const put = (p, x, y, z, ry, fDir, shelfDepth) => {
-      const rows = Math.max(1, Math.min(4, Math.floor((shelfDepth - .04) / depEff)));
-      for (let rr = 0; rr < rows; rr++) {
-        const px = x - fDir * rr * depEff;              // صفوف متلاصقة من الأمام إلى الخلف
-        for (let q = 0; q < units; q++) {
-          mp[p.id].push([px, y + .04 + (q + .5) * h * sy, z, ry, sy, sy]);
-        }
-      }
-    };
+  const stackUnits = (dm) => {
+    if (dm.st === 5) return 2; // كراتين بيض متراصة رأسياً بالكامل
+    if (dm.st === 6) return 2; // باليتات كانز متراصة
+    if (dm.st === 1 || dm.st === 4 || dm.st === 7) return 1;
+    if (dm.st === 3) return 2;
+    return dm.h < .18 ? 2 : 1;
+  };
 
-    FACES.forEach((f, fi) => (f.wall ? ROWW : ROWI).forEach((y, r) => {
-      const nb = f.wall ? 8 : 6;
-      const shelfDepth = f.wall ? .75 : .90;
-      for (let b = 0; b < nb; b++) {
-        const p = L[(b * 2 + r * 3 + fi) % L.length], z0 = secZ(ci) - nb * BAY / 2 + (b + .5) * BAY;
-        (mp[p.id] = mp[p.id] || []);
-        for (let a = 0; a < across; a++) {
-          put(p, f.x - f.d * (.02 + depEff / 2), y, z0 + (a - (across - 1) / 2) * spacing, f.d * Math.PI / 2, f.d, shelfDepth);
-        }
-      }
-    }));
-
-    STANDS.forEach(st => {
-      if (st.ci != ci) return;
-      const standSy = Math.min(1, .40 / (units * h));
-      const standDep = dep * standSy;
-      [.18, .72, 1.26].forEach((y, r) => {
-        const rad = .78 - standDep / 2 - .03, n = Math.max(1, Math.floor(2 * Math.PI * rad / (w * standSy)));
-        for (let a = 0; a < n; a++) {
-          const th = a / n * 2 * Math.PI, p = L[(a + r * 2) % L.length];
-          mp[p.id] = mp[p.id] || [];
-          for (let q = 0; q < units; q++) {
-            mp[p.id].push([st.x + Math.cos(th) * rad, y + .05 + (q + .5) * h * standSy, st.z + Math.sin(th) * rad, Math.atan2(Math.cos(th), Math.sin(th)), standSy, standSy]);
+  // تعبئة أرفف الممرات بكثافة كاملة بدون فراغات أفقية أو رأسية أو خلفية
+  for (let rowIdx = 0; rowIdx < NROWS; rowIdx++) {
+    const zC = rowZ(rowIdx);
+    FACES.forEach((f, fi) => {
+      const ci = f.x < 0 ? (rowIdx * 2) : Math.min(CATS.length - 1, rowIdx * 2 + 1);
+      const L = byCat[ci] && byCat[ci].length ? byCat[ci] : P;
+      const nb = f.wall ? 7 : 6;
+      const shelfDepth = f.wall ? .73 : .88;
+      (f.wall ? ROWW : ROWI).forEach((y, r) => {
+        for (let b = 0; b < nb; b++) {
+          const p = L[(b + r * 2 + fi) % L.length];
+          const z0 = zC - nb * BAY / 2 + (b + .5) * BAY;
+          const dm = prodDims(p);
+          const units = stackUnits(dm);
+          const sy = Math.min(1.12, SHELF_H / (units * dm.h));
+          const across = Math.max(3, Math.min(12, Math.floor(baySpan / Math.max(.08, dm.w * sy))));
+          const spacing = baySpan / across;
+          const sx = Math.min(sy * 1.15, (spacing - .004) / dm.w);
+          const depEff = Math.max(.09, dm.d * sy);
+          const rows = Math.max(2, Math.min(5, Math.floor((shelfDepth - .02) / depEff)));
+          const arr = (mp[p.id] = mp[p.id] || []);
+          for (let a = 0; a < across; a++) {
+            const pz = z0 + (a - (across - 1) / 2) * spacing;
+            for (let rr = 0; rr < rows; rr++) {
+              const px = f.x - f.d * (.015 + depEff / 2 + rr * depEff);
+              for (let q = 0; q < units; q++) {
+                arr.push([px, y + .035 + (q + .5) * dm.h * sy, pz, f.d * Math.PI / 2, sx, sy, sy]);
+              }
+            }
           }
         }
       });
     });
+  }
 
-    L.forEach(p => {
-      const a = mp[p.id]; if (!a) return;
-      const im = new THREE.InstancedMesh(spriteGeo(ci), spriteMat(p), a.length);
-      im.frustumCulled = false;
-      a.forEach((v, i) => {
-        o.position.set(v[0], v[1], v[2]);
-        o.rotation.set(0, v[3], 0);
-        o.scale.set(v[4], v[5], 1);
-        o.updateMatrix();
-        im.setMatrixAt(i, o.matrix);
-        im.setColorAt(i, new THREE.Color().setScalar(.9 + .14 * rnd(i * 5 + 2)));
-      });
-      im.userData.p = p; PG.add(im); hit.push(im);
+  // تعبئة جميع الثلاجات الخلفية (اللحوم والمجمدات والألبان) والثلاجات الجانبية وإضافتها لقائمة الشراء
+  const rearFridgePool = [byCat[1], byCat[3], byCat[3], byCat[1], byCat[0]].map(L => (L && L.length ? L : P));
+  const sideFridgePool = [byCat[0], byCat[4], byCat[3], byCat[1], byCat[4]].map(L => (L && L.length ? L : P));
+  FRIDGE_ROWS.forEach(r => {
+    const pool = r.isRear ? rearFridgePool : sideFridgePool;
+    const L = pool[r.t % pool.length]; if (!L.length) return;
+    const p = L[(r.a * 3 + r.t * 5) % L.length], dm = prodDims(p);
+    const s2 = Math.min(.78, .26 / dm.h, .20 / dm.w) * (r.s || 1);
+    (mp[p.id] = mp[p.id] || []).push([r.x, r.y + dm.h * s2 * .5, r.z, r.ry, s2, s2, s2]);
+  });
+
+  // تعبئة الستاندات الدائرية
+  STANDS.forEach(st => {
+    const L = byCat[st.ci] && byCat[st.ci].length ? byCat[st.ci] : P;
+    [.18, .72, 1.26].forEach((y, r) => {
+      const pSample = L[r % L.length], dmS = prodDims(pSample);
+      const standUnits = stackUnits(dmS);
+      const standSy = Math.min(1.04, .42 / (standUnits * dmS.h));
+      const standDep = dmS.d * standSy;
+      const rad = .78 - standDep / 2 - .02, n = Math.max(5, Math.min(24, Math.floor(2 * Math.PI * rad / Math.max(.12, dmS.w * standSy))));
+      for (let a = 0; a < n; a++) {
+        const th = a / n * 2 * Math.PI, p = L[(a + r * 2) % L.length], dm = prodDims(p);
+        const u = stackUnits(dm);
+        const sy = Math.min(1.04, .42 / (u * dm.h));
+        const arr = (mp[p.id] = mp[p.id] || []);
+        for (let q = 0; q < u; q++) {
+          arr.push([st.x + Math.cos(th) * rad, y + .04 + (q + .5) * dm.h * sy, st.z + Math.sin(th) * rad, Math.atan2(Math.cos(th), Math.sin(th)), sy, sy, sy]);
+        }
+      }
     });
   });
-  if (HQ) { const m = PG.clone(true); MG.add(m) }
+
+  P.forEach(p => {
+    const a = mp[p.id]; if (!a || !a.length) return;
+    const im = new THREE.InstancedMesh(prodGeo(p), prodMat(p), a.length);
+    im.frustumCulled = false;
+    a.forEach((v, i) => {
+      o.position.set(v[0], v[1], v[2]);
+      o.rotation.set(0, v[3], 0);
+      o.scale.set(v[4], v[5], v[6]);
+      o.updateMatrix();
+      im.setMatrixAt(i, o.matrix);
+      im.setColorAt(i, new THREE.Color().setScalar(.94 + .08 * rnd(i * 5 + 2)));
+    });
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
+    im.userData.p = p; PG.add(im); hit.push(im);
+  });
   castShadows(SG, true, true);
   castShadows(ENV_G, true, true);
-  castShadows(PG, true, false);
-  castShadows(MG, true, false);
+  castShadows(PG, false, true);
   refreshScr();
 }
 build();
@@ -1305,26 +2309,24 @@ const glowT = tx(64, 64, (c) => { const g = c.createRadialGradient(32, 32, 0, 32
 function spark(par, pos, sz) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowT, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, fog: false })); sp.position.copy(pos); sp.scale.setScalar(sz); par.add(sp); return sp }
 const flyFrom = pos => { cam.updateMatrixWorld(true); return pos ? cam.worldToLocal(pos.clone()) : new THREE.Vector3(0, .3, -2.6) };
 function fly(p, a, b, done) {
-  const m = new THREE.Mesh(geo(p.cat), mat(p)); m.scale.setScalar(.65); cam.add(m); const o = { t: 0 }, hd = .6 + a.distanceTo(b) * .25; let last = 0; spark(m, new THREE.Vector3(), 1.4);
+  const m = new THREE.Mesh(prodGeo(p), prodMat(p)); m.scale.setScalar(.65); cam.add(m); const o = { t: 0 }, hd = .6 + a.distanceTo(b) * .25; let last = 0; spark(m, new THREE.Vector3(), 1.4);
   gsap.to(o, { t: 1, duration: .9, ease: "power1.in", onUpdate() { m.position.lerpVectors(a, b, o.t); m.position.y += Math.sin(o.t * Math.PI) * hd; m.rotation.x = o.t * 7; m.rotation.z = o.t * 3;
     if (o.t - last > .07) { last = o.t; const q = spark(cam, m.position, .45); gsap.to(q.scale, { x: .05, y: .05, duration: .4 }); gsap.to(q.material, { opacity: 0, duration: .4, onComplete() { cam.remove(q); q.material.dispose() } }) } }, onComplete() { cam.remove(m); done() } });
 }
 function syncCart(last, from) {
   while (cartItems.children.length) cartItems.remove(cartItems.children[0]);
   let i = 0;
-  // الحد الأقصى للمجسمات المرئية داخل السلة هو 18 قطعة مرتبة داخل حدودها
   cartList().forEach(it => {
     for (let q = 0; q < it.q && i < 18; q++, i++) {
-      const m = new THREE.Mesh(geo(it.p.cat), mat(it.p));
+      const m = new THREE.Mesh(prodGeo(it.p), prodMat(it.p));
       const s = SLOT(i);
-      const y = s[1] + getShape(it.p.cat)[1] * .32;
+      const y = s[1] + prodDims(it.p).h * .32;
       m.scale.setScalar(.65);
       m.position.set(s[0], y, s[2]);
       cartItems.add(m);
       if (it.k == last && q == it.q - 1) {
         if (from) {
           m.visible = false;
-          // هدف متطابق مع موضع فتحة السلة على الشاشة: يُشتق من تحويل العربة الفعلي (يتبع أي تغيير في الحجم/الموضع)
           myCart.updateWorldMatrix(true, false);
           const tgt = myCart.localToWorld(new THREE.Vector3(s[0], y, s[2]));
           fly(it.p, from, tgt, () => {
@@ -1341,84 +2343,186 @@ function syncCart(last, from) {
 }
 syncCart();
 
-/* ---------- المتسوقون المتحركون (عائلات + عربة بالطول الصحيح) ---------- */
+/* ---------- المتسوقون المتحركون (ملابس عصرية مشبعة + تباعد محكم بلا تداخل + تفادي وتصادم حقيقي مع العربة) ---------- */
 const NPC = [];
-const SHIRTS = [0x141414, 0xb00020, 0x1e3a5f, 0x2d5a27, 0x4a235a, 0x1c1c1c, 0x8b0000];
+const SHIRTS = [0xb91c1c, 0x1e3a8a, 0x0f766e, 0xd97706, 0x15803d, 0x9f1239, 0x18181b, 0xf3f4f6, 0x7c2d12, 0x0369a1, 0xa16207, 0x312e81];
 function attachCartCorrect(person) {
   const c = makeCart();
   c.scale.setScalar(.72);
-  // عربة بالطول (ليست بالعرض) — المقبض أمام الشخص
-  c.position.set(0, 0, 1.18);
-  c.rotation.y = Math.PI; // موجهة للأمام مع اتجاه المشي
+  c.position.set(0, 0, -1.04);
+  c.rotation.y = 0;
   person.add(c);
-  person.userData.armL.rotation.x = -.72;
-  person.userData.armR.rotation.x = -.72;
+  person.userData.pushing = true;
+  person.userData.armL.rotation.x = .48;
+  person.userData.armR.rotation.x = .48;
+  person.userData.elbowL.rotation.x = .62;
+  person.userData.elbowR.rotation.x = .62;
   return c;
 }
-function createFamilyGroup(type, shirtBase) {
+function createFamilyGroup(type, shirtBase, idx) {
   const g = new THREE.Group();
-  if (type === 0) { // أب + أم + بنت
-    const dad = createRealisticPerson(shirtBase, true, false);
-    const mom = createRealisticPerson(0xc8a2c8, false, true);
-    mom.position.set(0.85, 0, 0.15);
-    const girl = createRealisticPerson(0xff6b9d, false, true);
-    girl.scale.setScalar(0.62);
-    girl.position.set(0.35, 0, 0.55);
+  const sd = (idx || 0) * 17;
+  const MOM_COLS = [0x9f1239, 0x0f766e, 0xf5f5f4, 0xb91c1c, 0x1e3a8a, 0x92400e];
+  const KID_B_COLS = [0x1d4ed8, 0x15803d, 0xb45309, 0xc2410c, 0x1e293b];
+  const KID_G_COLS = [0xdc2626, 0x0d9488, 0xca8a04, 0xf3f4f6, 0x7c2d12];
+  const mc = MOM_COLS[idx % MOM_COLS.length];
+  const kcB = KID_B_COLS[idx % KID_B_COLS.length];
+  const kcG = KID_G_COLS[idx % KID_G_COLS.length];
+  if (type === 0) {
+    const dad = createRealisticPerson(shirtBase, true, false, { seed: sd + 1 });
+    dad.position.set(-0.26, 0, 0);
+    const mom = createRealisticPerson(mc, false, true, { hijab: true, seed: sd + 2 });
+    mom.position.set(0.28, 0, 0.14);
+    const girl = createRealisticPerson(kcG, false, true, { hijab: false, seed: sd + 3, isChild: true });
+    girl.scale.setScalar(0.62); girl.position.set(0.02, 0, 0.56);
     g.add(dad, mom, girl);
     attachCartCorrect(dad);
-  } else if (type === 1) { // أب + ابن
-    const dad = createRealisticPerson(shirtBase, true, false);
-    const boy = createRealisticPerson(0x1e88e5, false, false);
-    boy.scale.setScalar(0.65);
-    boy.position.set(0.55, 0, 0.4);
+  } else if (type === 1) {
+    const dad = createRealisticPerson(shirtBase, true, false, { seed: sd + 4 });
+    dad.position.set(-0.20, 0, 0);
+    const boy = createRealisticPerson(kcB, false, false, { seed: sd + 5, isChild: true });
+    boy.scale.setScalar(0.65); boy.position.set(0.26, 0, 0.24);
     g.add(dad, boy);
     attachCartCorrect(dad);
-  } else if (type === 2) { // أم + بنت
-    const mom = createRealisticPerson(0xb00020, false, true);
-    const girl = createRealisticPerson(0xffb6c1, false, true);
-    girl.scale.setScalar(0.6);
-    girl.position.set(0.5, 0, 0.35);
+  } else if (type === 2) {
+    const mom = createRealisticPerson(mc, false, true, { hijab: true, seed: sd + 6 });
+    mom.position.set(-0.20, 0, 0);
+    const girl = createRealisticPerson(kcG, false, true, { hijab: false, seed: sd + 7, isChild: true });
+    girl.scale.setScalar(0.60); girl.position.set(0.24, 0, 0.24);
     g.add(mom, girl);
     attachCartCorrect(mom);
-  } else { // أب + أم + ابن + بنت
-    const dad = createRealisticPerson(shirtBase, true, false);
-    const mom = createRealisticPerson(0x6a1b9a, false, true);
-    mom.position.set(0.9, 0, 0.1);
-    const boy = createRealisticPerson(0x1565c0, false, false);
-    boy.scale.setScalar(0.63);
-    boy.position.set(0.25, 0, 0.6);
-    const girl = createRealisticPerson(0xff8a80, false, true);
-    girl.scale.setScalar(0.58);
-    girl.position.set(0.55, 0, 0.7);
+  } else if (type === 3) {
+    const dad = createRealisticPerson(shirtBase, true, false, { seed: sd + 8 });
+    dad.position.set(-0.28, 0, 0);
+    const mom = createRealisticPerson(mc, false, true, { hijab: true, seed: sd + 9 });
+    mom.position.set(0.28, 0, 0.08);
+    const boy = createRealisticPerson(kcB, false, false, { seed: sd + 10, isChild: true });
+    boy.scale.setScalar(0.63); boy.position.set(-0.18, 0, 0.58);
+    const girl = createRealisticPerson(kcG, false, true, { hijab: false, seed: sd + 11, isChild: true });
+    girl.scale.setScalar(0.58); girl.position.set(0.20, 0, 0.62);
     g.add(dad, mom, boy, girl);
     attachCartCorrect(dad);
+  } else {
+    const man = createRealisticPerson(shirtBase, true, false, { seed: sd + 12 });
+    man.position.set(-0.24, 0, 0);
+    const woman = createRealisticPerson(mc, false, true, { hijab: true, seed: sd + 13 });
+    woman.position.set(0.26, 0, 0.14);
+    g.add(man, woman);
+    attachCartCorrect(man);
   }
   return g;
 }
-const familyTypes = [0, 1, 2, 3, 0, 1, 2, 3];
-for (let i = 0; i < (COARSE ? 4 : 7); i++) {
-  const g = createFamilyGroup(familyTypes[i % 4], SHIRTS[i % SHIRTS.length]);
-  const x = AISLES[1 + (i % 4)] + (rnd(i) - .5) * 0.9;
-  g.position.set(x, 0, -12 - i * 16);
+const AISLE_LIM = [[-12.82, -10.88], [-7.72, -5.18], [-2.02, 2.02], [5.18, 7.72], [10.88, 12.82]];
+const familyPlan = [
+  // الصف الطولي 0 (الجناح الأيسر)
+  { type: 0, aisle: 0, z: -10, dir: -1, lane: -0.52 },
+  { type: 1, aisle: 0, z: -28, dir:  1, lane:  0.54 },
+  { type: 4, aisle: 0, z: -48, dir: -1, lane: -0.52 },
+  // الصف الطولي 1
+  { type: 3, aisle: 1, z: -12, dir:  1, lane:  0.66 },
+  { type: 0, aisle: 1, z: -30, dir: -1, lane: -0.66 },
+  { type: 2, aisle: 1, z: -48, dir:  1, lane:  0.66 },
+  // الصف الطولي 2 (الممر الأوسط الرئيسي)
+  { type: 3, aisle: 2, z: -10, dir: -1, lane: -0.95 },
+  { type: 0, aisle: 2, z: -28, dir:  1, lane:  0.95 },
+  { type: 4, aisle: 2, z: -46, dir: -1, lane: -0.95 },
+  // الصف الطولي 3
+  { type: 1, aisle: 3, z: -12, dir: -1, lane: -0.66 },
+  { type: 3, aisle: 3, z: -30, dir:  1, lane:  0.66 },
+  { type: 0, aisle: 3, z: -48, dir: -1, lane: -0.66 },
+  // الصف الطولي 4 (الجناح الأيمن)
+  { type: 2, aisle: 4, z: -10, dir:  1, lane:  0.54 },
+  { type: 4, aisle: 4, z: -28, dir: -1, lane: -0.52 },
+  { type: 0, aisle: 4, z: -48, dir:  1, lane:  0.54 }
+];
+familyPlan.forEach((fp, i) => {
+  const aisleX = AISLES[fp.aisle];
+  const lim = AISLE_LIM[fp.aisle];
+  const x = Math.max(lim[0], Math.min(lim[1], aisleX + (fp.lane || 0)));
+  const g = createFamilyGroup(fp.type, SHIRTS[i % SHIRTS.length], i);
+  const yaw = fp.dir > 0 ? Math.PI : 0;
+  g.position.set(x, 0, fp.z);
+  g.rotation.y = yaw;
   castShadows(g, true, false);
   sc.add(g);
-  NPC.push({ bx: x, g, dir: i % 2 ? 1 : -1, sp: .55 + rnd(i + 9) * .4 });
-}
+  NPC.push({ aisleIdx: fp.aisle, aisleX, lim, bx: x, g, dir: fp.dir, yaw, avoidSide: 0, speedMul: 1, sp: .52 + rnd(i + 9) * .26 });
+});
 
-/* ---------- الحركة والكاميرا ---------- */
+/* ---------- الحركة والكاميرا ونظام التصادم الكامل للعربة مع الرفوف والجدران والأشخاص ---------- */
 const S = { x: 0, z: 40, tx: 0, tz: 40, yaw: 0, tyaw: 0, pitch: 0, tpitch: 0, open: false, lock: false, q: 0, prev: null };
-function blocked(x, z) { const r = .5; if (z > 12.6 || z < ZMIN || Math.abs(x) > 13.55) return true; for (const b of SOL) if (x > b[0] - r && x < b[1] + r && z > b[2] - r && z < b[3] + r) return true; return false }
+function pointBlocked(px, pz, r, skipNpc) {
+  if (pz > 12.6 || pz < ZBACK + 2.05 || Math.abs(px) > 14.45) return true;
+  for (let i = 0; i < SOL.length; i++) {
+    const b = SOL[i];
+    if (px > b[0] - r && px < b[1] + r && pz > b[2] - r && pz < b[3] + r) return true;
+  }
+  if (!skipNpc) {
+    for (let i = 0; i < NPC.length; i++) {
+      const ng = NPC[i].g;
+      const nx = ng.position.x, nz = ng.position.z;
+      if (Math.hypot(px - nx, pz - nz) < r + .56) return true;
+      const ny = ng.rotation.y;
+      const cx = nx - Math.sin(ny) * .85, cz = nz - Math.cos(ny) * .85;
+      if (Math.hypot(px - cx, pz - cz) < r + .40) return true;
+    }
+  }
+  return false;
+}
+function blocked(x, z, yaw, skipNpc) {
+  const y = (yaw == null) ? S.tyaw : yaw;
+  const sn = Math.sin(y), cs = Math.cos(y);
+  if (pointBlocked(x, z, .42, skipNpc)) return true;
+  if (pointBlocked(x - sn * .62, z - cs * .62, .42, skipNpc)) return true;
+  if (pointBlocked(x - sn * 1.12, z - cs * 1.12, .44, skipNpc)) return true;
+  return false;
+}
+function resolveCartTurn(x, z, yaw, skipNpc) {
+  if (!blocked(x, z, yaw, skipNpc)) return [x, z];
+  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1], [.71, .71], [-.71, .71], [.71, -.71], [-.71, -.71]];
+  const rads = [.14, .28, .45, .65, .88, 1.15];
+  for (let r = 0; r < rads.length; r++) {
+    const d = rads[r];
+    for (let i = 0; i < dirs.length; i++) {
+      const nx = x + dirs[i][0] * d, nz = z + dirs[i][1] * d;
+      if (!blocked(nx, nz, yaw, skipNpc)) return [nx, nz];
+    }
+  }
+  return null;
+}
+function applyYaw(newYaw) {
+  if (!S.open) { S.tyaw = newYaw; return; }
+  const res = resolveCartTurn(S.tx, S.tz, newYaw, false) || resolveCartTurn(S.tx, S.tz, newYaw, true);
+  if (res) { S.tx = res[0]; S.tz = res[1]; S.tyaw = newYaw; }
+}
 function walk(f, sd) {
-  const sn = Math.sin(S.tyaw), cs = Math.cos(S.tyaw), nx = S.tx + (-sn * f + cs * sd), nz = S.tz + (-cs * f - sn * sd); let m = false;
-  if (!blocked(nx, S.tz)) { S.tx = nx; m = true } if (!blocked(S.tx, nz)) { S.tz = nz; m = true } return m;
+  const sn = Math.sin(S.tyaw), cs = Math.cos(S.tyaw);
+  const dx = -sn * f + cs * sd, dz = -cs * f - sn * sd;
+  const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz) / .06));
+  const sx = dx / steps, sz = dz / steps;
+  let moved = false;
+  for (let i = 0; i < steps; i++) {
+    let stepMoved = false;
+    if (!blocked(S.tx + sx, S.tz, S.tyaw, false)) { S.tx += sx; stepMoved = true; }
+    if (!blocked(S.tx, S.tz + sz, S.tyaw, false)) { S.tz += sz; stepMoved = true; }
+    if (stepMoved) moved = true; else break;
+  }
+  return moved;
 }
 const nearCash = () => Math.hypot(S.tx - 9, S.tz - 4) < 6.5;
-const inBand = z => { for (let i = 0; i < CATS.length; i++) if (Math.abs(z - secZ(i)) < 4.9) return true; return false };
-const nearCross = z => { let b = 0; for (let k = 0; k <= CATS.length; k++) { const c = -12 * k; if (Math.abs(c - z) < Math.abs(b - z)) b = c } return b };
+const inBand = z => { const nr = Math.ceil(CATS.length / 2); for (let r = 0; r < nr; r++) if (Math.abs(z - rowZ(r)) < 4.55) return true; return false };
+const nearCross = z => { const nr = Math.ceil(CATS.length / 2); let b = -.4; for (let k = 0; k <= nr; k++) { const c = -.4 - SECD * k; if (Math.abs(c - z) < Math.abs(b - z)) b = c } return b };
 const angTo = (cur, t) => cur + ((((t - cur + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) - Math.PI);
 function go(x, z, yaw, pitch) {
   gsap.killTweensOf(S); S.q = 0; const tl = gsap.timeline(); let cx = S.tx, cz = S.tz;
-  const seg = (o, d) => tl.to(S, Object.assign({ duration: d, ease: "power2.inOut" }, o));
+  const seg = (o, d) => tl.to(S, Object.assign({
+    duration: d, ease: "power2.inOut",
+    onUpdate() {
+      if (S.open && blocked(S.tx, S.tz, S.tyaw, true)) {
+        const res = resolveCartTurn(S.tx, S.tz, S.tyaw, true);
+        if (res) { S.tx = res[0]; S.tz = res[1]; }
+      }
+    }
+  }, o));
   if (inBand(cz) && Math.abs(cx - x) > .3) { const c = nearCross(cz); seg({ tz: c }, Math.abs(c - cz) / 12 + .25); cz = c }
   if (Math.abs(cx - x) > .05) { seg({ tx: x }, Math.abs(cx - x) / 12 + .25); cx = x }
   seg({ tz: z, tyaw: angTo(S.tyaw, yaw || 0), tpitch: pitch || 0 }, Math.abs(z - cz) / 12 + .45); return tl;
@@ -1443,15 +2547,38 @@ function bindArrow(id, dir) {
 bindArrow("arrUp", 1);
 bindArrow("arrDn", -1);
 
-/* السحب للالتفاف والنظر + النقر على العربة أو الأسهم الصفراء أو المنتجات */
-let drag = null;
-cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY } });
+/* السحب للالتفاف والنظر + النقر على العربة أو الأسهم أو المنتجات + معاينة سعر المنتج عند التحويم */
+let drag = null, lastHover = 0;
+const hoverTipEl = $("hoverTip");
+function hideHoverTip() { if (hoverTipEl) hoverTipEl.style.display = "none"; cv.style.cursor = ""; }
+function updateHoverTip(e) {
+  if (!S.open || S.lock || drag || mm.classList.contains("on")) { hideHoverTip(); return; }
+  const now = performance.now();
+  if (now - lastHover < 75) return;
+  lastHover = now;
+  const ndc = { x: e.clientX / innerWidth * 2 - 1, y: -(e.clientY / innerHeight) * 2 + 1 };
+  ray.setFromCamera(ndc, cam);
+  const hp = ray.intersectObjects(hit)[0];
+  if (hp && hp.distance < 11 && hp.object.userData && hp.object.userData.p) {
+    const p = hp.object.userData.p;
+    hoverTipEl.innerHTML = `<div class="ht-cat">${esc(CATS[p.cat] || "")}</div><div class="ht-name">${esc(p.name)}</div><div class="ht-price"><span>${money(unit(p, vr(p).length === 3 ? 1 : 0))}</span>${p.disc ? `<span class="ht-disc">-${p.disc}%</span>` : ""}</div><div class="ht-act">انقر لاختيار الحجم والإضافة للسلة</div>`;
+    hoverTipEl.style.display = "block";
+    hoverTipEl.style.left = Math.min(innerWidth - 270, e.clientX + 16) + "px";
+    hoverTipEl.style.top = Math.min(innerHeight - 110, e.clientY + 16) + "px";
+    cv.style.cursor = "pointer";
+  } else {
+    hideHoverTip();
+  }
+}
+cv.addEventListener("pointerdown", e => { hideHoverTip(); drag = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY } });
 cv.addEventListener("pointermove", e => {
-  if (!drag || !S.open || S.lock) return;
-  S.tyaw -= (e.clientX - drag.x) * .0055;
-  S.tpitch = Math.max(-.6, Math.min(1.05, S.tpitch - (e.clientY - drag.y) * .0035)); // السحب لأعلى = النظر لأعلى
+  if (!drag) { updateHoverTip(e); return; }
+  if (!S.open || S.lock) return;
+  applyYaw(S.tyaw - (e.clientX - drag.x) * .0055);
+  S.tpitch = Math.max(-.6, Math.min(1.05, S.tpitch - (e.clientY - drag.y) * .0035));
   drag.x = e.clientX; drag.y = e.clientY;
 });
+cv.addEventListener("pointerleave", hideHoverTip);
 addEventListener("pointerup", e => {
   if (!drag) return;
   const mv = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
@@ -1463,16 +2590,16 @@ cv.addEventListener("wheel", e => {
   e.preventDefault();
   if (S.open && !S.lock) {
     S.tpitch = Math.max(-.6, Math.min(1.05, S.tpitch - e.deltaY * .002));
-    S.tyaw -= e.deltaX * .003;
+    applyYaw(S.tyaw - e.deltaX * .003);
   }
 }, { passive: false });
 
 const ray = new THREE.Raycaster();
 function pick(e) {
   if (!S.open || S.lock) return;
+  hideHoverTip();
   const ndc = { x: e.clientX / innerWidth * 2 - 1, y: -(e.clientY / innerHeight) * 2 + 1 };
 
-  // الضغط على عربة التسوق أو مقبضها الأحمر يحرك المستخدم للأمام (كاميرا HUD الثابتة)
   hudScene.updateMatrixWorld(true);
   hudCam.updateMatrixWorld(true);
   ray.setFromCamera(ndc, hudCam);
@@ -1510,56 +2637,158 @@ function loop() {
     if (keys.s || keys.arrowdown || moveDir === -1) walk(-sp, 0);
     if (keys.a) walk(0, -sp);
     if (keys.d) walk(0, sp);
-    if (keys.arrowleft || keys.q) S.tyaw += 1.6 * dt;
-    if (keys.arrowright || keys.e) S.tyaw -= 1.6 * dt;
+    if (keys.arrowleft || keys.q) applyYaw(S.tyaw + 1.6 * dt);
+    if (keys.arrowright || keys.e) applyYaw(S.tyaw - 1.6 * dt);
     if (S.q) { const d = Math.sign(S.q) * Math.min(.04, Math.abs(S.q)); if (walk(d, 0)) S.q -= d; else S.q = 0 }
   }
   const k = Math.min(1, dt * 7);
   const px = S.x, pz = S.z;
-  S.x += (S.tx - S.x) * k; S.z += (S.tz - S.z) * k;
-  S.yaw += (S.tyaw - S.yaw) * Math.min(1, dt * 8);
+  const nx = S.x + (S.tx - S.x) * k, nz = S.z + (S.tz - S.z) * k;
+  const nyaw = S.yaw + (S.tyaw - S.yaw) * Math.min(1, dt * 8);
+  if (S.open && blocked(nx, nz, nyaw, true)) {
+    S.x = S.tx; S.z = S.tz; S.yaw = S.tyaw;
+  } else {
+    S.x = nx; S.z = nz; S.yaw = nyaw;
+  }
   S.pitch += (S.tpitch - S.pitch) * Math.min(1, dt * 8);
   const spd = Math.hypot(S.x - px, S.z - pz) / Math.max(dt, .001);
   const hh = S.z > 19.4 ? -.6 : S.z > 15.5 ? -.6 + .6 * (19.4 - S.z) / 3.9 : 0;
   cam.position.set(S.x, hh + EYE_Y + Math.sin(t * 9) * .028 * Math.min(1, spd / 3), S.z);
   cam.rotation.set(S.pitch, S.yaw, Math.sin(t * 4.5) * .003 * Math.min(1, spd / 3), "YXZ");
-  /* الإضاءة المفتاحية تتبع اللاعب لإبقاء الظلال ناعمة وحادة حوله */
   keyLight.position.set(S.x + 9, 17, S.z + 14);
   keyLight.target.position.set(S.x, 0, S.z);
   if (S.open) placeCartArrows();
   if (S.z < 13 && !myCart.visible) { myCart.visible = true; rowCarts[rowCarts.length - 1].visible = false }
 
   greeters.forEach((gp, i) => {
+    const side = i ? 1 : -1;
     const waveArm = i === 0 ? gp.userData.armL : gp.userData.armR;
-    waveArm.rotation.z = (i ? 1 : -1) * (2.2 + Math.sin(t * 4 + i) * .35);
+    const waveElb = i === 0 ? gp.userData.elbowL : gp.userData.elbowR;
+    waveArm.rotation.z = side * (1.85 + Math.sin(t * 3.4 + i) * .18);
+    waveElb.rotation.z = side * (.65 + Math.sin(t * 4.2 + i) * .28);
+    gp.userData.headGroup.rotation.y = Math.sin(t * 1.1 + i) * .16;
+  });
+  staffNpc.forEach(st => {
+    const ud = st.p.userData;
+    ud.torsoGrp.position.y = .86 + Math.sin(t * 2.1 + st.phase) * .008;
+    ud.headGroup.rotation.y = Math.sin(t * .9 + st.phase) * .24;
+    if (st.isBarista) {
+      ud.armL.rotation.x = .42 + Math.sin(t * 3.1) * .12;
+      ud.elbowL.rotation.x = .82 + Math.cos(t * 3.1) * .15;
+      ud.armR.rotation.x = .38 - Math.sin(t * 2.6) * .10;
+      ud.elbowR.rotation.x = .76 + Math.sin(t * 3.5) * .14;
+      ud.torsoGrp.rotation.y = Math.sin(t * 1.1) * .14;
+    } else {
+      ud.elbowL.rotation.x = .72 + Math.sin(t * 2.6 + st.phase) * .06;
+      ud.elbowR.rotation.x = .66 - Math.sin(t * 2.4 + st.phase) * .06;
+    }
+  });
+  cafeAnimated.forEach(cg => {
+    const ud = cg.p.userData, sip = Math.max(0, Math.sin(t * .85 + cg.phase));
+    ud.headGroup.rotation.y = Math.sin(t * .7 + cg.phase) * .22;
+    ud.armR.rotation.x = .54 + sip * .22;
+    ud.elbowR.rotation.x = .98 + sip * .34;
+    ud.torsoGrp.rotation.x = Math.sin(t * 1.4 + cg.phase) * .03;
   });
 
-  const maxNpcZ = ZMIN + 7;
+  const maxNpcZ = ZMIN + 5.8, minFrontZ = -4.0;
+  const cartFx = S.x - Math.sin(S.yaw) * .88, cartFz = S.z - Math.cos(S.yaw) * .88;
   NPC.forEach((n, idx) => {
-    const dz = n.g.position.z - S.z, dx = n.g.position.x - S.x;
-    const dist = Math.hypot(dx, dz);
-    const near = dist < 3.4; // منطقة تفادي سلسة حول العربة
-    let tx = n.bx;
-    if (near) {
-      // يفسح الطريق بسلاسة بعيداً عن مسار عربة التسوق
-      const side = dx >= 0 ? 1 : -1;
-      tx = Math.max(n.bx - 1.6, Math.min(n.bx + 1.6, S.x + side * 1.8));
-    }
-    n.g.position.x += (tx - n.g.position.x) * Math.min(1, dt * 4);
-    const curSp = n.sp * (near ? Math.max(.12, 1 - dist / 3.4) : 1);
-    n.g.position.z += n.dir * curSp * dt;
-    if (n.g.position.z < maxNpcZ) n.dir = 1;
-    if (n.g.position.z > -3) n.dir = -1;
-    n.g.rotation.y = n.dir > 0 ? Math.PI : 0;
-    const stride = Math.sin(t * 6 * curSp + idx);
-    // تحريك أرجل كل الأشخاص في المجموعة (عائلات)
-    n.g.traverse(ch => {
-      if (ch.userData && ch.userData.legL) {
-        ch.userData.legL.rotation.x = stride * .45;
-        ch.userData.legR.rotation.x = -stride * .45;
+    const nx = n.g.position.x, nz = n.g.position.z;
+    const minX = n.lim[0], maxX = n.lim[1];
+    const dCam = Math.hypot(nx - S.x, nz - S.z), dCart = Math.hypot(nx - cartFx, nz - cartFz);
+    const dist = Math.min(dCam, dCart);
+    const refX = dCart < dCam ? cartFx : S.x;
+    const near = dist < 5.2;
+    let tx = n.bx, npcPush = 0, npcBrake = 1;
+    for (let j = 0; j < NPC.length; j++) {
+      if (j === idx) continue;
+      const ot = NPC[j];
+      if (ot.aisleIdx !== n.aisleIdx) continue;
+      const dzO = nz - ot.g.position.z, dxO = nx - ot.g.position.x;
+      const adz = Math.abs(dzO), adx = Math.abs(dxO);
+      if (adz < 4.5 && adx < 1.35) {
+        const pushDir = adx > .12 ? (dxO >= 0 ? 1 : -1) : (idx % 2 ? 1 : -1);
+        npcPush += pushDir * ((4.5 - adz) / 4.5) * 1.15;
       }
+      if (n.dir * (ot.g.position.z - nz) > 0 && adz < 4.2 && adx < 1.15) {
+        npcBrake = Math.min(npcBrake, adz < 2.2 ? .08 : .42);
+      }
+    }
+    if (near) {
+      if (!n.avoidSide) {
+        const roomPos = maxX - refX, roomNeg = refX - minX;
+        const diff = nx - refX;
+        if (Math.abs(diff) > .28 && ((diff > 0 && roomPos > .65) || (diff < 0 && roomNeg > .65))) {
+          n.avoidSide = diff > 0 ? 1 : -1;
+        } else {
+          n.avoidSide = roomPos >= roomNeg ? 1 : -1;
+        }
+      }
+      tx = Math.max(minX, Math.min(maxX, refX + n.avoidSide * 1.65));
+      const baseWait = dist < 1.85 ? .10 : Math.max(.35, Math.min(1, (dist - .85) / 3.8));
+      const tgtSp = Math.min(baseWait, npcBrake);
+      n.speedMul += (tgtSp - n.speedMul) * Math.min(1, dt * 6);
+    } else {
+      tx = Math.max(minX, Math.min(maxX, n.bx + npcPush));
+      n.avoidSide = 0;
+      n.speedMul += (npcBrake - n.speedMul) * Math.min(1, dt * 4);
+    }
+    const prevX = nx, prevZ = nz;
+    let nextX = Math.max(minX, Math.min(maxX, nx + (tx - nx) * Math.min(1, dt * (near ? 6.5 : 4.2))));
+    const curSp = n.sp * n.speedMul;
+    let nextZ = nz + n.dir * curSp * dt;
+
+    // فرض فصل سلس ومنع أي تداخل جسدي بين المتسوقين في نفس الممر بدون قفزات
+    for (let j = 0; j < idx; j++) {
+      const ot = NPC[j];
+      if (ot.aisleIdx !== n.aisleIdx) continue;
+      const ox = ot.g.position.x, oz = ot.g.position.z;
+      const dzSep = nextZ - oz, dxSep = nextX - ox;
+      if (Math.abs(dzSep) < 2.05 && Math.abs(dxSep) < 1.18) {
+        const pushSign = Math.abs(dxSep) > .06 ? (dxSep > 0 ? 1 : -1) : ((ox - (minX + maxX) * .5) <= 0 ? 1 : -1);
+        nextX = Math.max(minX, Math.min(maxX, nextX + pushSign * Math.min(.09, 1.18 - Math.abs(dxSep))));
+        if (Math.abs(nextX - ox) < 1.06 && Math.abs(nextZ - oz) < 1.95) {
+          if (Math.abs(nextZ - oz) < Math.abs(nz - oz)) nextZ = nz;
+          if (Math.abs(nextZ - oz) < 1.85) nextZ += (dzSep >= 0 ? 1 : -1) * Math.min(.06, 1.85 - Math.abs(nextZ - oz));
+        }
+      }
+    }
+
+    n.g.position.x = nextX;
+    n.g.position.z = Math.max(maxNpcZ, Math.min(minFrontZ, nextZ));
+    if (n.g.position.z <= maxNpcZ) n.dir = 1;
+    if (n.g.position.z >= minFrontZ) n.dir = -1;
+    const mdx = n.g.position.x - prevX, mdz = n.g.position.z - prevZ;
+    const walkYaw = n.dir > 0 ? Math.PI : 0;
+    const lean = Math.atan2(-mdx, Math.max(.025, Math.abs(mdz))) * .32;
+    const targetYaw = walkYaw + (n.dir > 0 ? -lean : lean);
+    n.yaw = angTo(n.yaw, targetYaw);
+    n.g.rotation.y += (n.yaw - n.g.rotation.y) * Math.min(1, dt * 8);
+
+    const strideAmp = Math.min(1, curSp / .62);
+    n.g.traverse(ch => {
+      if (!ch.userData || !ch.userData.legL) return;
+      const ud = ch.userData;
+      const ph = t * 5.2 * curSp + idx * 1.3 + (ch.position.x * .65);
+      const sw = Math.sin(ph);
+      ud.legL.rotation.x = sw * .48 * strideAmp;
+      ud.legR.rotation.x = -sw * .48 * strideAmp;
+      ud.kneeL.rotation.x = -Math.max(0, Math.sin(ph + .55)) * .62 * strideAmp;
+      ud.kneeR.rotation.x = -Math.max(0, -Math.sin(ph + .55)) * .62 * strideAmp;
+      if (!ud.pushing) {
+        ud.armL.rotation.x = -sw * .34 * strideAmp;
+        ud.armR.rotation.x = sw * .34 * strideAmp;
+        ud.elbowL.rotation.x = .22 + Math.max(0, -sw) * .24 * strideAmp;
+        ud.elbowR.rotation.x = .22 + Math.max(0, sw) * .24 * strideAmp;
+      } else {
+        ud.armL.rotation.x = .48 + sw * .02 * strideAmp;
+        ud.armR.rotation.x = .48 - sw * .02 * strideAmp;
+      }
+      ud.torsoGrp.position.y = .86 + Math.abs(sw) * .022 * strideAmp;
+      ud.torsoGrp.rotation.y = sw * .045 * strideAmp;
+      ud.headGroup.rotation.y = Math.sin(t * .75 + idx + ch.position.x) * .18;
     });
-    n.g.position.y = Math.abs(stride) * .025;
   });
 
   // لا نرسم المشهد ثلاثي الأبعاد خلف الفيديو التعريفي لتوفير أداء الجهاز
@@ -1843,11 +3072,13 @@ function showP(p, pos, nx) {
 }
 function cardH() {
   const { p, vi, q } = sel, sz = vr(p);
+  const finalUnit = unit(p, vi), rawUnit = Math.round(p.price * mul(p, vi)), saveAmt = Math.max(0, rawUnit - finalUnit);
   openM(`${X}<div class="pc"><div class="pimg"><img src="${esc(shot(p))}" alt="${esc(p.name)}"></div><div>
    <h3>${esc(p.name)}</h3><div style="color:var(--mut)">${esc(CATS[p.cat] || "")} · العبوة: ${esc(p.pack)}</div>
+   <div style="font-size:12px;color:#15803d;font-weight:700;margin-top:4px">${p.stock ? "✔ متوفر الآن بالمخزن • توصيل سريع لباب البيت" : ""}</div>
    <div style="margin-top:10px;font-weight:700">الحجم</div><div class="chips">${sz.map((s, i) => `<button class="${i == vi ? "on" : ""}" onclick="pickV(${i})">${esc(s)}</button>`).join("")}</div>
-   <div><span class="big">${money(unit(p, vi))}</span>${p.disc ? `<span class="old">${money(Math.round(p.price * mul(p, vi)))}</span> <span class="tag">خصم ${p.disc}%</span>` : ""}</div><br>
-   ${p.stock ? `<div class="qty"><button onclick="qtyCh(-1)">−</button><b style="font-size:20px;min-width:28px;text-align:center">${q}</b><button onclick="qtyCh(1)">+</button><span style="margin-inline-start:auto">${money(unit(p, vi) * q)}</span></div>
+   <div><span class="big">${money(finalUnit)}</span>${p.disc ? `<span class="old">${money(rawUnit)}</span> <span class="tag">خصم ${p.disc}% · وفّر ${money(saveAmt)}</span>` : ""}</div><br>
+   ${p.stock ? `<div class="qty"><button onclick="qtyCh(-1)">−</button><b style="font-size:20px;min-width:28px;text-align:center">${q}</b><button onclick="qtyCh(1)">+</button><span style="margin-inline-start:auto">${money(finalUnit * q)}</span></div>
    <button class="pr" style="width:100%;padding:13px" onclick="addSel()">أضف إلى العربة 🛒</button>` : `<p class="tag" style="padding:10px;font-size:15px">هذا المنتج غير متاح حالياً (خلص من المخزون)</p>`}</div></div>`);
 }
 function pickV(i) { sel.vi = i; cardH() } function qtyCh(d) { sel.q = Math.max(1, Math.min(20, sel.q + d)); cardH() }
@@ -1855,7 +3086,7 @@ function addSel() { const k = sel.p.id + "|" + sel.vi; cart[k] = (cart[k] || 0) 
 function add(id, vi) { const k = id + "|" + (vi == null ? 1 : vi); cart[k] = (cart[k] || 0) + 1; upd(); syncCart(k, flyFrom(null)); toast("تمت الإضافة ✔") }
 
 $("bCat").onclick = () => openM(`${X}<h3>الأقسام</h3><div class="cats">${CATS.map((c, i) => `<button onclick="goCat(${i})">${ECAT[i] || "🛒"} ${esc(c)}</button>`).join("")}</div>`);
-function goCat(i) { S.prev = null; S.lock = false; mm.classList.remove("on"); go(0, secZ(i) + 7.2, 0, 0) }
+function goCat(i) { S.prev = null; S.lock = false; mm.classList.remove("on"); const right = (i % 2 === 1); go(right ? 6.45 : -6.45, secZ(i) + 5.6, 0, 0) }
 $("bOff").onclick = () => { const o = P.filter(p => p.disc && p.stock); openM(`${X}<h3>العروض والخصومات</h3>${o.map(p => `<div class="row"><span>${esc(p.name)} <span class="tag">-${p.disc}%</span></span><span><b>${money(unit(p, vi1(p)))}</b> <button onclick="add(${p.id},${vi1(p)})">+</button></span></div>`).join("") || "لا توجد عروض الآن."}`) };
 const vi1 = p => (vr(p).length == 3 ? 1 : 0);
 
@@ -2001,7 +3232,7 @@ function addCat() {
   adm();
 }
 
-function persist() { if (!save("_p4", P)) alert("مساحة التخزين في المتصفح امتلأت — استخدم روابط صور أو صوراً أصغر.") }
+function persist() { if (!save("_p5", P)) alert("مساحة التخزين في المتصفح امتلأت — استخدم روابط صور أو صوراً أصغر.") }
 function up(id, k, v) { P.find(p => p.id == id)[k] = v; persist(); build(); toast("تم التحديث ✔") }
 function del(id) { P = P.filter(p => p.id != id); persist(); build(); adm() }
 function readImg(file, cb) {
