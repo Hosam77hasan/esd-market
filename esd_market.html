@@ -63,6 +63,34 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #hoverTip .ht-disc{background:#e60000;color:#fff;font-size:11px;padding:1px 6px;border-radius:5px}
 #hoverTip .ht-act{font-size:11px;color:#cbd5e1;margin-top:3px}
 #toast{position:fixed;z-index:30;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:12px;margin:auto;max-width:420px;text-align:center;background:var(--p);color:#fff;padding:10px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
+/* ---------- كروت المنتجات الجانبية المنبثقة أثناء السير في الممر ---------- */
+.spu-rail{position:fixed;z-index:12;top:calc(62px + env(safe-area-inset-top,0px));width:214px;display:flex;flex-direction:column;gap:7px;pointer-events:none;transition:opacity .28s ease,transform .28s ease;direction:rtl}
+#sidePushRight{right:max(10px,env(safe-area-inset-right,0px));align-items:stretch}
+#sidePushLeft{left:max(10px,env(safe-area-inset-left,0px));align-items:stretch}
+.spu-rail.spu-hidden{opacity:0;transform:translateY(-6px);pointer-events:none!important}
+.spu-hd{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:10px;background:rgba(15,17,24,.90);border:1px solid rgba(242,201,76,.42);color:#f2c94c;font-size:12px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.38);backdrop-filter:blur(10px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spu-hd span{overflow:hidden;text-overflow:ellipsis}
+.spu-card{pointer-events:auto;display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:1px solid rgba(255,255,255,.16);border-inline-start:3px solid #e60000;border-radius:12px;background:rgba(15,17,24,.88);color:#fff;text-align:right;font:inherit;box-shadow:0 10px 24px rgba(0,0,0,.42);backdrop-filter:blur(10px);cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;animation:spuIn .32s cubic-bezier(.2,.9,.3,1.15) backwards;-webkit-tap-highlight-color:transparent}
+.spu-card:hover{transform:translateY(-2px) scale(1.02);border-color:rgba(242,201,76,.75);background:rgba(24,26,36,.95)}
+.spu-card:active{transform:scale(.97)}
+.spu-thumb{width:38px;height:46px;flex-shrink:0;border-radius:8px;background:radial-gradient(circle at 50% 35%,#fff,#ece4d6);object-fit:contain;padding:2px;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.spu-info{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.spu-name{font-size:12.5px;font-weight:800;line-height:1.25;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spu-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.spu-price{font-size:12px;font-weight:800;color:#f2c94c}
+.spu-disc{background:#e60000;color:#fff;font-size:10px;font-weight:800;padding:0 5px;border-radius:5px;line-height:1.4}
+@keyframes spuIn{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
+@media(max-width:640px){
+  .spu-rail{top:calc(54px + env(safe-area-inset-top,0px));width:clamp(132px,37vw,166px);gap:5px;max-height:calc(100dvh - 230px);overflow:hidden}
+  #sidePushRight{right:max(6px,env(safe-area-inset-right,0px))}
+  #sidePushLeft{left:max(6px,env(safe-area-inset-left,0px))}
+  .spu-hd{padding:4px 7px;font-size:10.5px;border-radius:8px}
+  .spu-card{padding:5px 6px;gap:6px;border-radius:10px}
+  .spu-thumb{width:30px;height:36px;border-radius:6px}
+  .spu-name{font-size:11px}
+  .spu-price{font-size:10.5px}
+  .spu-disc{font-size:9px;padding:0 4px}
+}
 /* ---------- شاشة البداية (Splash) ---------- */
 #load{
   --sp-bg:#ffffff;--sp-ink:#000;--sp-ink-soft:#111827;--sp-red:#ef3b36;
@@ -237,6 +265,8 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
   <button type="button" class="arr-plain" id="arrUp" aria-label="تحرك للأمام">▲</button>
   <button type="button" class="arr-plain" id="arrDn" aria-label="تحرك للخلف">▼</button>
 </div>
+<aside id="sidePushRight" class="spu-rail spu-hidden" aria-live="polite"></aside>
+<aside id="sidePushLeft" class="spu-rail spu-hidden" aria-live="polite"></aside>
 <div id="hoverTip" role="tooltip"></div>
 <div id="toast"></div>
 <div class="modal" id="m"><div class="box" id="mb"></div></div>
@@ -2177,6 +2207,8 @@ function buildEnvironmentAndShelves() {
 /* ---------- البضائع 3D وشاشات العروض ---------- */
 const hit = [];
 let SL = [], scrK = -1, lastScr = 0; const packCache = new Map();
+const sideThumbCache = new Map();
+let lastSideZone = "", lastSideCheckAt = 0;
 function slideList() {
   const discounted = P.filter(p => (p.disc || 0) > 0 && p.stock).map(p => ({ p, title: "خصم خاص • عرض حصري", disc: p.disc }));
   const custom = (CONFIG.SCREENS && CONFIG.SCREENS.length) ? CONFIG.SCREENS.map(q => ({ p: P.find(x => x.id == q.id) || P[0], title: q.title || "عرض خاص", disc: q.disc || 0 })) : [];
@@ -2317,6 +2349,9 @@ function build() {
   castShadows(ENV_G, false, true);
   castShadows(PG, false, !COARSE);
   refreshScr();
+  sideThumbCache.clear();
+  lastSideZone = "";
+  requestAnimationFrame(() => updateSidePush(true));
 }
 build();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => build());
@@ -2685,6 +2720,7 @@ function loop() {
   keyLight.position.set(S.x + 9, 17, S.z + 14);
   keyLight.target.position.set(S.x, 0, S.z);
   if (S.z < 13 && !myCart.visible) { myCart.visible = true; rowCarts[rowCarts.length - 1].visible = false }
+  updateSidePush();
 
   greeters.forEach((gp, i) => {
     const side = i ? 1 : -1;
@@ -2826,6 +2862,149 @@ function loop() {
     R.autoClear = true;
   }
 }
+
+/* ---------- كروت المنتجات الجانبية المنبثقة أثناء السير في الممرات ---------- */
+const sideLeftEl = $("sidePushLeft"), sideRightEl = $("sidePushRight");
+
+function sideThumb(p) {
+  const k = [p.id, p.img, p.price, p.disc].join("|");
+  if (!sideThumbCache.has(k)) {
+    if (p.img) {
+      sideThumbCache.set(k, p.img);
+    } else {
+      const c = document.createElement("canvas"); c.width = 120; c.height = 150;
+      paint(c.getContext("2d"), 120, 150, p, false, null);
+      sideThumbCache.set(k, c.toDataURL("image/png"));
+    }
+  }
+  return sideThumbCache.get(k);
+}
+
+function openSideProd(id) {
+  const p = P.find(x => x.id == id);
+  if (p) showP(p, null, 1);
+}
+
+function pickCatItems(ci, limit, offset) {
+  const all = P.filter(p => p.cat == ci && p.stock);
+  const pool = all.length ? all : P.filter(p => p.cat == ci);
+  if (!pool.length) return [];
+  const out = [];
+  const count = Math.min(limit, pool.length);
+  for (let i = 0; i < count; i++) out.push(pool[(offset + i) % pool.length]);
+  return out;
+}
+
+function renderSideRail(el, title, emoji, items) {
+  if (!items || !items.length) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="spu-hd"><span>${emoji || "🛒"}</span><span>${esc(title)}</span></div>` +
+    items.map((p, idx) => {
+      const vIdx = vr(p).length == 3 ? 1 : 0;
+      const pr = money(unit(p, vIdx));
+      const discHtml = p.disc ? `<span class="spu-disc">-${p.disc}%</span>` : "";
+      return `<button type="button" class="spu-card" style="animation-delay:${idx * 55}ms" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();openSideProd(${p.id})"><img class="spu-thumb" src="${esc(sideThumb(p))}" alt="${esc(p.name)}"><div class="spu-info"><div class="spu-name">${esc(p.name)}</div><div class="spu-meta"><span class="spu-price">${esc(pr)}</span>${discHtml}</div></div></button>`;
+    }).join("");
+}
+
+function computeSideZone() {
+  const x = S.x, z = S.z;
+  const nrows = Math.ceil(CATS.length / 2);
+  const rearCut = rowZ(nrows - 1) - 5.0;
+  const maxPerSide = innerWidth <= 640 ? 3 : 4;
+
+  // 1) منطقة الثلاجات الخلفية (اللحوم والمجمدات والألبان)
+  if (z <= rearCut) {
+    const lItems = pickCatItems(1, maxPerSide, 0);
+    const rItems = pickCatItems(3, maxPerSide, 0);
+    return { key: "rear|" + maxPerSide, left: { t: CATS[1] || "اللحوم والدواجن", e: ECAT[1] || "🥩", items: lItems }, right: { t: CATS[3] || "المجمدات", e: ECAT[3] || "🧊", items: rItems } };
+  }
+
+  // 2) منطقة ركن الكافيه على الجانب الأيسر
+  if (x < -7.5 && z > 0.8 && z < 11.4) {
+    const cafePool = P.filter(p => p.stock && (p.cat === 9 || p.cat === 4 || /قهوة|نسكافيه|شوكولاتة|عصير|بسكويت|كوكيز|كرواسون/i.test(p.name)));
+    const list = cafePool.length ? cafePool : P.filter(p => p.cat === 9 || p.cat === 4);
+    const lItems = list.filter((_, i) => i % 2 === 0).slice(0, maxPerSide);
+    const rItems = list.filter((_, i) => i % 2 === 1).slice(0, maxPerSide);
+    return { key: "cafe|" + maxPerSide, left: { t: "الكافيه والمخبوزات", e: "☕", items: lItems }, right: { t: "مشروبات وحلويات", e: "🥐", items: rItems.length ? rItems : lItems } };
+  }
+
+  // 3) منطقة ثلاجات المشروبات والألبان الأمامية على الجانب الأيمن
+  if (x > 10.5 && z > 2.2) {
+    return {
+      key: "sideFridge|" + maxPerSide,
+      left: { t: CATS[0] || "الألبان والجبن", e: ECAT[0] || "🧀", items: pickCatItems(0, maxPerSide, 0) },
+      right: { t: CATS[4] || "المشروبات والعصائر", e: ECAT[4] || "🥤", items: pickCatItems(4, maxPerSide, 0) }
+    };
+  }
+
+  // 4) داخل الممرات والأقسام
+  if (z <= 1.5) {
+    const row = Math.max(0, Math.min(nrows - 1, Math.floor((SEC0 + 6.0 - z) / SECD)));
+    const ciL = row * 2;
+    const ciR = Math.min(CATS.length - 1, row * 2 + 1);
+
+    const splitSingle = (ci, tag) => {
+      const all = P.filter(p => p.cat == ci && p.stock);
+      const pool = all.length ? all : P.filter(p => p.cat == ci);
+      const lItems = pool.filter((_, i) => i % 2 === 0).slice(0, maxPerSide);
+      const rItems = pool.filter((_, i) => i % 2 === 1).slice(0, maxPerSide);
+      return {
+        key: `cat|${ci}|${tag}|${maxPerSide}`,
+        left: { t: CATS[ci] || "", e: ECAT[ci] || "🛒", items: lItems },
+        right: { t: CATS[ci] || "", e: ECAT[ci] || "🛒", items: rItems.length ? rItems : lItems }
+      };
+    };
+
+    // الممرات اليسرى تتبع القسم الأيسر للصف، والممرات اليمنى تتبع القسم الأيمن للصف
+    if (x < -2.65) return splitSingle(ciL, "L");
+    if (x > 2.65) return splitSingle(ciR, "R");
+
+    // في الممر الأوسط: إذا اقترب أو التفت نحو أحد الجانبين يُظهر منتجات ذلك القسم، وإلا يُظهر القسمين معاً على جانبي الشاشة
+    const lookX = -Math.sin(S.yaw);
+    if (x < -1.05 || lookX < -0.62) return splitSingle(ciL, "CL");
+    if (x > 1.05 || lookX > 0.62) return splitSingle(ciR, "CR");
+
+    const facingForward = Math.cos(S.yaw) >= 0;
+    const leftCi = facingForward ? ciL : ciR;
+    const rightCi = facingForward ? ciR : ciL;
+    return {
+      key: `dual|${leftCi}|${rightCi}|${maxPerSide}`,
+      left: { t: CATS[leftCi] || "", e: ECAT[leftCi] || "🛒", items: pickCatItems(leftCi, maxPerSide, 0) },
+      right: { t: CATS[rightCi] || "", e: ECAT[rightCi] || "🛒", items: pickCatItems(rightCi, maxPerSide, 0) }
+    };
+  }
+
+  return { key: "none" };
+}
+
+function updateSidePush(force) {
+  if (!sideLeftEl || !sideRightEl) return;
+  const active = S.open && !S.lock && !mm.classList.contains("on") && !$("videoIntro").classList.contains("show");
+  if (!active) {
+    sideLeftEl.classList.add("spu-hidden");
+    sideRightEl.classList.add("spu-hidden");
+    return;
+  }
+  const now = performance.now();
+  if (!force && now - lastSideCheckAt < 120) return;
+  lastSideCheckAt = now;
+
+  const zone = computeSideZone();
+  if (zone.key === "none") {
+    lastSideZone = "none";
+    sideLeftEl.classList.add("spu-hidden");
+    sideRightEl.classList.add("spu-hidden");
+    return;
+  }
+  if (force || zone.key !== lastSideZone) {
+    lastSideZone = zone.key;
+    renderSideRail(sideLeftEl, zone.left.t, zone.left.e, zone.left.items);
+    renderSideRail(sideRightEl, zone.right.t, zone.right.e, zone.right.items);
+  }
+  sideLeftEl.classList.toggle("spu-hidden", !sideLeftEl.innerHTML);
+  sideRightEl.classList.toggle("spu-hidden", !sideRightEl.innerHTML);
+}
+
 loop();
 
 /* ---------- مشهد الدخول: فيديو تعريفي إجباري + موسيقى بلا أي تحكم يدوي ---------- */
@@ -3033,7 +3212,7 @@ function finishEnter() {
   arrowsH = 0;
   placeCartArrows();
   startMusic();
-  toast("مرحباً بك في ESD Market 🛒");
+  updateSidePush(true);
 }
 
 function hideLanding() {
@@ -3101,7 +3280,7 @@ requestAnimationFrame(() => setTimeout(() => { sceneReady = true; hideLoader(); 
    ===================================================================== */
 const mb = $("mb");
 function openM(h) { mb.innerHTML = h; mm.classList.add("on"); mb.scrollTop = 0 }
-function closeM() { mm.classList.remove("on"); S.prev = null; S.lock = false }
+function closeM() { mm.classList.remove("on"); S.prev = null; S.lock = false; if (typeof updateSidePush === "function") updateSidePush(true) }
 mm.addEventListener("click", e => { if (e.target == mm) closeM() }); addEventListener("keydown", e => { if (e.key == "Escape") closeM() });
 const X = '<button onclick="closeM()" style="float:left">إغلاق ✕</button>';
 function upd() { $("bCart").textContent = "السلة (" + cnt() + ")"; save("_c4", cart) } upd();
@@ -3109,6 +3288,7 @@ function upd() { $("bCart").textContent = "السلة (" + cnt() + ")"; save("_c
 let sel = null;
 function showP(p, pos, nx) {
   S.lock = true; // قفل الكاميرا في مكانها دون أي تحريك نهائياً
+  if (typeof updateSidePush === "function") updateSidePush(true);
   sel = { p, vi: 1, q: 1, pos }; if (vr(p).length != 3) sel.vi = 0;
   cardH(); // فتح كارت المنتج فوراً في مكانه
 }
