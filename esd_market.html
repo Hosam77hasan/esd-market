@@ -7,7 +7,7 @@
 <title>ESD Market — عيش التجربه</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@900&family=Poppins:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@900&family=Poppins:wght@500;700&display=swap">
 <meta name="description" content="ESD Market — تجربة تسوق استثنائية: جولة افتراضية داخل المتجر، عروض وخصومات، وتوصيل سريع لباب البيت.">
 <meta name="theme-color" content="#c8102e">
 <!-- معاينة المشاركة: بعد ربط نطاق، اجعل og:image (و og:url) رابطًا مطلقًا https://نطاقك/og-image.jpg -->
@@ -65,7 +65,7 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #toast{position:fixed;z-index:30;top:calc(64px + env(safe-area-inset-top,0px));inset-inline:12px;margin:auto;max-width:420px;text-align:center;background:var(--p);color:#fff;padding:10px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none}
 /* ---------- شاشة البداية (Splash) ---------- */
 #load{
-  --sp-bg:#ffffff;--sp-ink:#000;--sp-ink-soft:#1a1a1a;--sp-red:#ef3b36;
+  --sp-bg:#ffffff;--sp-ink:#000;--sp-ink-soft:#111827;--sp-red:#ef3b36;
   --u:min(1.1vw,1.25vh,10px);
   --sp-font-latin:"Montserrat","Arial Black",Arial,sans-serif;
   --sp-font-script:"Dancing Script","Brush Script MT",cursive;
@@ -73,25 +73,28 @@ header button.pr{background:var(--p);border-color:var(--p)}
   --sp-font-credit:"Poppins","Segoe UI",Arial,sans-serif;
   position:fixed;inset:0;z-index:60;background:var(--sp-bg);color:var(--sp-ink);
   display:grid;place-items:center;overflow:hidden;text-align:center;
-  padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));
+  padding:16px max(16px,env(safe-area-inset-right,0px)) max(64px,calc(env(safe-area-inset-bottom,0px) + 56px)) max(16px,env(safe-area-inset-left,0px));
   transition:opacity .75s ease;
 }
 #load .sp-stage{width:calc(var(--u)*76);max-width:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
-#load .sp-logo{margin:0;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.6);direction:ltr;line-height:1.1}
-#load .sp-word{display:inline-block}
-#load .sp-word>span{display:inline-block;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 4px rgba(0,0,0,.22))}
-#load .sp-esd{font-family:var(--sp-font-latin);font-weight:900;font-size:calc(var(--u)*12);letter-spacing:-.02em}
-#load .sp-esd>span{background-image:linear-gradient(180deg,#ff7a6b 0%,#e8261f 45%,#a11212 100%)}
-#load .sp-market{font-family:var(--sp-font-script);font-weight:700;font-size:calc(var(--u)*13.5)}
-#load .sp-market>span{padding-inline-end:.06em;background-image:linear-gradient(180deg,#fff3bf 0%,#e6bb4d 50%,#9c7421 100%)}
-#load .sp-cart{display:block;width:calc(var(--u)*30);height:calc(var(--u)*26);margin-top:calc(var(--u)*1.5);overflow:visible}
+#load .sp-logo{margin:0;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.8);direction:ltr;line-height:1.1;perspective:720px;transform:rotateX(5deg)}
+#load .sp-word{position:relative;display:inline-block}
+#load .sp-word::before{content:attr(data-text);position:absolute;inset:0;z-index:0;pointer-events:none}
+#load .sp-word>span{position:relative;z-index:1;display:inline-block;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+#load .sp-esd{font-family:var(--sp-font-latin);font-weight:900;font-size:calc(var(--u)*12.6);letter-spacing:-.02em}
+#load .sp-esd::before{color:#8f0b0b;text-shadow:0 1px 0 #b81010,0 2px 0 #9f0d0d,0 3px 0 #860a0a,0 4px 0 #6e0707,0 5px 0 #550505,0 6px 0 #3d0303,0 11px 22px rgba(0,0,0,.36)}
+#load .sp-esd>span{background-image:linear-gradient(180deg,#ff887a 0%,#ef261f 40%,#c8102e 78%,#960a1e 100%);-webkit-text-stroke:1px rgba(255,215,205,.35)}
+#load .sp-market{font-family:var(--sp-font-script);font-weight:700;font-size:calc(var(--u)*14.2)}
+#load .sp-market::before{padding-inline-end:.06em;color:#8c6312;text-shadow:0 1px 0 #ba8a1e,0 2px 0 #9c7014,0 3px 0 #7e570c,0 4px 0 #614006,0 5px 0 #442b03,0 9px 18px rgba(0,0,0,.28)}
+#load .sp-market>span{padding-inline-end:.06em;background-image:linear-gradient(180deg,#fff6c7 0%,#f0c44d 48%,#c6911f 84%,#96680f 100%);-webkit-text-stroke:.6px rgba(255,248,210,.45)}
+#load .sp-cart{display:block;width:calc(var(--u)*29);height:calc(var(--u)*25);margin-top:calc(var(--u)*1.4);overflow:visible}
 #load .sp-bob{transform-origin:150px 211px}
 #load .sp-wheel{transform-box:fill-box;transform-origin:center}
-#load .sp-copy{margin-top:calc(var(--u)*2.6);display:flex;flex-direction:column;align-items:center}
+#load .sp-copy{margin-top:calc(var(--u)*2.2);display:flex;flex-direction:column;align-items:center}
 #load .sp-copy p{margin:0;font-family:var(--sp-font-ar);font-weight:800;color:var(--sp-ink);line-height:1.5;text-wrap:balance}
-#load .sp-l1{font-size:calc(var(--u)*5.6)}
-#load .sp-l2,#load .sp-l3{font-size:calc(var(--u)*4.4)}
-#load .sp-powered{margin:calc(var(--u)*3.4) 0 0;font-family:var(--sp-font-credit);font-weight:500;font-size:calc(var(--u)*2.1);color:var(--sp-ink-soft);letter-spacing:.01em}
+#load .sp-l1{font-size:calc(var(--u)*5.5)}
+#load .sp-l2,#load .sp-l3{font-size:calc(var(--u)*4.3)}
+#load .sp-powered{position:fixed;bottom:max(20px,calc(env(safe-area-inset-bottom,0px) + 16px));inset-inline:16px;margin:0;text-align:center;font-family:var(--sp-font-credit);font-weight:700;font-size:clamp(14px,calc(var(--u)*2.6),22px);color:var(--sp-ink-soft);letter-spacing:.03em;text-shadow:0 1px 0 rgba(0,0,0,.08)}
 @keyframes spLogoIn{from{opacity:0;transform:translateY(calc(var(--u)*1.2)) scale(.8)}to{opacity:1;transform:none}}
 @keyframes spCartIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
 @keyframes spBob{0%,50%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(1.5px,-6px) rotate(-1.2deg)}75%{transform:translate(-1.5px,-6px) rotate(1.2deg)}}
@@ -105,10 +108,10 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #load .sp-play .sp-bob{animation:spBob 1.4s ease-in-out 1.8s infinite}
 #load .sp-play .sp-wheel{animation:spSpin .7s linear infinite}
 #load .sp-play .sp-mk{animation:spMark 1.4s ease-in-out var(--p) infinite}
-#load .sp-play .sp-l1{animation:spFadeUp .7s cubic-bezier(.2,.8,.2,1) 1.9s backwards}
-#load .sp-play .sp-l2{animation:spFadeUp .7s cubic-bezier(.2,.8,.2,1) 2.25s backwards}
-#load .sp-play .sp-l3{animation:spFadeUp .7s cubic-bezier(.2,.8,.2,1) 2.6s backwards}
-#load .sp-play .sp-powered{animation:spFadeIn .8s ease-out 3.2s backwards}
+#load .sp-play .sp-l1{animation:spFadeUp .7s cubic-bezier(.2,.8,.2,1) 1.85s backwards}
+#load .sp-play .sp-l2{animation:spFadeUp .7s cubic-bezier(.2,.8,.2,1) 2.2s backwards}
+#load .sp-play .sp-l3{animation:spFadeUp .7s cubic-bezier(.2,.8,.2,1) 2.55s backwards}
+#load .sp-play .sp-powered{animation:spFadeIn .8s ease-out 2.1s backwards}
 @media(prefers-reduced-motion:reduce){#load .sp-play *,#load .sp-play{animation:none!important}}
 /* فيديو الدخلة: ملء الشاشة بالكامل على كل الأجهزة دون أي فراغات سوداء */
 #videoIntro{position:fixed;inset:0;z-index:45;width:100vw;max-width:100vw;height:100vh;height:100dvh;max-height:100dvh;object-fit:cover;object-position:center;background:#000;opacity:0;pointer-events:none;transition:opacity .9s}
@@ -180,8 +183,8 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
 <div id="load">
   <main class="sp-stage sp-play" id="splashStage">
     <h1 class="sp-logo" aria-label="ESD Market">
-      <span class="sp-word sp-esd"><span>ESD</span></span>
-      <span class="sp-word sp-market"><span>Market</span></span>
+      <span class="sp-word sp-esd" data-text="ESD"><span>ESD</span></span>
+      <span class="sp-word sp-market" data-text="Market"><span>Market</span></span>
     </h1>
     <svg class="sp-cart" viewBox="0 0 300 260" role="img" aria-label="عربة تسوق" xmlns="http://www.w3.org/2000/svg">
       <g fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -214,8 +217,8 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
       <p class="sp-l2">خصومات وعروض حقيقية</p>
       <p class="sp-l3">توصيل سريع حتى باب المنزل</p>
     </div>
-    <p class="sp-powered">Powered by Emperor Software Development</p>
   </main>
+  <p class="sp-powered">Powered by Emperor Software Development</p>
 </div>
 <div id="landing">
   <div class="stage"><img class="art" id="artImg" width="1376" height="768" decoding="async" alt="ESD Market — تجربة تسوق استثنائية"></div>
@@ -366,7 +369,7 @@ catch (e) { $("load").innerHTML = "<h1>⚠</h1><div>المتصفح أو الجه
 R.setPixelRatio(Math.min(devicePixelRatio, COARSE ? 1.5 : 2));
 R.outputEncoding = THREE.sRGBEncoding;
 R.toneMapping = THREE.ACESFilmicToneMapping;
-R.toneMappingExposure = 1.14;
+R.toneMappingExposure = 1.06;
 R.physicallyCorrectLights = false;
 R.shadowMap.enabled = true;
 R.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -378,31 +381,31 @@ const EYE_Y = 1.72;
 const FOV_LAND = 60, FOV_PORT = 70;
 const cam = new THREE.PerspectiveCamera(FOV_LAND, 1, .1, 260);
 
-/* بيئة انعكاس استوديو هايبرماركت واقعية (أشرطة سقف مضيئة + جدران محايدة + أرضية دافئة) */
+/* بيئة انعكاس استوديو هايبرماركت متوازنة: تحافظ على لمعان الأرضية كمرآة نظيفة بدون شريط توهج وسط الممر */
 (function () {
   const pm = new THREE.PMREMGenerator(R), e = new THREE.Scene();
-  e.add(new THREE.Mesh(new THREE.BoxGeometry(48, 18, 96), new THREE.MeshBasicMaterial({ color: 0x3b404c, side: THREE.BackSide })));
-  const floorBounce = new THREE.Mesh(new THREE.PlaneGeometry(46, 94), new THREE.MeshBasicMaterial({ color: 0x5c5b58 }));
+  e.add(new THREE.Mesh(new THREE.BoxGeometry(48, 18, 96), new THREE.MeshBasicMaterial({ color: 0x353a46, side: THREE.BackSide })));
+  const floorBounce = new THREE.Mesh(new THREE.PlaneGeometry(46, 94), new THREE.MeshBasicMaterial({ color: 0x4b4a48 }));
   floorBounce.rotation.x = -Math.PI / 2; floorBounce.position.y = -8.8; e.add(floorBounce);
-  const ceilDark = new THREE.Mesh(new THREE.PlaneGeometry(46, 94), new THREE.MeshBasicMaterial({ color: 0x20232b }));
+  const ceilDark = new THREE.Mesh(new THREE.PlaneGeometry(46, 94), new THREE.MeshBasicMaterial({ color: 0x1c2028 }));
   ceilDark.rotation.x = Math.PI / 2; ceilDark.position.y = 8.8; e.add(ceilDark);
-  const softBoxMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 2.38, 2.32) });
-  const warmAccentMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.35, 0.9) });
-  [-12, -6, 0, 6, 12].forEach(lx => {
-    const strip = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 86), softBoxMat);
+  const softBoxMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.86, 0.85, 0.82) });
+  const warmAccentMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.95, 0.78, 0.56) });
+  [-13.5, -7.8, 7.8, 13.5].forEach(lx => {
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 86), softBoxMat);
     strip.rotation.x = Math.PI / 2; strip.position.set(lx, 8.72, 0); e.add(strip);
   });
   [-22, 22].forEach(wx => {
-    const band = new THREE.Mesh(new THREE.PlaneGeometry(80, 1.6), warmAccentMat);
+    const band = new THREE.Mesh(new THREE.PlaneGeometry(80, 1.5), warmAccentMat);
     band.rotation.y = wx < 0 ? Math.PI / 2 : -Math.PI / 2;
     band.position.set(wx, 4.5, 0); e.add(band);
   });
-  sc.environment = pm.fromScene(e, .032).texture; pm.dispose();
+  sc.environment = pm.fromScene(e, .04).texture; pm.dispose();
 })();
-sc.add(new THREE.HemisphereLight(0xf5f8ff, 0x7c7468, .78));
+sc.add(new THREE.HemisphereLight(0xf5f8ff, 0x7c7468, .68));
 
-/* إضاءة معمارية متوازنة: رئيسية دافئة بظلال دقيقة + تعبئة سماوية + إضاءة حواف */
-const keyLight = new THREE.DirectionalLight(0xfff5e6, 1.12);
+/* إضاءة معمارية متوازنة: ألوان المتجر واضحة بدون وهج مباشر أمام العربة */
+const keyLight = new THREE.DirectionalLight(0xfff5e6, .94);
 keyLight.position.set(10, 18, 14);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048);
@@ -412,12 +415,12 @@ keyLight.shadow.camera.top = 32; keyLight.shadow.camera.bottom = -26;
 keyLight.shadow.bias = -0.00035; keyLight.shadow.normalBias = 0.025;
 sc.add(keyLight); sc.add(keyLight.target);
 
-const fillLight = new THREE.DirectionalLight(0xc9ddff, .42);
+const fillLight = new THREE.DirectionalLight(0xc9ddff, .36);
 fillLight.position.set(-12, 10, 8);
 sc.add(fillLight);
 
-const rimLight = new THREE.DirectionalLight(0xffe0b5, .36);
-rimLight.position.set(0, 6, -24);
+const rimLight = new THREE.DirectionalLight(0xffe0b5, .18);
+rimLight.position.set(-16, 14, -22);
 sc.add(rimLight);
 
 function castShadows(root, cast, receive) {
@@ -582,29 +585,49 @@ const floorRoughT = tx(512, 512, (c, W, H) => {
 }, true);
 floorRoughT.wrapS = floorRoughT.wrapT = THREE.RepeatWrapping;
 
-const arrowSingleT = tx(128, 128, (c, W, H) => {
+const arrowSingleT = tx(512, 512, (c, W, H) => {
   c.clearRect(0, 0, W, H);
-  c.fillStyle = "rgba(0,0,0,.22)";
+  c.lineJoin = "round";
+  c.lineCap = "round";
   c.beginPath();
-  c.moveTo(64, 18); c.lineTo(110, 64); c.lineTo(86, 64); c.lineTo(86, 116);
-  c.lineTo(42, 116); c.lineTo(42, 64); c.lineTo(18, 64);
-  c.closePath(); c.fill();
-  c.fillStyle = "#f2c200";
-  c.beginPath();
-  c.moveTo(64, 14); c.lineTo(106, 60); c.lineTo(82, 60); c.lineTo(82, 112);
-  c.lineTo(46, 112); c.lineTo(46, 60); c.lineTo(22, 60);
-  c.closePath(); c.fill();
+  c.moveTo(256, 56);
+  c.lineTo(428, 240);
+  c.lineTo(328, 240);
+  c.lineTo(328, 448);
+  c.lineTo(184, 448);
+  c.lineTo(184, 240);
+  c.lineTo(84, 240);
+  c.closePath();
+  c.strokeStyle = "rgba(18,22,28,.65)";
+  c.lineWidth = 14;
+  c.stroke();
+  c.fillStyle = "#f5c400";
+  c.fill();
 });
-const arrowTurnT = tx(128, 128, (c, W, H) => {
+const arrowTurnT = tx(512, 512, (c, W, H) => {
   c.clearRect(0, 0, W, H);
-  c.fillStyle = "#f2c200";
+  c.lineJoin = "round";
+  c.lineCap = "round";
   c.beginPath();
-  c.moveTo(10, 64); c.lineTo(38, 38); c.lineTo(38, 54); c.lineTo(90, 54); c.lineTo(90, 38); c.lineTo(118, 64);
-  c.lineTo(90, 90); c.lineTo(90, 74); c.lineTo(38, 74); c.lineTo(38, 90);
-  c.closePath(); c.fill();
+  c.moveTo(44, 256);
+  c.lineTo(156, 152);
+  c.lineTo(156, 214);
+  c.lineTo(356, 214);
+  c.lineTo(356, 152);
+  c.lineTo(468, 256);
+  c.lineTo(356, 360);
+  c.lineTo(356, 298);
+  c.lineTo(156, 298);
+  c.lineTo(156, 360);
+  c.closePath();
+  c.strokeStyle = "rgba(18,22,28,.65)";
+  c.lineWidth = 14;
+  c.stroke();
+  c.fillStyle = "#f5c400";
+  c.fill();
 });
-const arrowMat = new THREE.MeshBasicMaterial({ map: arrowSingleT, transparent: true, opacity: .88, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false });
-const arrowTurnMat = new THREE.MeshBasicMaterial({ map: arrowTurnT, transparent: true, opacity: .88, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false });
+const arrowMat = new THREE.MeshBasicMaterial({ map: arrowSingleT, transparent: true, alphaTest: .08, opacity: .94, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, depthWrite: false });
+const arrowTurnMat = new THREE.MeshBasicMaterial({ map: arrowTurnT, transparent: true, alphaTest: .08, opacity: .94, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, depthWrite: false });
 
 /* ---------- شخصيات بشرية واقعية بمستوى GTA V (ألوان ملابس واضحة ومشبعة + شعر بني طبيعي + نسيج قماش واقعي) ---------- */
 const SKIN_PALETTE = [0xf2cbb0, 0xe4b28a, 0xd0946a, 0xf7dbc3, 0xc2875f];
@@ -1920,15 +1943,17 @@ function buildEnvironmentAndShelves() {
   const hallLen = Math.abs(ZBACK - 20) + 12;
   const hallMidZ = (20 + ZBACK) / 2;
 
-  // إضاءة متوازنة دافئة في الممرات تبرز تفاصيل المنتجات والوجوه
-  for (let z = 11; z > ZBACK + 3; z -= 18) {
-    const l = new THREE.PointLight(0xfff6e9, .95, 48, 1.8);
-    l.position.set(0, 7.1, z);
-    sc.add(l);
-    dynLights.push(l);
+  // إضاءة متوازنة موزعة على الجانبين لتجنب سطوع البقعة الضوئية في منتصف الممر أمام العربة
+  for (let z = 4; z > ZBACK + 3; z -= 16) {
+    [-6.45, 6.45].forEach(lx => {
+      const l = new THREE.PointLight(0xfff6ea, .36, 36, 2.0);
+      l.position.set(lx, 7.4, z);
+      sc.add(l);
+      dynLights.push(l);
+    });
   }
 
-  // أرضية بورسلين لامعة صلبة بخريطة خشونة وتفاوت لمعان واقعي بدون شبحية
+  // أرضية بورسلين لامعة كالمرآة بألوانها الأصلية المتناسقة بدون توهج في المنتصف
   const rptY = Math.round(hallLen / 4);
   floorT.repeat.set(7.5, rptY);
   floorRoughT.repeat.set(7.5, rptY);
@@ -1936,7 +1961,7 @@ function buildEnvironmentAndShelves() {
     new THREE.PlaneGeometry(30, hallLen),
     new THREE.MeshPhysicalMaterial({
       map: floorT, roughnessMap: floorRoughT, bumpMap: floorRoughT, bumpScale: .004,
-      roughness: .24, metalness: .06, clearcoat: .52, clearcoatRoughness: .18, envMapIntensity: 1.2
+      roughness: .24, metalness: .06, clearcoat: .52, clearcoatRoughness: .18, envMapIntensity: .95
     })
   );
   fl.rotation.x = -Math.PI / 2;
@@ -1944,32 +1969,35 @@ function buildEnvironmentAndShelves() {
   fl.receiveShadow = true;
   ENV_G.add(fl);
 
-  // أسهم إرشاد الممرات الصفراء الواضحة بدون تداخل ارتفاع أو اصطدام
+  // أسهم إرشاد الممرات الصفراء النقية بدون تداخل أو تشويه أو رعشة
+  const crossZs = Array.from({ length: NROWS + 1 }, (_, k) => -.4 - SECD * k);
   AISLES.forEach(x => {
     for (let z = 10; z >= ZMIN + 3; z -= 3.8) {
       if (z > 6 && x == 6.45) continue;
       if (z > .5 && x == -12.15) continue;
       if (z > 8.5 && x == -6.45) continue;
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.08, 1.08), arrowMat);
+      if (crossZs.some(cz => Math.abs(z - cz) < 1.55)) continue;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.04, 1.04), arrowMat);
       m.rotation.x = -Math.PI / 2;
-      m.position.set(x, .016, z);
+      m.position.set(x, .024, z);
+      m.renderOrder = 2;
       m.userData.go = [x, z];
       ENV_G.add(m);
       HS.push(m);
     }
   });
-  for (let k = 0; k <= NROWS; k++) {
-    const cz = -.4 - SECD * k;
-    [-11.8, -6.45, 0, 6.45, 11.8].forEach(cx => {
-      if (k === 0 && cx === -11.8) return;
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 1.18), arrowTurnMat);
+  crossZs.forEach((cz, k) => {
+    AISLES.forEach(cx => {
+      if (k === 0 && cx === -12.15) return;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1.12, 1.12), arrowTurnMat);
       m.rotation.x = -Math.PI / 2;
-      m.position.set(cx, .018, cz);
+      m.position.set(cx, .026, cz);
+      m.renderOrder = 3;
       m.userData.go = [cx, cz];
       ENV_G.add(m);
       HS.push(m);
     });
-  }
+  });
 
   // الجدران المعمارية المزدوجة (سيراميك سفلي داكن + فاصل ألومنيوم + واجهة علوية حديثة + أعمدة)
   const WALL_UP = M(0x282d38, { roughness: .68, metalness: .06 });
@@ -3034,7 +3062,7 @@ addEventListener("keydown", e => {
 
 /* ---------- شاشة البداية (Splash): تنتهي تلقائياً إلى فيديو الدخلة مباشرة ---------- */
 const bootAt = window.__esdBootAt || Date.now();
-const SPLASH_MS = 4600; // مدة أنيميشن الـ Splash قبل الانتقال لفيديو الدخلة (4-5 ثوانٍ كاملة)
+const SPLASH_MS = 6500; // مدة أنيميشن الـ Splash قبل الانتقال لفيديو الدخلة (6.5 ثوانٍ كاملة)
 let sceneReady = false, mediaReady = false, loaderHidden = false;
 function hideLoader() {
   if (loaderHidden || !sceneReady) return;
