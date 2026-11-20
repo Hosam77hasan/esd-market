@@ -220,7 +220,7 @@ input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px sol
 html.lock,html.mlock{overflow-y:hidden}
 #scene{position:relative;overscroll-behavior:none}
 #stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#07080c;overscroll-behavior:none}
-#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:default;-webkit-user-select:none;user-select:none;opacity:0;transition:opacity 1.25s cubic-bezier(.4,0,.2,1)}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:default;-webkit-user-select:none;user-select:none;opacity:0;transition:opacity 1.25s cubic-bezier(.4,0,.2,1)}
 body.in #cv{opacity:1}
 #bar{position:absolute;top:0;right:0;left:0;height:3px;z-index:3;background:linear-gradient(90deg,var(--p),#f2c94c);transform-origin:right;transform:scaleX(0);pointer-events:none}
 #hud{--a:#f2c94c;position:absolute;left:0;right:0;bottom:0;z-index:3;padding:54px max(18px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));background:linear-gradient(transparent,rgba(5,6,10,.9));color:#fff;opacity:0;transition:opacity .6s;pointer-events:none;text-align:center}
@@ -966,10 +966,10 @@ function texFor(o) {
   else { w = 1024; h = 190; key = ["n", o.sec.idx, o.next ? o.next.name : "end", o.sec.turn, accOf(o.next ? o.next.ci : o.sec.ci)].join("|"); fn = c => drawNextSign(c, w, h, o) }
   const e = texCache.get(key);
   if (e) { e.u = frameNo; return e }
-  if (builds >= (o.k === "card" || o.k === "add" ? (COARSE ? 3 : 5) : 3)) { pendingTex = true; return (o.k === "card" || o.k === "add") ? null : PH; }
+  if (builds >= (o.k === "card" || o.k === "add" ? (COARSE ? 3 : 5) : 5)) { pendingTex = true; return null; }
   if (texCache.size > 30) trimTexCache(48e6);
   builds++;
-  const k = (o.k === "card" || o.k === "add") ? TEXK : 1;
+  const k = (o.tex === "sconce" || o.tex === "wash") ? 1 : TEXK;
   const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
   const g = c.getContext("2d"); g.scale(k, k); fn(g);
   const ne = { c, w: c.width, h: c.height, u: frameNo }; texCache.set(key, ne); return ne;
@@ -1000,19 +1000,36 @@ function plane(t, x, z, ux, uz, nx, nz, w, yc, hh, alpha, mirror) {
   let ta = 0, tb = 1;
   if (da < NEAR) ta = (NEAR - da) / (db - da); else if (db < NEAR) tb = (da - NEAR) / (da - db);
   const dd = t_ => da + (db - da) * t_, ll = t_ => la + (lb - la) * t_;
-  const X0 = W / 2 + ll(ta) * F / dd(ta), X1 = W / 2 + ll(tb) * F / dd(tb);
+  const dTa = dd(ta), dTb = dd(tb);
+  const X0 = W / 2 + ll(ta) * F / dTa, X1 = W / 2 + ll(tb) * F / dTb;
   if (Math.max(X0, X1) < -60 || Math.min(X0, X1) > W + 60) return null;
   const flip = X1 < X0, tl = flip ? tb : ta, tr = flip ? ta : tb;
-  const N = clamp(Math.round(Math.abs(X1 - X0) / (mirror ? 14 : (COARSE ? 12 : 8))), 2, mirror ? 20 : (COARSE ? 28 : 44));
+  const span = Math.abs(X1 - X0);
+  const pDrop = (Math.abs(yc) + hh) * Math.abs(F / dTa - F / dTb);
+  const N = mirror
+    ? clamp(Math.round(span / 16), 2, 18)
+    : clamp(Math.max(Math.round(span / (COARSE ? 10 : 7)), Math.round(pDrop / 2.2)), 4, COARSE ? 36 : 52);
   cx.globalAlpha = alpha;
   for (let j = 0; j < N; j++) {
     const t0 = tl + (tr - tl) * j / N, t1 = tl + (tr - tl) * (j + 1) / N, tm = (t0 + t1) / 2;
-    const xa = W / 2 + ll(t0) * F / dd(t0), xb = W / 2 + ll(t1) * F / dd(t1), s = F / dd(tm);
-    const u0 = flip ? 1 - t0 : t0, u1 = flip ? 1 - t1 : t1;
-    if (mirror) cx.setTransform(DPR, 0, 0, -DPR, 0, 2 * (HOR - FLOOR_Y * s) * DPR);
-    cx.drawImage(t.c, u0 * t.w, 0, (u1 - u0) * t.w, t.h, xa, HOR - (yc + hh / 2) * s, (xb - xa) + .8, hh * s);
+    const d0 = dd(t0), d1 = dd(t1), dm = dd(tm);
+    const s0 = F / d0, s1 = F / d1, sm = F / dm;
+    const xa = W / 2 + ll(t0) * s0, xb = W / 2 + ll(t1) * s1, dx = xb - xa;
+    if (dx <= .05) continue;
+    const u0 = flip ? 1 - t0 : t0, u1 = flip ? 1 - t1 : t1, sw = (u1 - u0) * t.w;
+    if (sw <= .001) continue;
+    const pad = Math.min(.45, dx * .22);
+    if (mirror) {
+      cx.setTransform(DPR, 0, 0, -DPR, 0, 2 * (HOR - FLOOR_Y * sm) * DPR);
+      cx.drawImage(t.c, u0 * t.w, 0, sw, t.h, xa, HOR - (yc + hh / 2) * sm, dx + pad, hh * sm);
+    } else {
+      const cy0 = HOR - yc * s0, cy1 = HOR - yc * s1, hm = hh * sm;
+      const sy = clamp((cy1 - cy0) / dx, -4, 4);
+      cx.setTransform(DPR, sy * DPR, 0, DPR, xa * DPR, cy0 * DPR);
+      cx.drawImage(t.c, u0 * t.w, 0, sw, t.h, 0, -hm * .5, dx + pad, hm);
+    }
   }
-  if (mirror) cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
   cx.globalAlpha = 1;
   if (mirror) return null;
   const sL = F / dd(tl), sR = F / dd(tr), xl = W / 2 + ll(tl) * sL, xr = W / 2 + ll(tr) * sR;
@@ -1056,7 +1073,7 @@ function rsNow() {
   port = COARSE ? true : H > W;
   F = port ? W * .66 : Math.min(W * .40, H * .52);
   HOR = H * (port ? .48 : .485);
-  cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = COARSE ? "medium" : "high";
+  cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = "high";
   sizeScene(); forceRender = true;
 }
 function rs() {
@@ -1245,15 +1262,15 @@ function drawWorld(dt) {
   const vis = [];
   for (const o of OBJS) {
     if (o.s < camS - 500 || o.s > camS + 2100) { o.q = null; continue }
-    const c = cam3(o.x, o.z); o.d = c[1];
-    if (c[1] < NEAR || c[1] > OBJFAR) { o.q = null; continue }
+    const c = cam3(o.x, o.z); o.d = c[1]; o.ed = o.k === "sign" ? Math.hypot(c[0], Math.max(0, c[1])) : c[1];
+    if (c[1] < (o.k === "sign" ? -240 : NEAR) || c[1] > OBJFAR) { o.q = null; continue }
     vis.push(o);
   }
   vis.sort((a, b) => b.d - a.d);
   const pr = hover;
   for (const o of vis) {
     o.hv += ((o === pr ? 1 : 0) - o.hv) * Math.min(1, dt * 10);
-    const alpha = clamp((OBJFAR - o.d) / 700, 0, 1) * clamp((o.d - NEAR) / 140, 0, 1), inter = o.k === "card" || o.k === "add";
+    const alpha = clamp((OBJFAR - o.d) / 700, 0, 1) * clamp((o.ed - NEAR) / 140, 0, 1), inter = o.k === "card" || o.k === "add";
     const t = texFor(o); if (!t) continue;
     const sc = (inter || o.k === "gate" || (o.k === "sign" && o.link != null)) ? 1 + .04 * o.hv : 1;
     const dep = o.k === "card" ? 10 : (o.rod ? 12 : 0);
@@ -1352,6 +1369,16 @@ function dismissHint() {
   hintDismissed = true;
   const h = $("hint"); if (h) h.classList.add("gone");
 }
+let navY = 0, touchVelY = 0, ignoreScrollUntil = 0;
+const getScrollY = () => window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+const maxScrollY = () => Math.max(0, CAMMAX * PXU);
+function setNavY(v) {
+  navY = clamp(v, 0, maxScrollY());
+  ignoreScrollUntil = performance.now() + 90;
+  try { scrollTo(0, navY); } catch (e) {}
+}
+function moveNavY(dy) { setNavY(navY + dy); }
+
 let navRaf = 0, navToken = 0;
 function cancelNav() {
   navToken++;
@@ -1359,10 +1386,10 @@ function cancelNav() {
 }
 function jumpS(sv) {
   const to = clamp(sv, 0, CAMMAX) * PXU;
-  cancelNav();
-  if (RM) { scrollTo(0, to); return; }
-  const from = getScrollY(), dist = Math.abs(to - from);
-  if (dist < 2) { scrollTo(0, to); return; }
+  cancelNav(); touchVelY = 0;
+  if (RM) { setNavY(to); return; }
+  const from = navY, dist = Math.abs(to - from);
+  if (dist < 2) { setNavY(to); return; }
   const worldDist = dist / PXU, forward = to >= from;
   /* للأمام: سرعة متوسطة ومريحة، وللخلف: سرعة أهدأ (40-50) لوضوح المنتجات */
   const dur = forward ? clamp(480 + worldDist * .42, 550, 5200) : clamp(650 + worldDist * .68, 700, 7500);
@@ -1371,7 +1398,7 @@ function jumpS(sv) {
   const step = now => {
     if (token !== navToken) return;
     const t = clamp((now - start) / dur, 0, 1);
-    scrollTo(0, from + (to - from) * ease(t));
+    setNavY(from + (to - from) * ease(t));
     navRaf = t < 1 ? requestAnimationFrame(step) : 0;
   };
   navRaf = requestAnimationFrame(step);
@@ -1381,38 +1408,56 @@ function jumpSec(i) { const s = SECS[i]; if (s) jumpS(s.s0 + 20) }
 /* ---------- المدخلات ---------- */
 let keyMove = 0, worldWarmed = false, forceRender = true;
 let lastRS = -999, lastRL = -999, lastRH = -999, lastRHov = null, lastRSel = null;
-const getScrollY = () => window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
 
 cv.addEventListener("pointerdown", e => {
   if (!entered) return;
-  dismissHint(); cancelNav();
-  drag = { x: e.clientX, y: e.clientY, prevY: e.clientY, look: lookT, moved: false, axis: "", id: e.pointerId, ptr: e.pointerType };
+  dismissHint(); cancelNav(); touchVelY = 0;
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  drag = { x: e.clientX, y: e.clientY, prevY: e.clientY, prevT: performance.now(), vy: 0, look: lookT, moved: false, axis: "", id: e.pointerId, ptr: e.pointerType };
 });
 cv.addEventListener("pointermove", e => {
   mx = e.clientX; my = e.clientY; mouseIn = e.pointerType === "mouse";
   if (drag && e.pointerId === drag.id) {
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (!drag.axis) {
-      if (Math.abs(dy) > 9 && Math.abs(dy) >= Math.abs(dx)) { drag.axis = "y"; drag.moved = true; }
-      else if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) { drag.axis = "x"; drag.moved = true; }
+      if (Math.abs(dy) > 6 && Math.abs(dy) >= Math.abs(dx) * .85) { drag.axis = "y"; drag.moved = true; }
+      else if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.15) { drag.axis = "x"; drag.moved = true; }
     }
     if (drag.axis === "x") {
       lookT = clamp(drag.look - dx / W * 2.6, -1.55, 1.55);
-    } else if (drag.axis === "y" && drag.ptr === "mouse") {
+    } else if (drag.axis === "y") {
+      const nowT = performance.now();
       const stepY = e.clientY - drag.prevY;
-      drag.prevY = e.clientY;
-      if (stepY) window.scrollBy(0, -stepY * 1.5);
-    } else {
-      drag.prevY = e.clientY;
+      const dtMs = Math.max(4, nowT - drag.prevT);
+      drag.prevY = e.clientY; drag.prevT = nowT;
+      if (stepY) {
+        const mult = drag.ptr === "mouse" ? 1.5 : 2.05;
+        const delta = -stepY * mult;
+        moveNavY(delta);
+        const instV = delta / (dtMs / 1000);
+        drag.vy = drag.vy * .55 + instV * .45;
+      }
     }
   }
 });
 cv.addEventListener("pointerup", e => {
   const d = drag; drag = null;
+  try { if (cv.hasPointerCapture && cv.hasPointerCapture(e.pointerId)) cv.releasePointerCapture(e.pointerId); } catch (err) {}
+  if (d && d.axis === "y" && d.ptr !== "mouse") {
+    if (performance.now() - d.prevT < 90 && Math.abs(d.vy) > 45) touchVelY = clamp(d.vy, -3400, 3400);
+  }
   if (!d || d.moved || !entered || mm.classList.contains("on")) return;
   const o = hitAt(e.clientX, e.clientY); if (o) activate(o);
 });
-cv.addEventListener("pointercancel", () => { drag = null });
+cv.addEventListener("pointercancel", () => {
+  const d = drag; drag = null;
+  if (d && d.axis === "y" && d.ptr !== "mouse" && performance.now() - d.prevT < 90 && Math.abs(d.vy) > 45) {
+    touchVelY = clamp(d.vy, -3400, 3400);
+  }
+});
+cv.addEventListener("touchmove", e => {
+  if (entered && !mm.classList.contains("on")) e.preventDefault();
+}, { passive: false });
 cv.addEventListener("pointerleave", () => { mouseIn = false; hover = null });
 function activate(o) {
   if (o.k === "card") { o.flash = performance.now(); SELOBJ = o; forceRender = true; setTimeout(() => openProduct(o.p), 320) }
@@ -1423,14 +1468,21 @@ function activate(o) {
 /* سكرول يمين/شمال (لوحة اللمس أو Shift + عجلة الماوس) = التفات؛ السكرول العمودي = التقدم/الرجوع */
 addEventListener("wheel", e => {
   if (!entered || mm.classList.contains("on")) return;
-  dismissHint();
+  dismissHint(); touchVelY = 0;
   if (navRaf) cancelNav();
   const adx = Math.abs(e.deltaX), ady = Math.abs(e.deltaY);
   const dx = (adx > ady * 1.15 && adx > 2) ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
   if (!dx) return;
   e.preventDefault(); lookT = clamp(lookT + dx * .0035, -1.55, 1.55);
 }, { passive: false });
-addEventListener("scroll", () => { if (entered && getScrollY() > 10) dismissHint() }, { passive: true });
+addEventListener("scroll", () => {
+  if (!entered) return;
+  const sy = getScrollY();
+  if (sy > 10) dismissHint();
+  if (performance.now() > ignoreScrollUntil && (!drag || drag.axis !== "y")) {
+    navY = clamp(sy, 0, maxScrollY());
+  }
+}, { passive: true });
 addEventListener("keydown", e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName || "")) return;
   if (e.key === "ArrowLeft") { keyLook = -1; dismissHint(); }
@@ -1442,7 +1494,7 @@ addEventListener("keyup", e => {
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") keyLook = 0;
   if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "W" || e.key === "s" || e.key === "S") keyMove = 0;
 });
-addEventListener("blur", () => { keyLook = 0; keyMove = 0 });
+addEventListener("blur", () => { keyLook = 0; keyMove = 0; touchVelY = 0 });
 addEventListener("resize", rs);
 addEventListener("orientationchange", () => setTimeout(rs, 120));
 
@@ -1460,8 +1512,13 @@ function frame(now) {
     }
     return;
   }
-  if (keyMove && !mm.classList.contains("on")) window.scrollBy(0, keyMove * dt * 620);
-  const target = clamp(getScrollY() / PXU, 0, CAMMAX);
+  if (keyMove && !mm.classList.contains("on")) { touchVelY = 0; moveNavY(keyMove * dt * 620); }
+  else if (!drag && Math.abs(touchVelY) > 8 && !mm.classList.contains("on")) {
+    moveNavY(touchVelY * dt);
+    touchVelY *= Math.exp(-dt * 4.2);
+    if (Math.abs(touchVelY) <= 8 || navY <= 0 || navY >= maxScrollY()) touchVelY = 0;
+  }
+  const target = clamp(navY / PXU, 0, CAMMAX);
   camS += (target - camS) * (RM ? 1 : 1 - Math.exp(-dt * 6.5));
   if (Math.abs(target - camS) < .05) camS = target;
   vel += ((camS - prevS) / Math.max(dt, .001) - vel) * Math.min(1, dt * 8); prevS = camS;
@@ -1488,7 +1545,7 @@ function frame(now) {
   $("bar").style.transform = "scaleX(" + clamp(camS / CAMMAX, 0, 1) + ")";
   if (frameNo % 60 === 0) trimTexCache();
 }
-function rebuildWorld() { buildWorld(); texCache.clear(); buildRail(); sizeScene(); curHud = -2; forceRender = true; worldWarmed = false }
+function rebuildWorld() { buildWorld(); texCache.clear(); buildRail(); sizeScene(); navY = clamp(navY, 0, maxScrollY()); curHud = -2; forceRender = true; worldWarmed = false }
 try { Promise.all([document.fonts.load('800 30px Cairo', 'سلة'), document.fonts.load('700 20px Cairo', 'ABC')]).then(() => { texCache.clear(); forceRender = true }) } catch (e) {}
 buildWorld(); rs(); buildRail();
 
@@ -2095,9 +2152,9 @@ function finishEnter() {
   videoEl.classList.remove("show"); videoBgEl.classList.remove("show");
   setTimeout(() => { try { videoEl.pause() } catch (e) {} try { videoBgEl.pause() } catch (e) {} }, 900);
   document.documentElement.classList.remove("lock", "mlock");
-  cancelNav();
+  cancelNav(); touchVelY = 0;
   sizeScene();
-  scrollTo(0, 0); camS = 0; prevS = 0; vel = 0;
+  navY = 0; setNavY(0); camS = 0; prevS = 0; vel = 0;
   forceRender = true;
   document.querySelector("header").classList.add("show");
   document.body.classList.add("in");
