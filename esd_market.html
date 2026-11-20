@@ -445,7 +445,7 @@ const CONFIG = {
   STORE_NAME: "ESD Market",
   PRIMARY_COLOR: "#c8102e",
   ACCENT_COLOR: "#f2c94c",
-  WHATSAPP_PHONE: "201000000000",
+  WHATSAPP_PHONE: "20111915613",
   VODAFONE_CASH_NUMBER: "01000000000",
   INSTAPAY_HANDLE: "store@instapay",
   ADMIN_PASSWORD: "3317167",
@@ -1823,29 +1823,133 @@ $("bCart").onclick = () => {
   ${L.length ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px"><span class="big">الإجمالي: ${money(tot)}</span><button onclick="clearCartAll()" style="color:#c8102e;border-color:#c8102e">إفراغ السلة</button></div>
   <button class="pr" style="width:100%;padding:13px;margin-top:12px" onclick="checkout()">إتمام الطلب</button>` : ""}`)
 };
+function openWaUrl(waUrl) {
+  try {
+    const a = document.createElement("a");
+    a.href = waUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) {}
+}
+function normDigits(s) {
+  return String(s || "").replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660)).replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06F0));
+}
+function showCheckoutErr(msg, focusId) {
+  const errEl = $("cerr");
+  if (errEl) {
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+    errEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } else {
+    toast(msg);
+  }
+  const f = focusId && $(focusId);
+  if (f) f.focus();
+}
+function clearCheckoutErr() {
+  const errEl = $("cerr");
+  if (errEl) { errEl.textContent = ""; errEl.style.display = "none"; }
+}
 function checkout() {
   if (!cartList().length) return;
   const u = load("_u", {});
-  openM(`${X}<h3>بيانات الطلب</h3><label>الاسم<input id="cn" value="${esc(u.n || "")}"></label><label>رقم الهاتف<input id="cp" type="tel" value="${esc(u.p || "")}"></label><label>عنوان التوصيل<input id="ca" value="${esc(u.a || "")}"></label>
-  <label>طريقة الدفع<select id="pm" onchange="pmc()"><option value="cod">الدفع عند الاستلام</option><option value="vf">فودافون كاش</option><option value="ip">إنستا باي</option></select></label><div id="pmx"></div>
-  <div class="big" style="margin:6px 0">الإجمالي: ${money(cartTot())}</div>
-  <button class="pr" style="width:100%;padding:13px" onclick="send()">إرسال الطلب عبر واتساب</button>`)
+  const tot = cartTot();
+  openM(`${X}<h3>بيانات الطلب</h3>
+  <div id="cerr" role="alert" style="display:none;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px;padding:9px 12px;font-size:13.5px;font-weight:700;margin-bottom:10px"></div>
+  <label style="display:block;font-weight:700">الاسم<input id="cn" placeholder="اكتب اسمك بالكامل" autocomplete="name" oninput="clearCheckoutErr()" value="${esc(u.n || "")}"></label>
+  <label style="display:block;font-weight:700">رقم الهاتف <small style="color:var(--mut);font-weight:600">(لتواصل الدليفري/التوصيل)</small><input id="cp" type="tel" inputmode="tel" dir="ltr" style="text-align:right" placeholder="مثال: 01012345678" autocomplete="tel" oninput="clearCheckoutErr()" value="${esc(u.p || "")}"></label>
+  <label style="display:block;font-weight:700">عنوان التوصيل<input id="ca" placeholder="المنطقة، الشارع، رقم العقار والشقة" autocomplete="street-address" oninput="clearCheckoutErr()" value="${esc(u.a || "")}"></label>
+  <label style="display:block;font-weight:700">طريقة الدفع<select id="pm" onchange="pmc();clearCheckoutErr()">
+    <option value="cod">الدفع عند الاستلام</option>
+    <option value="vf">فودافون كاش</option>
+    <option value="ip">إنستا باي</option>
+  </select></label>
+  <div id="pmx"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:#f7f1e7;margin:8px 0 12px"><span style="font-weight:700;color:var(--mut)">الإجمالي الكلي للطلب</span><span class="big">${money(tot)}</span></div>
+  <button class="pr" style="width:100%;padding:13px;font-size:16px" onclick="send()">إرسال الطلب عبر واتساب</button>
+  <button type="button" style="width:100%;margin-top:8px" onclick="$('bCart').onclick()">العودة لعربة التسوق</button>`);
+  pmc();
 }
-function pmc() { const v = $("pm").value; $("pmx").innerHTML = v == "cod" ? "" : `<p>حوّل المبلغ إلى: <b>${esc(v == "vf" ? CONFIG.VODAFONE_CASH_NUMBER : CONFIG.INSTAPAY_HANDLE)}</b></p><label>رقم عملية التحويل<input id="pr"></label><p style="color:var(--mut);font-size:14px">أرفق صورة الإيصال في محادثة واتساب بعد فتحها.</p>` }
+function pmc() {
+  const pmEl = $("pm"), pmx = $("pmx");
+  if (!pmEl || !pmx) return;
+  const v = pmEl.value;
+  if (v === "cod") {
+    pmx.innerHTML = `<div class="adm-note" style="margin:4px 0 8px">سيتم سداد قيمة الطلب نقداً عند الاستلام من مندوب التوصيل.</div>`;
+  } else {
+    const label = v === "vf" ? "فودافون كاش" : "إنستا باي";
+    pmx.innerHTML = `<div class="adm-note" style="margin:4px 0 8px">تم اختيار <b>${label}</b>. عند فتح محادثة الواتساب، يرجى إرسال صورة الدفع/الإيصال قبل إرسال الطلب أو فور فتح المحادثة.</div>`;
+  }
+}
 function send() {
-  const n = $("cn").value.trim(), p = $("cp").value.trim(), a = $("ca").value.trim(); if (!n || !p || !a) { alert("من فضلك أكمل الاسم والهاتف والعنوان"); return }
-  const pm = $("pm").value, ref = $("pr") ? $("pr").value.trim() : "", pmt = { cod: "الدفع عند الاستلام", vf: "فودافون كاش", ip: "إنستا باي" }[pm];
-  if (pm != "cod" && !ref) { alert("أدخل رقم عملية التحويل"); return }
-  const items = cartList().map(i => ({ name: i.p.name + " (" + (vr(i.p)[i.vi] || "") + ")", qty: i.q, price: unit(i.p, i.vi) })), tot = cartTot();
-  const o = { id: "#" + CONFIG.ORDER_PREFIX + "-" + (1045 + orders.length), name: n, phone: p, address: a, items, total: tot, pay: pmt, ref, status: 0, t: Date.now() };
-  orders.unshift(o); save("_o", orders); save("_u", { n, p, a }); cart = {}; upd();
-  const msg = `*${CONFIG.STORE_NAME}*\nطلب جديد ${o.id}\n\nالاسم: ${n}\nالهاتف: ${p}\nالعنوان: ${a}\n\n*الطلبات:*\n` + items.map(i => `• ${i.name} × ${i.qty} = ${i.price * i.qty} ج`).join("\n") + `\n\n*الإجمالي: ${tot} ج.م*\nالدفع: ${pmt}${ref ? "\nرقم التحويل: " + ref : ""}${pm != "cod" ? "\n(صورة الإيصال مرفقة في المحادثة)" : ""}`;
-  window.open("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(msg), "_blank");
-  openM(`${X}<h3>تم تسجيل طلبك ✔</h3><p>رقم الطلب: <b>${esc(o.id)}</b></p><p>تابع حالته من زر «طلباتي».</p>`);
+  clearCheckoutErr();
+  const n = ($("cn") ? $("cn").value : "").trim();
+  const pRaw = ($("cp") ? $("cp").value : "").trim();
+  const a = ($("ca") ? $("ca").value : "").trim();
+  const pm = $("pm") ? $("pm").value : "cod";
+  if (n.length < 2) {
+    showCheckoutErr("من فضلك أدخل الاسم بالكامل.", "cn");
+    return;
+  }
+  const pAscii = normDigits(pRaw).replace(/[\s\-().]/g, "");
+  const pCore = pAscii.startsWith("+") ? pAscii.slice(1) : pAscii;
+  const validPhone = !!pCore && !/^(\d)\1+$/.test(pCore) && (
+    pCore.startsWith("01") ? /^01[0125]\d{8}$/.test(pCore) :
+    pCore.startsWith("201") ? /^201[0125]\d{8}$/.test(pCore) :
+    /^\d{9,15}$/.test(pCore)
+  );
+  if (!validPhone) {
+    showCheckoutErr("من فضلك أدخل رقم هاتف صحيح للتواصل عند التوصيل (مثال: 01012345678).", "cp");
+    return;
+  }
+  if (a.length < 5) {
+    showCheckoutErr("من فضلك أدخل عنوان التوصيل بالتفصيل.", "ca");
+    return;
+  }
+  const PAY_LABELS = { cod: "الدفع عند الاستلام", vf: "فودافون كاش", ip: "إنستا باي" };
+  const pmt = PAY_LABELS[pm];
+  if (!pmt) {
+    showCheckoutErr("من فضلك اختر طريقة الدفع.", "pm");
+    return;
+  }
+  const cartItems = cartList();
+  if (!cartItems.length) return;
+  const items = cartItems.map(i => ({ name: i.p.name + (vr(i.p)[i.vi] ? " (" + vr(i.p)[i.vi] + ")" : ""), qty: i.q, price: unit(i.p, i.vi) }));
+  const tot = cartTot();
+  const o = { id: "#" + CONFIG.ORDER_PREFIX + "-" + (1045 + orders.length), name: n, phone: pAscii, address: a, items, total: tot, pay: pmt, status: 0, t: Date.now() };
+  orders.unshift(o); save("_o", orders); save("_u", { n, p: pAscii, a }); cart = {}; upd();
+  const itemsText = items.map(i => `• ${i.name} × ${i.qty} = ${money(i.price * i.qty)}`).join("\n");
+  const payEnding = pm === "cod"
+    ? "الدفع: الدفع عند الاستلام (يتم سداد المبلغ عند استلام الطلب)."
+    : "يرجى إرسال صورة الدفع/الإيصال في محادثة الواتساب قبل إرسال الطلب أو فور فتح المحادثة.";
+  const msg = [
+    `مرحباً بكم في ${CONFIG.STORE_NAME}`,
+    `طلب جديد رقم: ${o.id}`,
+    ``,
+    `*بيانات العميل والتوصيل:*`,
+    `الاسم: ${n}`,
+    `رقم الهاتف للتوصيل: ${pAscii}`,
+    `عنوان التوصيل: ${a}`,
+    ``,
+    `*تفاصيل المنتجات:*`,
+    itemsText,
+    ``,
+    `*الإجمالي الكلي للطلب: ${money(tot)}*`,
+    `طريقة الدفع: ${pmt}`,
+    ``,
+    payEnding
+  ].join("\n");
+  const waUrl = "https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(msg);
+  openWaUrl(waUrl);
+  openM(`${X}<h3>تم تسجيل طلبك ✔</h3><p>رقم الطلب: <b>${esc(o.id)}</b></p><p>طريقة الدفع: <b>${esc(pmt)}</b> · الإجمالي: <b>${money(tot)}</b></p>${pm !== "cod" ? `<div class="adm-note" style="margin:8px 0">يرجى إرسال صورة الدفع/الإيصال في محادثة الواتساب قبل إرسال الطلب أو فور فتح المحادثة.</div>` : ""}<a class="pr" href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px;text-align:center;text-decoration:none;border-radius:10px;background:var(--p);color:#fff;font-weight:800;margin-top:8px">فتح محادثة واتساب الآن</a><p style="color:var(--mut);font-size:13px;margin-top:10px">تابع حالة طلبك من زر «طلباتي».</p>`);
 }
 const ST = ["قيد الانتظار", "جاري التجهيز", "خرج للتوصيل", "تم التسليم"];
 $("bOrd").onclick = () => openM(`${X}<h3>طلباتي</h3>${orders.map((o, i) => `<div class="row" style="display:block"><b>${esc(o.id)}</b> · ${money(o.total)}<br><span class="tag">${ST[o.status]}</span><br><button onclick="urg(${i})">استعجال / استفسار عن الطلب</button></div>`).join("") || "لا توجد طلبات بعد."}`);
-function urg(i) { const o = orders[i]; window.open("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(`بخصوص الطلب ${o.id} باسم ${o.name}: من فضلك محتاج أعرف موعد التوصيل، الموضوع مستعجل.`), "_blank") }
+function urg(i) { const o = orders[i]; if (!o) return; openWaUrl("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(`مرحباً بكم في ${CONFIG.STORE_NAME}\nبخصوص الطلب ${o.id} باسم ${o.name} (هاتف: ${o.phone || ""}): من فضلك محتاج أعرف موعد التوصيل.`)) }
 
 /* ---------- الإدارة ---------- */
 let admCatFilter = "all";
