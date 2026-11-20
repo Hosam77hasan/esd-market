@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <script>window.__esdBootAt=Date.now()</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ESD Market — عيش التجربه</title>
+<title>ESD Market — عيش التجربة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@900&family=Poppins:wght@500;700&display=swap">
-<meta name="description" content="ESD Market — تجربة تسوق استثنائية: جولة افتراضية داخل المتجر، عروض وخصومات، وتوصيل سريع لباب البيت.">
+<meta name="description" content="ESD Market — تجربة تسوق استثنائية: عيش التجربة داخل المتجر، عروض وخصومات، وتوصيل سريع لباب البيت.">
 <meta name="theme-color" content="#c8102e">
 <!-- تطبيق الويب القابل للتثبيت (PWA) -->
 <link rel="manifest" href="manifest.json">
@@ -35,7 +35,7 @@ addEventListener("appinstalled", () => {
 <!-- معاينة المشاركة: بعد ربط نطاق، اجعل og:image (و og:url) رابطًا مطلقًا https://نطاقك/og-image.jpg -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ESD Market">
-<meta property="og:title" content="ESD Market — جولة افتراضية داخل المتجر">
+<meta property="og:title" content="ESD Market — عيش التجربة داخل المتجر">
 <meta property="og:description" content="تجربة تسوق استثنائية: تسوّق على أرض الواقع… من بيتك.">
 <meta property="og:image" content="og-image.jpg">
 <meta property="og:image:type" content="image/jpeg">
@@ -44,7 +44,7 @@ addEventListener("appinstalled", () => {
 <meta property="og:image:alt" content="شعار ESD Market وعبارة تجربة تسوق استثنائية">
 <meta property="og:locale" content="ar_EG">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ESD Market — جولة افتراضية داخل المتجر">
+<meta name="twitter:title" content="ESD Market — عيش التجربة داخل المتجر">
 <meta name="twitter:description" content="تجربة تسوق استثنائية: تسوّق على أرض الواقع… من بيتك.">
 <meta name="twitter:image" content="og-image.jpg">
 <meta name="twitter:image:alt" content="شعار ESD Market وعبارة تجربة تسوق استثنائية">
@@ -80,11 +80,11 @@ header button.pr{background:var(--p);border-color:var(--p)}
   --sp-font-ar:"Cairo","Segoe UI",Tahoma,sans-serif;
   --sp-font-credit:"Poppins","Segoe UI",Arial,sans-serif;
   position:fixed;inset:0;z-index:60;background:var(--sp-bg);color:var(--sp-ink);
-  display:grid;place-items:center;overflow:hidden;text-align:center;
-  padding:16px max(16px,env(safe-area-inset-right,0px)) max(64px,calc(env(safe-area-inset-bottom,0px) + 56px)) max(16px,env(safe-area-inset-left,0px));
+  display:grid;grid-template-rows:minmax(0,1fr) auto;align-items:center;justify-items:center;overflow:hidden;text-align:center;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) max(10px,calc(env(safe-area-inset-bottom,0px) + 8px)) max(16px,env(safe-area-inset-left,0px));
   transition:opacity .75s ease;
 }
-#load .sp-stage{width:calc(var(--u)*76);max-width:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
+#load .sp-stage{grid-row:1;align-self:center;width:calc(var(--u)*76);max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
 #load .sp-logo-box{margin:0;width:min(88vw,calc(var(--u)*72));aspect-ratio:697/184;position:relative;overflow:hidden;direction:ltr}
 #load .sp-logo-img{position:absolute;left:0;top:0;width:100%;max-width:none;height:auto;display:block;mix-blend-mode:multiply;user-select:none;-webkit-user-drag:none}
 #load .sp-cart-lane{width:100vw;max-width:100%;display:flex;justify-content:center;overflow:hidden;margin-top:calc(var(--u)*1.4);padding-block:4px;direction:ltr}
@@ -95,7 +95,9 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #load .sp-copy p{margin:0;font-family:var(--sp-font-ar);font-weight:800;color:var(--sp-ink);line-height:1.45;text-wrap:balance}
 #load .sp-l1{font-size:clamp(22px,calc(var(--u)*6.2),56px)}
 #load .sp-l2,#load .sp-l3{font-size:clamp(18px,calc(var(--u)*4.9),44px)}
-#load .sp-powered{position:fixed;bottom:max(20px,calc(env(safe-area-inset-bottom,0px) + 16px));inset-inline:16px;margin:0;text-align:center;font-family:var(--sp-font-credit);font-weight:700;font-size:clamp(14px,calc(var(--u)*2.6),22px);color:var(--sp-ink-soft);letter-spacing:.03em;text-shadow:0 1px 0 rgba(0,0,0,.08)}
+#load .sp-powered{grid-row:2;position:static;z-index:2;margin:calc(var(--u)*1.6) 0 0;display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:.18em .5em;width:100%;max-width:100%;padding:0 12px;direction:ltr;font-family:var(--sp-font-credit);color:var(--sp-ink-soft);text-shadow:0 1px 0 rgba(0,0,0,.08);pointer-events:none}
+#load .sp-powered-by{font-size:clamp(8.5px,calc(var(--u)*1.35),11px);font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.62;white-space:nowrap}
+#load .sp-company{font-size:clamp(14px,calc(var(--u)*2.35),21px);font-weight:800;letter-spacing:.01em;line-height:1.2;white-space:nowrap}
 /* ---------- زر تثبيت صغير أنيق (أعلى يسار شاشة «تسوّق الآن») ---------- */
 #landing .install-wrap{position:absolute;z-index:4;top:calc(env(safe-area-inset-top,0px) + 10px);left:calc(env(safe-area-inset-left,0px) + 10px);display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:calc(100vw - 20px);pointer-events:none}
 #landing .install-pill{display:inline-flex;align-items:center;justify-content:center;gap:.45em;max-width:100%;padding:7px 13px;border-radius:999px;border:1px solid #ffffff4d;background:#0b0b10a6;color:#f6efe2;backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);font-family:var(--sp-font-ar);font-weight:700;font-size:clamp(11.5px,3vw,13px);line-height:1.2;white-space:nowrap;box-shadow:0 6px 20px #00000059,inset 0 1px 0 #ffffff26;cursor:pointer;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent;animation:installPulse 3.6s ease-in-out 1s infinite;transition:transform .18s ease,background .18s ease,border-color .18s ease}
@@ -132,7 +134,7 @@ header button.pr{background:var(--p);border-color:var(--p)}
 #load .sp-play .sp-l1{animation:spFadeUp .75s cubic-bezier(.2,.8,.2,1) 1.6s backwards}
 #load .sp-play .sp-l3{animation:spFadeUp .75s cubic-bezier(.2,.8,.2,1) 2.45s backwards}
 #load .sp-play .sp-l2{animation:spFadeUp .75s cubic-bezier(.2,.8,.2,1) 3.3s backwards}
-#load .sp-play .sp-powered{animation:spFadeIn .8s ease-out 4.15s backwards}
+#load .sp-play .sp-powered{animation:spFadeIn .8s ease-out 4.3s backwards}
 @media(prefers-reduced-motion:reduce){#load .sp-play *,#load .sp-play{animation:none!important}}
 /* فيديو الدخلة: ملء الشاشة بالكامل على كل الأجهزة دون أي فراغات سوداء */
 #videoIntro{position:fixed;inset:0;z-index:45;width:100vw;max-width:100vw;height:100vh;height:100dvh;max-height:100dvh;object-fit:cover;object-position:center;background:#000;opacity:0;pointer-events:none;transition:opacity 1.15s ease}
@@ -234,6 +236,60 @@ body.in #hint{opacity:1}body.in #hint.gone{opacity:0}
 @keyframes bump{40%{transform:scale(1.18)}}
 #bCart.bump{animation:bump .4s ease}
 .crow{gap:10px}.cth{width:46px;height:58px;border-radius:9px;object-fit:contain;background:#f4f1ea;flex:0 0 auto}
+/* ===== معرض صور المنتج ===== */
+.pgal{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.pgal img{width:54px;height:68px;object-fit:contain;background:#f4f1ea;border-radius:9px;border:2px solid transparent;cursor:pointer;padding:2px}
+.pgal img.on{border-color:var(--p);box-shadow:0 0 0 2px #c8102e22}
+/* ===== لوحة الإدارة ===== */
+.box.admin{width:min(100%,980px);background:linear-gradient(160deg,#fbf7effa,#f4ecdefa)}
+.box.editor{width:min(100%,820px)}
+.adm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.adm-head b{font-size:22px;display:block}.adm-head small{color:var(--mut);font-weight:700}
+.adm-tabs{display:flex;gap:6px;overflow:auto;padding:3px 0 10px;scrollbar-width:thin}
+.adm-tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px}
+.adm-tab.on{background:var(--p);border-color:var(--p);color:#fff;box-shadow:0 6px 16px #c8102e2e}
+.adm-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.adm-stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.adm-stat b{display:block;font-size:24px;color:var(--p);line-height:1.1}.adm-stat span{font-size:12px;color:var(--mut);font-weight:700}
+.adm-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px}
+.adm-card>h4{margin:0 0 8px;font-size:16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.adm-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.adm-toolbar select{margin:0;width:auto;min-width:160px}.adm-toolbar .grow{flex:1}
+.adm-prod{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:9px;margin-bottom:8px}
+.adm-thumb{width:64px;height:80px;border-radius:10px;background:#f4f1ea;object-fit:contain;display:block}
+.adm-thumb-ph{display:grid;place-items:center;font-size:28px;line-height:1;box-shadow:inset 0 0 0 1px #e5ddd0}
+.adm-pname{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adm-meta{font-size:12px;color:var(--mut);font-weight:700;margin-top:2px}
+.adm-price{font-weight:900;color:var(--p);white-space:nowrap}
+.adm-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.adm-actions button{padding:6px 8px;font-size:12px;border-radius:9px}
+.adm-offer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0}
+.adm-offer:last-child{border-bottom:0}
+.adm-cat{display:grid;grid-template-columns:44px minmax(0,1fr) 44px auto;gap:7px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:14px;padding:8px;margin-bottom:8px}
+.adm-cat input[type=text],.adm-cat input:not([type]){margin:0}
+.adm-color{width:42px;height:38px;padding:3px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.adm-cat-count{font-size:12px;color:var(--mut);font-weight:700;white-space:nowrap}
+.adm-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.adm-form-grid .full{grid-column:1/-1}
+.adm-form-grid label{margin:0;font-size:13px;font-weight:700}
+.adm-form-grid input,.adm-form-grid select{margin:3px 0 0}
+.adm-note{font-size:12px;color:var(--mut);line-height:1.6;background:#f7f1e7;border-radius:12px;padding:9px 11px;margin:8px 0}
+.adm-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:8px 0}
+.adm-img{position:relative;background:#f4f1ea;border:1px solid var(--line);border-radius:12px;padding:5px;text-align:center}
+.adm-img img{width:100%;height:94px;object-fit:contain;display:block;border-radius:8px}
+.adm-img .cover{position:absolute;top:8px;left:8px;background:#15803d;color:#fff;font-size:10px;font-weight:800;border-radius:999px;padding:2px 6px}
+.adm-img-actions{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.adm-img-actions button{padding:4px 5px;font-size:11px;border-radius:7px}
+.adm-save{width:100%;padding:13px;font-size:16px;border-radius:12px;margin-top:8px}
+@media(max-width:520px){
+  .adm-tabs{flex-wrap:wrap;overflow:visible}
+  .adm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .adm-prod{grid-template-columns:56px minmax(0,1fr);}.adm-thumb{width:56px;height:70px}
+  .adm-prod .adm-side{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .adm-form-grid{grid-template-columns:1fr}
+  .adm-cat{grid-template-columns:40px minmax(0,1fr) 40px;}.adm-cat .adm-cat-count{grid-column:2/4}
+  .adm-actions{justify-content:flex-start}
+}
 </style>
 </head>
 <body>
@@ -263,7 +319,7 @@ body.in #hint{opacity:1}body.in #hint.gone{opacity:0}
       <p class="sp-l2">خصومات وعروض حقيقية</p>
     </div>
   </main>
-  <p class="sp-powered">Powered by Emperor Software Development</p>
+  <p class="sp-powered"><span class="sp-powered-by">Powered by</span><span class="sp-company">Emperor Software Development</span></p>
 </div>
 <script>window.__esdSplashAt = Date.now();</script>
 <div id="iosInstallHelp" hidden role="dialog" aria-modal="true" aria-labelledby="iosHelpTitle">
@@ -388,17 +444,27 @@ if (load("_v", 0) !== 5) {
 }
 let CATS = load("_cats", null); if (!Array.isArray(CATS) || !CATS.length) CATS = [...DEFAULT_CATS];
 let ECAT = load("_ecat", null); if (!Array.isArray(ECAT) || !ECAT.length) ECAT = [...DEFAULT_ECAT];
-let P = load("_p5", null);
-if (!Array.isArray(P) || !P.length) {
+const savedP = load("_p5", null);
+let P = Array.isArray(savedP) ? savedP : [];
+const HAS_LOCAL = P.length > 0;
+if (!HAS_LOCAL) {
   const oldP = load("_p4", null);
   const customOnly = Array.isArray(oldP) ? oldP.filter(x => x && x.mine) : [];
   P = [...PRODUCTS.map(p => ({ ...p })), ...customOnly];
 }
-const HAS_LOCAL = Array.isArray(P) && P.length > 0;
+P = P.map(p => ({ ...p, discType: p.discType === "amount" ? "amount" : "percent", discAmt: Math.max(0, +p.discAmt || 0), imgs: Array.isArray(p.imgs) ? p.imgs : [] }));
 let cart = load("_c4", {}), orders = load("_o", []);
 
 const getSizes = ci => SIZES[ci % SIZES.length];
-const eff = p => Math.round(p.price * (1 - (p.disc || 0) / 100) * 100) / 100;
+const discOff = p => {
+  if (!p) return 0;
+  const base = Math.max(0, +p.price || 0);
+  if (p.discType === "amount") return Math.min(base, Math.max(0, +p.discAmt || 0));
+  return base * Math.min(95, Math.max(0, +p.disc || 0)) / 100;
+};
+const hasDisc = p => discOff(p) > .0001;
+const discLabel = p => p.discType === "amount" ? "-" + Math.round(discOff(p)) + " " + CONFIG.CURRENCY : "-" + Math.round(+p.disc || 0) + "%";
+const eff = p => Math.max(0, Math.round(((+p.price || 0) - discOff(p)) * 100) / 100);
 const vr = p => (p.sizes && p.sizes.length ? p.sizes : getSizes(p.cat));
 const mul = (p, i) => (vr(p).length == 3 ? MUL[i] : 1);
 const unit = (p, i) => Math.round(eff(p) * mul(p, i));
@@ -406,25 +472,24 @@ const money = n => n + " " + CONFIG.CURRENCY;
 const cartList = () => Object.keys(cart).map(k => { const [id, vi] = k.split("|"), p = P.find(x => x.id == id); return p ? { k, p, vi: +vi, q: cart[k] } : null }).filter(Boolean);
 const cnt = () => cartList().reduce((a, i) => a + i.q, 0);
 document.documentElement.style.setProperty("--p", CONFIG.PRIMARY_COLOR);
-$("nm").textContent = CONFIG.STORE_NAME; document.title = CONFIG.STORE_NAME + " — جولة افتراضية";
+$("nm").textContent = CONFIG.STORE_NAME; document.title = CONFIG.STORE_NAME + " — عيش التجربة";
 
-/* ---------- الضغط المطول 5 ثوانٍ على اسم المتجر لفتح الإدارة ---------- */
-let holdTimer = null;
+/* ---------- فتح الإدارة سراً: 5 ضغطات سريعة متتالية على اسم المتجر ---------- */
 const nmEl = $("nm");
-function startHold(e) {
-  if (e.button && e.button !== 0) return;
-  clearTimeout(holdTimer);
-  holdTimer = setTimeout(() => {
-    openAdminLogin();
-  }, 5000);
+let adminTapCount = 0, adminTapTimer = null;
+function resetAdminTaps() {
+  adminTapCount = 0;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = null;
 }
-function cancelHold() {
-  clearTimeout(holdTimer);
-}
-nmEl.addEventListener("pointerdown", startHold);
-nmEl.addEventListener("pointerup", cancelHold);
-nmEl.addEventListener("pointerleave", cancelHold);
-nmEl.addEventListener("pointercancel", cancelHold);
+nmEl.addEventListener("click", () => {
+  adminTapCount++;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = setTimeout(resetAdminTaps, 1600);
+  if (adminTapCount < 5) return;
+  resetAdminTaps();
+  if (ADMIN) adm(); else openAdminLogin();
+});
 
 /* ---------- العارض والإضاءة الواقعية لمتجر حديث بمستوى بصري احترافي ---------- */
 /* =====================================================================
@@ -443,7 +508,11 @@ const NEAR = 40, FARV = 3400;
 const COLW = 150, CWD = 130, CHT = 182, FLOOR_Y = -235, CEIL_Y = 560, HW = 330, PXU = .45, TY = [270, 75, -120], TEXK = COARSE ? .6 : .75;
 /* لون مميز لكل قسم: ذهبي، أحمر، أخضر، أزرق، أصفر، بنفسجي، برتقالي، تركواز، وردي، كراميل */
 const ACC = ["#e8b93a", "#ef5350", "#43b86a", "#5bb8ff", "#ffe04a", "#a78bfa", "#ff9a3c", "#2fd0c3", "#ff86c1", "#d9a066"];
-const accOf = i => ACC[i % ACC.length];
+let CAT_COLORS = load("_cols", null);
+if (!Array.isArray(CAT_COLORS) || !CAT_COLORS.length) { CAT_COLORS = [...ACC]; save("_cols", CAT_COLORS); }
+while (CAT_COLORS.length < Math.max(CATS.length, ACC.length)) CAT_COLORS.push(ACC[CAT_COLORS.length % ACC.length]);
+CAT_COLORS = CAT_COLORS.map(c => /^#[0-9a-f]{6}$/i.test(c) ? c : ACC[0]);
+const accOf = i => CAT_COLORS[i % CAT_COLORS.length] || ACC[i % ACC.length];
 const TURNS = ["R", "L"];
 let PATH = [], SECS = [], OBJS = [], DUST = [], TOTAL = 1000, CAMMAX = 800, SELOBJ = null;
 
@@ -482,8 +551,11 @@ function buildWorld() {
     sec.idx = i; sec.s0 = s;
     straight(340);
     sec.cs = s;
-    const n = sec.items.length + (ADMIN ? 1 : 0), per = Math.ceil(n / 2), cols = Math.max(1, Math.ceil(per / TY.length));
-    straight(cols * COLW + 20);
+    /* الطول يتمدد تلقائياً: كل صف يستوعب 6 كروت (3 مستويات على كل جانب) */
+    const n = sec.items.length + (ADMIN ? 1 : 0);
+    const cols = Math.max(1, Math.ceil(n / (TY.length * 2)));
+    sec.cols = cols; sec.capacity = cols * TY.length * 2;
+    straight(cols * COLW + 70);
     straight(300);
     sec.s1 = s;
     if (i < secs.length - 1) { const t = TURNS[i % TURNS.length]; sec.turn = t; sec.arcS = s; arc(t === "R" ? 1 : -1); sec.arcE = s }
@@ -583,9 +655,11 @@ function drawCard(c, W0, H0, p) {
   } else drawArt(c, ix, iy, iw, ih, p);
   c.restore();
   c.direction = "rtl"; c.textBaseline = "alphabetic";
-  if (p.disc) {
+  const off = discOff(p);
+  if (off > 0) {
+    const lab = discLabel(p);
     rrp(c, ix + 12, iy + 12, 92, 42, 13); c.fillStyle = "#e60000"; c.fill();
-    c.fillStyle = "#fff"; c.font = `800 26px ${FONT}`; c.textAlign = "center"; c.direction = "ltr"; c.fillText("-" + p.disc + "%", ix + 58, iy + 42); c.direction = "rtl";
+    c.fillStyle = "#fff"; c.font = `800 ${lab.length > 5 ? 20 : 26}px ${FONT}`; c.textAlign = "center"; c.direction = "ltr"; c.fillText(lab, ix + 58, iy + 42); c.direction = "rtl";
   }
   const py = iy + ih + 10, ph = h - py - 14;
   rrp(c, ix, py, iw, ph, 20); c.fillStyle = "#fff"; c.fill();
@@ -594,7 +668,7 @@ function drawCard(c, W0, H0, p) {
   c.fillStyle = "#8a8074"; c.font = `600 19px ${FONT}`; c.fillText(CATS[p.cat] || "", w / 2, py + 108);
   const vi = vr(p).length == 3 ? 1 : 0, fin = unit(p, vi), raw = Math.round(p.price * mul(p, vi));
   c.textAlign = "right"; c.fillStyle = "#c8102e"; c.font = `800 38px ${FONT}`; c.fillText(fin + " " + CONFIG.CURRENCY, w - ix - 14, h - 34);
-  if (p.disc) { c.fillStyle = "#9a9186"; c.font = `700 21px ${FONT}`; const t = raw + " " + CONFIG.CURRENCY; c.fillText(t, w - ix - 14, h - 78); const tw = c.measureText(t).width; c.fillRect(w - ix - 14 - tw, h - 85, tw, 2) }
+  if (off > 0) { c.fillStyle = "#9a9186"; c.font = `700 21px ${FONT}`; const t = raw + " " + CONFIG.CURRENCY; c.fillText(t, w - ix - 14, h - 78); const tw = c.measureText(t).width; c.fillRect(w - ix - 14 - tw, h - 85, tw, 2) }
   c.beginPath(); c.arc(ix + 44, h - 14 - 42, 27, 0, 7); c.fillStyle = col; c.fill();
   c.fillStyle = "#1d1a17"; c.fillRect(ix + 32, h - 59, 24, 6); c.fillRect(ix + 41, h - 68, 6, 24);
   if (!p.stock) {
@@ -660,12 +734,12 @@ function drawAdd(c, w, h, o) {
 const PH = (() => { const c = document.createElement("canvas"); c.width = 64; c.height = 90; const x = c.getContext("2d"); rrp(x, 0, 0, 64, 90, 8); x.fillStyle = "#e9e5dc"; x.fill(); return { c, w: 64, h: 90 } })();
 function texFor(o) {
   let key, w = TW, h = TH, fn;
-  if (o.k === "card") { const p = o.p; key = ["c", p.id, p.name, p.price, p.disc || 0, p.stock ? 1 : 0, p.cat, imgState(p)].join("|"); fn = c => drawCard(c, w, h, p) }
-  else if (o.k === "add") { key = "a|" + o.sec.name; fn = c => drawAdd(c, w, h, o) }
+  if (o.k === "card") { const p = o.p; key = ["c", p.id, p.name, p.price, p.disc || 0, p.discType || "percent", p.discAmt || 0, p.stock ? 1 : 0, p.cat, CATS[p.cat] || "", accOf(p.cat), imgState(p)].join("|"); fn = c => drawCard(c, w, h, p) }
+  else if (o.k === "add") { key = "a|" + o.sec.name + "|" + accOf(o.sec.ci); fn = c => drawAdd(c, w, h, o) }
   else if (o.k === "gate") { w = 640; h = 434; key = "g|" + cnt() + "|" + cartTot(); fn = c => drawGate(c, w, h) }
   else if (o.tex === "welcome") { w = 1024; h = 256; key = "w"; fn = c => drawWelcome(c, w, h) }
-  else if (o.tex === "sec" || o.tex === "promo") { const sc_ = o.tex === "promo" ? o.next : o.sec; w = 1024; h = 224; key = ["s", sc_.ci, sc_.name, sc_.items.length, sc_.idx, SECS.length].join("|"); fn = c => drawSecSign(c, w, h, sc_) }
-  else { w = 1024; h = 190; key = ["n", o.sec.idx, o.next ? o.next.name : "end", o.sec.turn].join("|"); fn = c => drawNextSign(c, w, h, o) }
+  else if (o.tex === "sec" || o.tex === "promo") { const sc_ = o.tex === "promo" ? o.next : o.sec; w = 1024; h = 224; key = ["s", sc_.ci, sc_.name, sc_.items.length, sc_.idx, SECS.length, accOf(sc_.ci)].join("|"); fn = c => drawSecSign(c, w, h, sc_) }
+  else { w = 1024; h = 190; key = ["n", o.sec.idx, o.next ? o.next.name : "end", o.sec.turn, accOf(o.next ? o.next.ci : o.sec.ci)].join("|"); fn = c => drawNextSign(c, w, h, o) }
   const e = texCache.get(key);
   if (e) { e.u = frameNo; return e }
   if (builds >= 3) return PH;
@@ -912,7 +986,7 @@ function setHud(i) {
   const t = $("ht"), n = $("hn"), d = $("hd");
   if (i < 0) { t.textContent = "ESD Market"; n.textContent = "مرحباً بك 👋"; d.textContent = "تقدّم في الممر بالتمرير للأسفل"; $("hud").style.setProperty("--a", "#f2c94c") }
   else {
-    const s = SECS[i], offers = s.items.filter(p => p.disc && p.stock).length;
+    const s = SECS[i], offers = s.items.filter(p => hasDisc(p) && p.stock).length;
     t.textContent = `القسم ${String(i + 1).padStart(2, "0")} / ${String(SECS.length).padStart(2, "0")}`;
     n.textContent = s.e + " " + s.name;
     d.textContent = `${s.items.length} منتج${offers ? " · " + offers + " عرض" : ""}` + (s.turn ? " · التالي: " + (s.turn === "R" ? "لفّة يميناً ↷" : s.turn === "L" ? "لفّة يساراً ↶" : "للأمام ↑") : "");
@@ -920,11 +994,32 @@ function setHud(i) {
   }
   $("rail").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === i));
 }
-function jumpS(sv) { scrollTo({ top: clamp(sv, 0, CAMMAX) * PXU, behavior: RM ? "auto" : "smooth" }) }
+let navRaf = 0, navToken = 0;
+function cancelNav() {
+  navToken++;
+  if (navRaf) { cancelAnimationFrame(navRaf); navRaf = 0; }
+}
+function jumpS(sv) {
+  const to = clamp(sv, 0, CAMMAX) * PXU;
+  cancelNav();
+  if (RM) { scrollTo(0, to); return; }
+  const from = scrollY, dist = Math.abs(to - from);
+  if (dist < 2) { scrollTo(0, to); return; }
+  const dur = clamp(480 + dist * .16, 560, 1500);
+  const start = performance.now(), token = navToken;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = now => {
+    if (token !== navToken) return;
+    const t = clamp((now - start) / dur, 0, 1);
+    scrollTo(0, from + (to - from) * ease(t));
+    navRaf = t < 1 ? requestAnimationFrame(step) : 0;
+  };
+  navRaf = requestAnimationFrame(step);
+}
 function jumpSec(i) { const s = SECS[i]; if (s) jumpS(s.s0 + 20) }
 
 /* ---------- المدخلات ---------- */
-cv.addEventListener("pointerdown", e => { if (!entered) return; drag = { x: e.clientX, y: e.clientY, look: lookT, moved: false, id: e.pointerId } });
+cv.addEventListener("pointerdown", e => { if (!entered) return; cancelNav(); drag = { x: e.clientX, y: e.clientY, look: lookT, moved: false, id: e.pointerId } });
 cv.addEventListener("pointermove", e => {
   mx = e.clientX; my = e.clientY; mouseIn = e.pointerType === "mouse";
   if (drag && e.pointerId === drag.id) {
@@ -948,6 +1043,7 @@ function activate(o) {
 /* سكرول يمين/شمال (لوحة اللمس أو Shift + عجلة الماوس) = التفات */
 addEventListener("wheel", e => {
   if (!entered || mm.classList.contains("on")) return;
+  if (navRaf) cancelNav();
   const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
   if (!dx) return;
   e.preventDefault(); lookT = clamp(lookT + dx * .0035, -1.3, 1.3); lookHold = performance.now() + 3500;
@@ -1170,8 +1266,8 @@ videoEl.addEventListener("ended", () => { if (introStarted && !entered) finishEn
    الواجهة: المنتج، السلة الحقيقية، الطلب، ولوحة الإدارة وإضافة المنتجات
    ===================================================================== */
 function toast(m) { const t = $("toast"); t.textContent = m; t.style.opacity = 1; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.opacity = 0, 2600) }
-function openM(h) { mb.innerHTML = h; mm.classList.add("on"); mb.scrollTop = 0; document.documentElement.classList.add("mlock"); hover = null }
-function closeM() { mm.classList.remove("on"); document.documentElement.classList.remove("mlock"); SELOBJ = null }
+function openM(h, cls) { mb.className = "box" + (cls ? " " + cls : ""); mb.innerHTML = h; mm.classList.add("on"); mb.scrollTop = 0; document.documentElement.classList.add("mlock"); hover = null }
+function closeM() { mm.classList.remove("on"); document.documentElement.classList.remove("mlock"); mb.className = "box"; SELOBJ = null }
 mm.addEventListener("click", e => { if (e.target == mm) closeM() });
 addEventListener("keydown", e => { if (e.key == "Escape") closeM() });
 const X = '<button onclick="closeM()" style="float:left">إغلاق ✕</button>';
@@ -1184,6 +1280,8 @@ function prodImg(p) {
   const c = document.createElement("canvas"); c.width = 360; c.height = 450; drawArt(c.getContext("2d"), 0, 0, 360, 450, p);
   return artCache[k] = c.toDataURL("image/jpeg", .8);
 }
+const extraImgs = p => Array.isArray(p.imgs) ? p.imgs.filter(Boolean) : [];
+const galleryOf = p => { const a = [p.img, ...extraImgs(p)].filter(Boolean); return a.length ? a : [prodImg(p)]; };
 function upd() {
   $("bCart").textContent = "السلة (" + cnt() + ")"; save("_c4", cart);
   const b = $("bCart"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
@@ -1192,20 +1290,28 @@ upd();
 
 /* ---------- المنتج ---------- */
 let sel = null;
-function openProduct(p) { sel = { p, vi: vr(p).length == 3 ? 1 : 0, q: 1 }; cardH() }
+function openProduct(p) { sel = { p, vi: vr(p).length == 3 ? 1 : 0, q: 1, gi: 0, imgs: galleryOf(p) }; cardH() }
 function cardH() {
   const { p, vi, q } = sel, sz = vr(p);
-  const finalUnit = unit(p, vi), rawUnit = Math.round(p.price * mul(p, vi)), saveAmt = Math.max(0, rawUnit - finalUnit);
-  openM(`${X}<div class="pc"><div class="pimg"><img id="pimgEl" src="${esc(prodImg(p))}" alt="${esc(p.name)}"></div><div>
+  const finalUnit = unit(p, vi), rawUnit = Math.round(p.price * mul(p, vi)), saveAmt = Math.max(0, rawUnit - finalUnit), off = discOff(p);
+  const img = sel.imgs[sel.gi] || prodImg(p);
+  openM(`${X}<div class="pc"><div><div class="pimg"><img id="pimgEl" src="${esc(img)}" alt="${esc(p.name)}"></div>
+   ${sel.imgs.length > 1 ? `<div class="pgal">${sel.imgs.map((src, i) => `<img class="${i == sel.gi ? "on" : ""}" src="${esc(src)}" alt="" onclick="pickImg(${i})">`).join("")}</div>` : ""}</div><div>
    <h3>${esc(p.name)}</h3><div style="color:var(--mut)">${esc(CATS[p.cat] || "")} · العبوة: ${esc(p.pack)}</div>
    <div style="font-size:12px;color:#15803d;font-weight:700;margin-top:4px">${p.stock ? "✔ متوفر الآن بالمخزن • توصيل سريع لباب البيت" : ""}</div>
    <div style="margin-top:10px;font-weight:700">الحجم</div><div class="chips">${sz.map((s, i) => `<button class="${i == vi ? "on" : ""}" onclick="pickV(${i})">${esc(s)}</button>`).join("")}</div>
-   <div><span class="big">${money(finalUnit)}</span>${p.disc ? `<span class="old">${money(rawUnit)}</span> <span class="tag">خصم ${p.disc}% · وفّر ${money(saveAmt)}</span>` : ""}</div><br>
+   <div><span class="big">${money(finalUnit)}</span>${off > 0 ? `<span class="old">${money(rawUnit)}</span> <span class="tag">${esc(discLabel(p))} · وفّر ${money(saveAmt)}</span>` : ""}</div><br>
    ${p.stock ? `<div class="qty"><button onclick="qtyCh(-1)">−</button><b style="font-size:20px;min-width:28px;text-align:center">${q}</b><button onclick="qtyCh(1)">+</button><span style="margin-inline-start:auto">${money(finalUnit * q)}</span></div>
    <button class="pr" style="width:100%;padding:13px" onclick="addSel()">أضف إلى السلة 🛒</button>` : `<p class="tag" style="padding:10px;font-size:15px">هذا المنتج غير متاح حالياً (خلص من المخزون)</p>`}
    ${ADMIN ? `<button style="width:100%;margin-top:8px" onclick="adm()">⚙ إدارة المنتجات</button>` : ""}</div></div>`);
 }
 function pickV(i) { sel.vi = i; cardH() }
+function pickImg(i) {
+  if (!sel || !sel.imgs[i]) return;
+  sel.gi = i;
+  const im = $("pimgEl"); if (im) im.src = sel.imgs[i];
+  document.querySelectorAll(".pgal img").forEach((el, k) => el.classList.toggle("on", k === i));
+}
 function qtyCh(d) { sel.q = Math.max(1, Math.min(20, sel.q + d)); cardH() }
 function flyToCart(srcEl, src) {
   if (RM) return;
@@ -1228,7 +1334,7 @@ $("bCat").onclick = () => openM(`${X}<h3>الأقسام</h3><div class="cats">${
 function goCat(i) { closeM(); jumpSec(i) }
 function goProd(id) { closeM(); const o = OBJS.find(o => o.p && o.p.id == id); if (o) jumpS(o.s - 470) }
 const vi1 = p => (vr(p).length == 3 ? 1 : 0);
-$("bOff").onclick = () => { const o = P.filter(p => p.disc && p.stock); openM(`${X}<h3>العروض والخصومات</h3>${o.map(p => `<div class="row"><span><b>${esc(p.name)}</b> <span class="tag">-${p.disc}%</span></span><span><b>${money(unit(p, vi1(p)))}</b> <button onclick="goProd(${p.id})" title="اعرضه في الممر">📍</button> <button onclick="add(${p.id},${vi1(p)})">+</button></span></div>`).join("") || "لا توجد عروض الآن."}`) };
+$("bOff").onclick = () => { const o = P.filter(p => hasDisc(p) && p.stock); openM(`${X}<h3>العروض والخصومات</h3>${o.map(p => `<div class="row"><span><b>${esc(p.name)}</b> <span class="tag">${esc(discLabel(p))}</span></span><span><b>${money(unit(p, vi1(p)))}</b> <button onclick="goProd(${p.id})" title="اعرضه في الممر">📍</button> <button onclick="add(${p.id},${vi1(p)})">+</button></span></div>`).join("") || "لا توجد عروض الآن."}`) };
 
 /* ---------- السلة ---------- */
 function ch(k, d) { cart[k] = Math.max(0, (cart[k] || 0) + d); if (!cart[k]) delete cart[k]; upd(); $("bCart").onclick() }
@@ -1273,107 +1379,292 @@ $("bOrd").onclick = () => openM(`${X}<h3>طلباتي</h3>${orders.map((o, i) =>
 function urg(i) { const o = orders[i]; window.open("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(`بخصوص الطلب ${o.id} باسم ${o.name}: من فضلك محتاج أعرف موعد التوصيل، الموضوع مستعجل.`), "_blank") }
 
 /* ---------- الإدارة ---------- */
-function openAdminLogin() { openM(`${X}<h3>دخول الإدارة</h3><input id="ap" type="password" placeholder="أدخل كلمة المرور"><button class="pr" style="width:100%" onclick="adm()">دخول</button>`) }
+let admCatFilter = "all";
+let admTab = "products";
+const ADM_TABS = {
+  products: "المنتجات",
+  categories: "الأقسام",
+  offers: "العروض",
+  orders: "الطلبات",
+  publish: "النشر"
+};
+function openAdminLogin() {
+  openM(`${X}<h3>دخول الإدارة</h3>
+  <p style="color:var(--mut);font-size:13px;line-height:1.6;margin:0 0 8px">هذه المنطقة مخصصة لإدارة المتجر. أدخل كلمة المرور للمتابعة.</p>
+  <input id="ap" type="password" placeholder="كلمة المرور" autocomplete="current-password" onkeydown="if(event.key==='Enter')adm()">
+  <button class="pr" style="width:100%;padding:13px" onclick="adm()">دخول</button>`);
+}
 function setAdmin(on) {
   ADMIN = on; try { sessionStorage.setItem("esd_admin", on ? "1" : "0") } catch (e) {}
   $("bAdd").hidden = !on; rebuildWorld();
+  if (!on) toast("تم الخروج من وضع الإدارة");
 }
-let admCatFilter = "all";
-function adm() {
+function adm(tab) {
   if ($("ap") && $("ap").value != CONFIG.ADMIN_PASSWORD) { alert("كلمة المرور غير صحيحة"); return }
   if (!ADMIN) setAdmin(true);
-  const filteredP = admCatFilter === "all" ? P : P.filter(p => p.cat == +admCatFilter);
-  openM(`${X}<h3>لوحة الإدارة — ${esc(CONFIG.STORE_NAME)}</h3>
-  <div style="background:#f5efe4;padding:12px;border-radius:14px;margin-bottom:14px">
-    <b>1. إضافة منتج</b><div style="font-size:13px;color:var(--mut);margin:4px 0 8px">يمكنك أيضاً الضغط على كارت «＋ أضف منتجاً» في نهاية كل قسم داخل الممر.</div>
-    <button class="pr" style="width:100%" onclick="openAddProduct()">＋ إضافة منتج جديد</button></div>
-  <div style="background:#f5efe4;padding:12px;border-radius:14px;margin-bottom:14px">
-    <b>2. إضافة قسم جديد</b>
-    <div style="display:flex;gap:8px;margin-top:6px"><input id="newCatIcon" style="width:70px;text-align:center" placeholder="أيقونة" value="🛍️"><input id="newCatName" placeholder="اسم القسم الجديد"><button class="pr" style="white-space:nowrap" onclick="addCat()">إضافة قسم</button></div>
-    <div style="font-size:13px;color:var(--mut);margin-top:4px">الأقسام (${CATS.length}): ${CATS.map(c => esc(c)).join(" • ")}</div></div>
-  <div style="background:#f5efe4;padding:12px;border-radius:14px;margin-bottom:14px">
-    <b>3. نشر المنتجات لكل الزوار</b>
-    <div style="font-size:13px;color:var(--mut);margin:4px 0 8px">المنتجات تُحفظ في متصفحك فقط. صدّرها ثم ارفع الملف باسم <b>products.json</b> بجانب الموقع ليراها كل العملاء.</div>
-    <div style="display:flex;gap:8px"><button class="pr" onclick="exportCatalog()">⬇ تصدير products.json</button><label style="flex:1;margin:0"><input type="file" accept="application/json" onchange="importCatalog(this)" style="margin:0"></label></div></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0"><b>4. إدارة المنتجات والأسعار والعروض</b>
-    <select style="width:auto;margin:0" onchange="admCatFilter=this.value;adm()"><option value="all" ${admCatFilter === "all" ? "selected" : ""}>كل الأقسام</option>${CATS.map((c, i) => `<option value="${i}" ${admCatFilter == i ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div>
-  ${filteredP.map(p => `<div class="row" style="flex-wrap:wrap;background:#fff;padding:10px;border-radius:12px;margin-bottom:8px">
-    <span style="flex:1 1 100%;font-weight:700">${esc(p.name)} <small style="color:var(--mut)">(${esc(CATS[p.cat] || "")})</small></span>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;margin-top:4px">
-      <label style="font-size:13px">السعر <input class="sm" type="number" value="${p.price}" onchange="up(${p.id},'price',+this.value)"></label>
-      <label style="font-size:13px">خصم% <input class="sm" type="number" value="${p.disc || 0}" onchange="up(${p.id},'disc',+this.value)"></label>
-      <select style="width:auto;margin:0" onchange="up(${p.id},'cat',+this.value)">${CATS.map((c, i) => `<option value="${i}" ${p.cat == i ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
-      <label style="font-size:13px"><input type="checkbox" style="width:auto" ${p.stock ? "checked" : ""} onchange="up(${p.id},'stock',this.checked)"> متوفر</label></div>
-    <div style="display:flex;gap:6px;align-items:center;width:100%;margin-top:4px">
-      <input style="flex:1;margin:0" placeholder="رابط الصورة أو ارفع ملف" value="${p.img && !p.img.startsWith("data:") ? esc(p.img) : ""}" onchange="up(${p.id},'img',this.value.trim())">
-      <input type="file" accept="image/*" style="width:140px;margin:0" onchange="upImg(${p.id},this)"><button onclick="del(${p.id})" style="color:#c8102e">حذف</button></div></div>`).join("")}<hr>
-  <b>5. الطلبات الواردة</b>
-  ${orders.map((o, i) => `<div class="row"><span>${esc(o.id)} - ${esc(o.name)} (${money(o.total)})</span><select style="width:auto" onchange="orders[${i}].status=+this.value;save('_o',orders)">${ST.map((s, j) => `<option value="${j}" ${o.status == j ? "selected" : ""}>${s}</option>`).join("")}</select></div>`).join("") || "<p style='color:var(--mut)'>لا توجد طلبات مسجلة حالياً.</p>"}
-  <hr><button onclick="setAdmin(false);closeM()" style="width:100%">خروج من وضع الإدارة</button>`);
+  if (typeof tab === "string" && ADM_TABS[tab]) admTab = tab;
+  const offers = P.filter(hasDisc).length;
+  const body = admTab === "categories" ? admCategories() :
+    admTab === "offers" ? admOffers() :
+    admTab === "orders" ? admOrders() :
+    admTab === "publish" ? admPublish() : admProducts();
+  openM(`<div class="adm">
+    <div class="adm-head"><div><b>لوحة الإدارة</b><small>${esc(CONFIG.STORE_NAME)} · تحكم كامل في المتجر</small></div><button onclick="setAdmin(false);closeM()">خروج</button></div>
+    <div class="adm-tabs">${Object.keys(ADM_TABS).map(k => `<button class="adm-tab ${admTab === k ? "on" : ""}" onclick="adm('${k}')">${ADM_TABS[k]}</button>`).join("")}</div>
+    <div class="adm-stats">
+      <div class="adm-stat"><b>${CATS.length}</b><span>قسم</span></div>
+      <div class="adm-stat"><b>${P.length}</b><span>منتج</span></div>
+      <div class="adm-stat"><b>${offers}</b><span>عرض نشط</span></div>
+      <div class="adm-stat"><b>${orders.length}</b><span>طلب</span></div>
+    </div>
+    ${body}
+  </div>`, "admin");
+}
+function admProducts() {
+  const list = admCatFilter === "all" ? P : P.filter(p => p.cat == +admCatFilter);
+  return `<div class="adm-toolbar">
+    <select onchange="admCatFilter=this.value;adm('products')"><option value="all" ${admCatFilter === "all" ? "selected" : ""}>كل الأقسام (${P.length})</option>${CATS.map((c, i) => `<option value="${i}" ${admCatFilter == i ? "selected" : ""}>${esc(c)} (${P.filter(p => p.cat == i).length})</option>`).join("")}</select>
+    <span class="grow"></span>
+    <button class="pr" onclick="openProductEditor(null,${admCatFilter === "all" ? 0 : +admCatFilter})">＋ منتج جديد</button>
+  </div>
+  ${list.map(p => `<div class="adm-prod">
+    ${p.img ? `<img class="adm-thumb" src="${esc(p.img)}" alt="">` : `<div class="adm-thumb adm-thumb-ph" aria-hidden="true">${esc(p.e || ECAT[p.cat] || "🛒")}</div>`}
+    <div style="min-width:0">
+      <div class="adm-pname">${esc(p.name)}</div>
+      <div class="adm-meta">${esc(CATS[p.cat] || "")} · ${money(p.price)}${hasDisc(p) ? ` · <span style="color:#c8102e;font-weight:800">${esc(discLabel(p))} → ${money(unit(p, vi1(p)))}</span>` : ""}</div>
+      <div class="adm-meta">${p.stock ? "متوفر" : "غير متوفر"} · ${extraImgs(p).length} صورة إضافية</div>
+    </div>
+    <div class="adm-side"><div class="adm-actions"><button onclick="openProductEditor(${p.id})">تعديل</button><button onclick="delP(${p.id})" style="color:#c8102e">حذف</button></div></div>
+  </div>`).join("") || `<p style="color:var(--mut);text-align:center;padding:16px">لا توجد منتجات في هذا القسم بعد.</p>`}`;
+}
+function admCategories() {
+  return `<div class="adm-card"><h4>إضافة قسم جديد</h4>
+    <div class="adm-form-grid">
+      <label>الأيقونة<input id="newCatIcon" value="🛍️" maxlength="8"></label>
+      <label>اسم القسم<input id="newCatName" placeholder="مثال: العطارة"></label>
+      <label>لون القسم<input id="newCatColor" class="adm-color" type="color" value="${ACC[CATS.length % ACC.length]}"></label>
+      <label style="display:flex;align-items:flex-end"><button class="pr" style="width:100%;padding:10px" onclick="addCat()">إضافة القسم</button></label>
+    </div>
+  </div>
+  <div class="adm-card"><h4>الأقسام <small>${CATS.length}</small></h4>
+    ${CATS.map((c, i) => `<div class="adm-cat">
+      <input value="${esc(ECAT[i] || "🛍️")}" style="text-align:center" maxlength="8" onchange="upCat(${i},'icon',this.value)">
+      <input value="${esc(c)}" onchange="upCat(${i},'name',this.value)">
+      <input class="adm-color" type="color" value="${accOf(i)}" onchange="upCat(${i},'color',this.value)">
+      <div><span class="adm-cat-count">${P.filter(p => p.cat == i).length} منتج</span> <button onclick="delCat(${i})" style="color:#c8102e;padding:5px 7px;font-size:12px">حذف</button></div>
+    </div>`).join("")}
+  </div>`;
+}
+function admOffers() {
+  const offers = P.filter(p => hasDisc(p));
+  return `<div class="adm-card"><h4>العروض النشطة <small>${offers.length}</small></h4>
+    ${offers.map(p => `<div class="adm-offer">
+      <div><b>${esc(p.name)}</b><div class="adm-meta">${esc(CATS[p.cat] || "")} · ${money(p.price)} → ${money(unit(p, vi1(p)))}</div></div>
+      <div class="adm-actions"><span class="tag">${esc(discLabel(p))}</span><button onclick="openProductEditor(${p.id})">تعديل</button><button onclick="clearDisc(${p.id})" style="color:#c8102e">إزالة</button></div>
+    </div>`).join("") || `<p style="color:var(--mut);text-align:center;padding:14px">لا توجد عروض نشطة الآن.</p>`}
+  </div>
+  <div class="adm-card"><h4>إضافة خصم سريع</h4>
+    <div class="adm-toolbar"><select id="quickOff">${P.map(p => `<option value="${p.id}">${esc(p.name)} — ${money(p.price)}</option>`).join("")}</select><button class="pr" onclick="openProductEditor(+$('quickOff').value)">تعديل المنتج والخصم</button></div>
+    <div class="adm-note">اختر المنتج ثم حدّد السعر الأساسي ونوع الخصم (نسبة أو قيمة ثابتة) وشاهد السعر النهائي قبل الحفظ.</div>
+  </div>`;
+}
+function admOrders() {
+  return `<div class="adm-card"><h4>الطلبات الواردة <small>${orders.length}</small></h4>
+    ${orders.map((o, i) => `<div class="adm-offer"><div><b>${esc(o.id)}</b> · ${esc(o.name)}<div class="adm-meta">${money(o.total)} · ${o.items.length} صنف · ${esc(o.phone || "")}</div></div><select style="width:auto;margin:0" onchange="orders[${i}].status=+this.value;save('_o',orders);toast('تم تحديث حالة الطلب ✔')">${ST.map((s, j) => `<option value="${j}" ${o.status == j ? "selected" : ""}>${s}</option>`).join("")}</select></div>`).join("") || `<p style="color:var(--mut);text-align:center;padding:14px">لا توجد طلبات مسجلة حالياً.</p>`}
+  </div>`;
+}
+function admPublish() {
+  return `<div class="adm-card"><h4>نشر الكتالوج لكل الزوار</h4>
+    <p style="font-size:13px;color:var(--mut);line-height:1.7;margin:0 0 10px">المنتجات والأقسام والألوان تُحفظ في متصفحك أثناء التعديل. ليراها كل العملاء، صدّر ملف <b>products.json</b> وارفعه بجانب الموقع.</p>
+    <div class="adm-toolbar"><button class="pr" onclick="exportCatalog()">⬇ تصدير products.json</button><label style="flex:1;margin:0"><input type="file" accept="application/json" onchange="importCatalog(this)" style="margin:0"></label></div>
+    <div class="adm-note">التصدير يشمل الأقسام والأيقونات والألوان والمنتجات وكل صورها وخصوماتها.</div>
+  </div>
+  <div class="adm-card"><h4>ملخص المحتوى</h4>
+    <div class="adm-stats" style="margin:0"><div class="adm-stat"><b>${CATS.length}</b><span>قسم</span></div><div class="adm-stat"><b>${P.length}</b><span>منتج</span></div><div class="adm-stat"><b>${P.reduce((n, p) => n + extraImgs(p).length, 0)}</b><span>صورة إضافية</span></div><div class="adm-stat"><b>${P.filter(hasDisc).length}</b><span>خصم</span></div></div>
+  </div>`;
 }
 function addCat() {
   const name = $("newCatName").value.trim(), icon = $("newCatIcon").value.trim() || "🛍️";
+  const color = ($("newCatColor").value || ACC[CATS.length % ACC.length]).toLowerCase();
   if (!name) { alert("اكتب اسم القسم أولاً"); return }
-  CATS.push(name); ECAT.push(icon); save("_cats", CATS); save("_ecat", ECAT);
-  rebuildWorld(); toast("تمت إضافة قسم «" + name + "» ✔ — أضف منتجاتك من نهاية القسم"); adm();
+  if (CATS.some(c => c.trim().toLowerCase() === name.toLowerCase())) { alert("هذا القسم موجود بالفعل"); return }
+  CATS.push(name); ECAT.push(icon); CAT_COLORS.push(/^#[0-9a-f]{6}$/i.test(color) ? color : ACC[CATS.length % ACC.length]);
+  save("_cats", CATS); save("_ecat", ECAT); save("_cols", CAT_COLORS);
+  rebuildWorld(); toast("تمت إضافة قسم «" + name + "» ✔"); adm("categories");
+}
+function upCat(ci, key, value) {
+  if (key === "name") {
+    const v = String(value).trim();
+    if (!v) { alert("اسم القسم مطلوب"); adm("categories"); return }
+    if (CATS.some((c, i) => i !== ci && c.trim().toLowerCase() === v.toLowerCase())) { alert("يوجد قسم بهذا الاسم بالفعل"); adm("categories"); return }
+    CATS[ci] = v; save("_cats", CATS);
+  } else if (key === "icon") {
+    ECAT[ci] = String(value).trim() || "🛍️"; save("_ecat", ECAT);
+  } else if (key === "color") {
+    if (!/^#[0-9a-f]{6}$/i.test(value)) return;
+    CAT_COLORS[ci] = value; save("_cols", CAT_COLORS);
+  }
+  rebuildWorld(); toast("تم تحديث القسم ✔"); adm("categories");
+}
+function delCat(ci) {
+  if (CATS.length <= 1) { alert("لا يمكن حذف القسم الأخير"); return }
+  const n = P.filter(p => p.cat == ci).length;
+  if (!confirm(`حذف قسم «${CATS[ci]}»${n ? ` و${n} منتجاً` : ""}؟`)) return;
+  P = P.filter(p => p.cat != ci).map(p => ({ ...p, cat: p.cat > ci ? p.cat - 1 : p.cat }));
+  CATS.splice(ci, 1); ECAT.splice(ci, 1); CAT_COLORS.splice(ci, 1);
+  P.forEach(p => { p.e = ECAT[p.cat] || p.e; });
+  save("_cats", CATS); save("_ecat", ECAT); save("_cols", CAT_COLORS); persist();
+  if (admCatFilter !== "all" && +admCatFilter >= CATS.length) admCatFilter = "all";
+  rebuildWorld(); toast("تم حذف القسم ✔"); adm("categories");
+}
+function setProduct(id, patch) {
+  const p = P.find(x => x.id == id); if (!p) return;
+  Object.assign(p, patch); persist(); rebuildWorld(); toast("تم التحديث ✔");
+}
+function delP(id) {
+  const p = P.find(x => x.id == id); if (!p) return;
+  if (!confirm(`حذف المنتج «${p.name}»؟`)) return;
+  P = P.filter(x => x.id != id); persist(); rebuildWorld(); toast("تم حذف المنتج ✔"); adm("products");
+}
+function clearDisc(id) {
+  const p = P.find(x => x.id == id); if (!p) return;
+  p.disc = 0; p.discAmt = 0; p.discType = "percent";
+  persist(); rebuildWorld(); toast("تمت إزالة الخصم ✔"); adm("offers");
 }
 function persist() { if (!save("_p5", P)) alert("مساحة التخزين في المتصفح امتلأت — استخدم روابط صور أو صوراً أصغر.") }
-function up(id, k, v) { P.find(p => p.id == id)[k] = v; persist(); rebuildWorld(); toast("تم التحديث ✔") }
-function del(id) { P = P.filter(p => p.id != id); persist(); rebuildWorld(); adm() }
-function readImg(file, cb) {
+function readImg(file, cb, maxDim, quality) {
+  const MAX = maxDim || 720, Q = quality == null ? .82 : quality;
   const fr = new FileReader();
   fr.onload = () => {
     const im = new Image();
     im.onload = () => {
-      const M = 480, k = Math.min(1, M / Math.max(im.width, im.height)), c = document.createElement("canvas");
-      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      const k = Math.min(1, MAX / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
       const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
-      cb(c.toDataURL("image/jpeg", .84));
+      cb(c.toDataURL("image/jpeg", Q));
     };
+    im.onerror = () => alert("تعذر قراءة الصورة");
     im.src = fr.result;
   };
+  fr.onerror = () => alert("تعذر قراءة الملف");
   fr.readAsDataURL(file);
 }
-function upImg(id, el) { const f = el.files[0]; if (!f) return; readImg(f, d => { up(id, "img", d) }) }
-function prevImg(el) { const f = el.files[0], box = $("aprev"); if (!f) { box.innerHTML = ""; return } readImg(f, d => { box.innerHTML = `<img src="${d}" style="width:110px;height:110px;object-fit:contain;border-radius:12px;background:#f4f1ea;margin-bottom:8px">`; box.dataset.img = d }) }
-function openAddProduct(ci) {
+let pedit = null, peditImgs = [], peditCover = "";
+function openProductEditor(id, ci) {
   if (!ADMIN) { openAdminLogin(); return }
-  ci = ci == null ? 0 : ci;
-  openM(`${X}<h3>＋ إضافة منتج جديد</h3>
-  <label>القسم<select id="ac">${CATS.map((c, i) => `<option value="${i}" ${i == ci ? "selected" : ""}>${ECAT[i] || "🛒"} ${esc(c)}</option>`).join("")}</select></label>
-  <label>اسم المنتج<input id="an" placeholder="مثال: جبنة رومي قديمة"></label>
-  <div style="display:flex;gap:8px"><label style="flex:1">السعر (${CONFIG.CURRENCY})<input id="apr" type="number" inputmode="decimal"></label><label style="flex:1">خصم % (اختياري)<input id="adisc" type="number" inputmode="decimal" value="0"></label></div>
-  <div style="display:flex;gap:8px"><label style="flex:1">الحجم<input id="as" placeholder="500 جم"></label><label style="flex:1">العبوة<input id="aq" placeholder="1 علبة"></label></div>
-  <label>صورة المنتج<input id="af" type="file" accept="image/*" onchange="prevImg(this)"></label><div id="aprev"></div>
-  <button class="pr" style="width:100%;padding:13px" onclick="addP()">إضافة المنتج للقسم</button>`);
+  const p = id == null ? null : P.find(x => x.id == id);
+  const cat = p ? p.cat : (ci == null ? 0 : ci);
+  pedit = { id: p ? p.id : null, cat };
+  peditImgs = p ? [p.img, ...extraImgs(p)].filter(Boolean) : [];
+  peditCover = p && p.img ? p.img : (peditImgs[0] || "");
+  const type = p && p.discType === "amount" ? "amount" : "percent";
+  const val = p ? (type === "amount" ? (p.discAmt || 0) : (p.disc || 0)) : 0;
+  openM(`${X}<h3>${p ? "تعديل المنتج" : "＋ إضافة منتج جديد"}</h3>
+    <div class="adm-form-grid">
+      <label class="full">اسم المنتج<input id="edName" value="${esc(p ? p.name : "")}" placeholder="مثال: جبنة رومي قديمة"></label>
+      <label>القسم<select id="edCat">${CATS.map((c, i) => `<option value="${i}" ${i == cat ? "selected" : ""}>${ECAT[i] || "🛒"} ${esc(c)}</option>`).join("")}</select></label>
+      <label>السعر الأساسي (${CONFIG.CURRENCY})<input id="edPrice" type="number" min="0" step="0.01" value="${p ? p.price : ""}" oninput="peditPreview()"></label>
+      <label>نوع الخصم<select id="edDiscType" onchange="peditPreview()"><option value="percent" ${type === "percent" ? "selected" : ""}>نسبة مئوية %</option><option value="amount" ${type === "amount" ? "selected" : ""}>قيمة ثابتة (${CONFIG.CURRENCY})</option></select></label>
+      <label>قيمة الخصم<input id="edDiscVal" type="number" min="0" step="0.01" value="${val}" oninput="peditPreview()"></label>
+      <div class="full" id="edPreview"></div>
+      <label>الحجم<input id="edSize" value="${esc(p ? p.size : "قياسي")}"></label>
+      <label>العبوة<input id="edPack" value="${esc(p ? p.pack : "1 قطعة")}"></label>
+      <label class="full" style="display:flex;align-items:center;gap:8px"><input id="edStock" type="checkbox" style="width:auto;margin:0" ${p ? (p.stock ? "checked" : "") : "checked"}> متوفر في المخزن</label>
+    </div>
+    <div class="adm-card" style="margin-top:12px"><h4>صور المنتج</h4>
+      <div class="adm-note">الصورة المحددة كغلاف تظهر على الكارت الخارجي. الصور الأخرى تظهر داخل تفاصيل المنتج. الحد الأقصى 8 صور.</div>
+      <div class="adm-toolbar"><label style="flex:1;margin:0"><span style="font-size:13px;font-weight:700">رفع صور متعددة</span><input type="file" accept="image/*" multiple onchange="peditAddFiles(this)" style="margin:0"></label><button onclick="peditAddUrl()">＋ رابط صورة</button></div>
+      <input id="edImgUrl" placeholder="https://... أو رابط صورة مباشر" style="margin:0 0 8px">
+      <div id="edGallery" class="adm-gallery"></div>
+    </div>
+    <button class="pr adm-save" onclick="saveProductEditor()">${p ? "حفظ التعديلات" : "إضافة المنتج"}</button>`, "editor");
+  peditPreview(); peditRenderImgs();
 }
-function addP() {
-  const n = $("an").value.trim(), pr = +$("apr").value;
-  if (!n || !pr) { alert("أدخل اسم المنتج والسعر"); return }
-  const c = +$("ac").value, disc = Math.max(0, Math.min(95, +$("adisc").value || 0)), id = Date.now();
-  const sz = $("as").value.trim() || "قياسي";
-  const go = () => {
-    P.push({ id, name: n, cat: c, price: pr, size: sz, pack: $("aq").value.trim() || "1 قطعة", sizes: [sz], disc, stock: true, mine: true, e: ECAT[c] || "🛒", img: $("aprev").dataset.img || "" });
-    persist(); rebuildWorld(); toast("تمت إضافة المنتج في قسم " + CATS[c] + " ✔"); closeM();
-    const o = OBJS.find(o => o.p && o.p.id === id); if (o) setTimeout(() => jumpS(o.s - 470), 150);
+function peditPreview() {
+  const box = $("edPreview"); if (!box) return;
+  const price = Math.max(0, +$("edPrice").value || 0), type = $("edDiscType").value, raw = Math.max(0, +$("edDiscVal").value || 0);
+  const off = type === "amount" ? Math.min(price, raw) : price * Math.min(95, raw) / 100;
+  const final = Math.max(0, price - off);
+  box.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px"><div class="adm-stat"><b>${money(price)}</b><span>السعر الأساسي</span></div><div class="adm-stat"><b>${off > 0 ? money(Math.round(off * 100) / 100) : "—"}</b><span>قيمة الخصم</span></div><div class="adm-stat"><b style="color:#15803d">${money(Math.round(final * 100) / 100)}</b><span>السعر النهائي</span></div></div>`;
+}
+function peditRenderImgs() {
+  const box = $("edGallery"); if (!box) return;
+  if (!peditImgs.length) { box.innerHTML = `<div class="adm-note" style="grid-column:1/-1;margin:0">لا توجد صور بعد. سيتم استخدام رسم تلقائي للمنتج.</div>`; return }
+  box.innerHTML = peditImgs.map((src, i) => `<div class="adm-img">${src === peditCover ? `<span class="cover">غلاف</span>` : ""}<img src="${esc(src)}" alt=""><div class="adm-img-actions">${src === peditCover ? "" : `<button onclick="peditSetCover(${i})">غلاف</button>`}<button onclick="peditRemoveImg(${i})" style="color:#c8102e">حذف</button></div></div>`).join("");
+}
+function peditSetCover(i) { if (!peditImgs[i]) return; peditCover = peditImgs[i]; peditRenderImgs(); }
+function peditRemoveImg(i) {
+  const removed = peditImgs.splice(i, 1)[0];
+  if (removed === peditCover) peditCover = peditImgs[0] || "";
+  peditRenderImgs();
+}
+function peditAddUrl() {
+  const el = $("edImgUrl"), v = el.value.trim();
+  if (!v) return;
+  if (!/^(https?:\/\/|data:image\/)/i.test(v)) { alert("أدخل رابط صورة صالح يبدأ بـ http/https أو data:image"); return }
+  if (peditImgs.length >= 8) { alert("الحد الأقصى 8 صور للمنتج"); return }
+  peditImgs.push(v); if (!peditCover) peditCover = v; el.value = "";
+  peditRenderImgs(); toast("تمت إضافة رابط الصورة ✔");
+}
+function peditAddFiles(input) {
+  const files = [...(input.files || [])]; input.value = "";
+  if (!files.length) return;
+  if (peditImgs.length >= 8) { alert("الحد الأقصى 8 صور للمنتج"); return }
+  const room = 8 - peditImgs.length, use = files.slice(0, room);
+  if (files.length > room) alert("تمت إضافة أول " + room + " صور فقط (الحد 8).");
+  let left = use.length;
+  use.forEach(file => readImg(file, data => {
+    if (peditImgs.length >= 8) return;
+    peditImgs.push(data); if (!peditCover) peditCover = data;
+    peditRenderImgs();
+    if (--left === 0) toast("تمت إضافة الصور ✔");
+  }, 720, .8));
+}
+function saveProductEditor() {
+  const name = $("edName").value.trim(), price = +$("edPrice").value;
+  if (!name || !(price > 0)) { alert("أدخل اسم المنتج وسعراً صحيحاً"); return }
+  const cat = +$("edCat").value, type = $("edDiscType").value === "amount" ? "amount" : "percent";
+  const raw = Math.max(0, +$("edDiscVal").value || 0);
+  const val = type === "percent" ? Math.min(95, raw) : Math.min(price, raw);
+  const size = $("edSize").value.trim() || "قياسي", pack = $("edPack").value.trim() || "1 قطعة";
+  const imgs = peditImgs.filter(Boolean).slice(0, 8);
+  const cover = imgs.includes(peditCover) ? peditCover : (imgs[0] || "");
+  const extras = imgs.filter(x => x !== cover);
+  const id = pedit.id || Date.now();
+  const old = pedit.id ? P.find(x => x.id == pedit.id) : null;
+  const item = {
+    id, name, cat, price, discType: type, disc: type === "percent" ? val : 0, discAmt: type === "amount" ? val : 0,
+    size, pack, sizes: old && Array.isArray(old.sizes) && old.sizes.length ? old.sizes : [size],
+    stock: !!$("edStock").checked, mine: true, e: ECAT[cat] || "🛒", img: cover, imgs: extras
   };
-  const f = $("af").files[0];
-  if (f && !$("aprev").dataset.img) readImg(f, d => { $("aprev").dataset.img = d; go() }); else go();
+  if (old) Object.assign(old, item); else P.push(item);
+  persist(); rebuildWorld(); toast(old ? "تم حفظ تعديلات المنتج ✔" : "تمت إضافة المنتج ✔"); adm("products");
 }
+function openAddProduct(ci) { if (!ADMIN) { openAdminLogin(); return } openProductEditor(null, ci); }
 /* تصدير/استيراد الكتالوج حتى يظهر لكل الزوار */
 function exportCatalog() {
-  const b = new Blob([JSON.stringify({ cats: CATS, ecat: ECAT, products: P })], { type: "application/json" }), a = document.createElement("a");
+  const b = new Blob([JSON.stringify({ cats: CATS, ecat: ECAT, colors: CAT_COLORS, products: P })], { type: "application/json" }), a = document.createElement("a");
   a.href = URL.createObjectURL(b); a.download = "products.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 function applyCatalog(j) {
   if (!j || !Array.isArray(j.products)) return false;
-  P = j.products; if (Array.isArray(j.cats) && j.cats.length) { CATS = j.cats; ECAT = Array.isArray(j.ecat) && j.ecat.length ? j.ecat : ECAT }
+  P = j.products;
+  if (Array.isArray(j.cats) && j.cats.length) { CATS = j.cats; ECAT = Array.isArray(j.ecat) && j.ecat.length ? j.ecat : ECAT }
+  if (Array.isArray(j.colors) && j.colors.length) CAT_COLORS = j.colors.slice();
+  while (CAT_COLORS.length < CATS.length) CAT_COLORS.push(ACC[CAT_COLORS.length % ACC.length]);
+  CAT_COLORS = CAT_COLORS.map(c => /^#[0-9a-f]{6}$/i.test(c) ? c : ACC[0]);
   return true;
 }
 function importCatalog(el) {
   const f = el.files[0]; if (!f) return;
   const fr = new FileReader();
-  fr.onload = () => { try { if (!applyCatalog(JSON.parse(fr.result))) throw 0; save("_cats", CATS); save("_ecat", ECAT); persist(); rebuildWorld(); toast("تم استيراد الكتالوج ✔"); adm() } catch (e) { alert("ملف غير صالح") } };
+  fr.onload = () => {
+    try {
+      if (!applyCatalog(JSON.parse(fr.result))) throw 0;
+      save("_cats", CATS); save("_ecat", ECAT); save("_cols", CAT_COLORS); persist();
+      rebuildWorld(); toast("تم استيراد الكتالوج ✔"); adm("products");
+    } catch (e) { alert("ملف غير صالح") }
+  };
   fr.readAsText(f);
 }
 if (!HAS_LOCAL) {
@@ -1389,6 +1680,7 @@ function finishEnter() {
   videoEl.classList.remove("show"); videoBgEl.classList.remove("show");
   setTimeout(() => { try { videoEl.pause() } catch (e) {} try { videoBgEl.pause() } catch (e) {} }, 1300);
   document.documentElement.classList.remove("lock");
+  cancelNav();
   scrollTo(0, 0); camS = 0; prevS = 0; vel = 0;
   document.querySelector("header").classList.add("show");
   document.body.classList.add("in");
