@@ -81,6 +81,23 @@ export async function runDirtyDozenTests() {
   await assertFails(setDoc(doc(attackerDb, 'orders', 'ord_1'), { ...validOrder, status: 3, updatedBy: attackerUid }));
   await assertSucceeds(getDocs(collection(adminDb, 'orders')));
 
+  // Store settings assertions (admin-only write with strict schema, public visitor read)
+  const validSettings = {
+    whatsappOrderPhone: '20111915613',
+    whatsappStaff: [{ label: 'الإدارة', phone: '01111915613' }],
+    vodafoneNumbers: [{ label: 'فودافون كاش', number: '01012345678' }],
+    instaPayNumbers: [{ label: 'إنستا باي', number: '01111915613' }],
+    paymentInstruction: 'أرفق صورة الإيصال على واتساب.',
+    storePhone: '01111915613',
+    updatedAt: serverTimestamp(),
+    updatedBy: adminUid
+  };
+  await assertFails(setDoc(doc(guestDb, 'store', 'settings'), validSettings));
+  await assertFails(setDoc(doc(attackerDb, 'store', 'settings'), { ...validSettings, updatedBy: attackerUid }));
+  await assertFails(setDoc(doc(adminDb, 'store', 'settings'), { ...validSettings, whatsappOrderPhone: 'abc' }));
+  await assertSucceeds(setDoc(doc(adminDb, 'store', 'settings'), validSettings));
+  await assertSucceeds(getDoc(doc(guestDb, 'store', 'settings')));
+
   // Authorized admin & public guest reads pass
   await assertSucceeds(setDoc(doc(adminDb, 'store', 'catalog'), { cats: ['الألبان'], ecat: ['🧀'], colors: ['#ffc107'], chunkCount: 1, productCount: 1, updatedAt: serverTimestamp(), updatedBy: adminUid }));
   await assertSucceeds(setDoc(doc(adminDb, 'product_images', 'pimg_1'), { dataUrl: 'data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=', mime: 'image/webp', width: 100, height: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: adminUid }));

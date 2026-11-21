@@ -9,6 +9,7 @@
 6. **Strict Schema & Server Timestamps**: Every write enforces `hasAll` + `hasOnly` (no shadow ghost fields), field type checks, `.size()` caps, and `request.time` server timestamp equality.
 7. **Self-Removal & Email Spoofing Protection**: Admins cannot delete their own UID or own allowlist email; unverified email tokens are unconditionally rejected; users can only check their own `admin_emails/{email}` or `admins/{uid}` doc.
 8. **Order PII Isolation & Integrity**: Customers can only `create` initial orders in `/orders/{orderId}` (`status == 0`, `returnedTotal == 0`, `discountDeduction == 0`, `paymentPaid == false`, `total == subtotal > 0`, `createdAt == request.time`). Reading (`get`/`list`), updating (returns, deductions, payment collection, status), and deleting orders are strictly restricted to `isAdmin()`.
+9. **Merchant Contact & Payment Numbers Integrity**: `/store/settings` stores the active WhatsApp order receiving phone, staff WhatsApp presets (`<= 10`), Vodafone Cash numbers (`<= 10`), InstaPay accounts (`<= 10`), support phone, and checkout payment note; publicly readable (`get`) for checkout, writable solely by `isAdmin()` with strict phone regex (`^[0-9]{8,20}$`), array bounds, and `hasAll`/`hasOnly`.
 
 ## 2. The "Dirty Dozen" Attack Payloads
 1. **Unauthenticated catalog write**: `setDoc('/store/catalog', {...})` with `auth = null` -> `PERMISSION_DENIED`.
@@ -25,6 +26,7 @@
 12. **Plaintext PIN overwrite on `/store_private/admin_auth`**: admin tries writing `{ pin: '3317167' }` instead of 64-char hex `pinHash` -> `PERMISSION_DENIED`.
 13. **Guest/Non-Admin PII Scrape on `/orders`**: guest or regular user calls `getDoc('/orders/ord_1')` or `getDocs('/orders')` -> `PERMISSION_DENIED`.
 14. **Tampered Initial Order State**: visitor creates order with `status: 3`, `paymentPaid: true`, `total: 0`, or `isAdminOverride: true` -> `PERMISSION_DENIED`.
+15. **Non-admin hijacking `/store/settings` payment numbers**: guest or non-admin tries writing `{ whatsappOrderPhone: '20199999999', ... }` to `/store/settings` -> `PERMISSION_DENIED`.
 
 ## 3. Red Team Audit Summary
 - **Identity Spoofing**: Closed via `updatedBy == request.auth.uid` and `emailId == request.auth.token.email.lower()`.

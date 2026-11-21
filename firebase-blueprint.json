@@ -179,6 +179,53 @@
       },
       "required": ["pinHash", "updatedAt", "updatedBy"]
     },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Public storefront merchant WhatsApp order routing and electronic payment numbers managed exclusively by verified admins.",
+      "type": "object",
+      "properties": {
+        "whatsappOrderPhone": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 20,
+          "pattern": "^[0-9]{8,20}$",
+          "description": "Active WhatsApp number (international digits without +) receiving customer orders."
+        },
+        "whatsappStaff": {
+          "type": "array",
+          "description": "Bounded list of saved staff/owner WhatsApp presets (max 10)."
+        },
+        "vodafoneNumbers": {
+          "type": "array",
+          "description": "Bounded list of Vodafone Cash transfer numbers shown to customers at checkout (max 10)."
+        },
+        "instaPayNumbers": {
+          "type": "array",
+          "description": "Bounded list of InstaPay numbers or addresses shown to customers at checkout (max 10)."
+        },
+        "paymentInstruction": {
+          "type": "string",
+          "maxLength": 400,
+          "description": "Merchant payment & receipt screenshot instruction displayed at checkout."
+        },
+        "storePhone": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Optional public customer support phone number."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last settings update."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who updated store settings."
+        }
+      },
+      "required": ["whatsappOrderPhone", "whatsappStaff", "vodafoneNumbers", "instaPayNumbers", "paymentInstruction", "storePhone", "updatedAt", "updatedBy"]
+    },
     "Order": {
       "title": "Order",
       "description": "Customer checkout order and admin sales/returns ledger entry.",
@@ -278,7 +325,7 @@
   "firestore": {
     "/store/{docId}": {
       "schema": { "$ref": "#/entities/StoreCatalog" },
-      "description": "Public store metadata document (/store/catalog); readable by visitors, writable only by verified admins."
+      "description": "Public store metadata documents (/store/catalog and /store/settings); readable by visitors, writable only by verified admins."
     },
     "/catalog_chunks/{chunkId}": {
       "schema": { "$ref": "#/entities/CatalogChunk" },

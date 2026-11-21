@@ -150,13 +150,37 @@ service cloud.firestore {
         data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
     }
 
-    // 1. Public Store Catalog Metadata (/store/catalog)
+    function isValidStoreSettings(data) {
+      return data.keys().hasAll(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'updatedAt', 'updatedBy']) &&
+        data.keys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'updatedAt', 'updatedBy']) &&
+        data.whatsappOrderPhone is string && data.whatsappOrderPhone.size() >= 8 && data.whatsappOrderPhone.size() <= 20 &&
+        data.whatsappOrderPhone.matches('^[0-9]{8,20}$') &&
+        data.whatsappStaff is list && data.whatsappStaff.size() <= 10 &&
+        (data.whatsappStaff.size() == 0 || data.whatsappStaff[0] is map) &&
+        data.vodafoneNumbers is list && data.vodafoneNumbers.size() <= 10 &&
+        (data.vodafoneNumbers.size() == 0 || data.vodafoneNumbers[0] is map) &&
+        data.instaPayNumbers is list && data.instaPayNumbers.size() <= 10 &&
+        (data.instaPayNumbers.size() == 0 || data.instaPayNumbers[0] is map) &&
+        data.paymentInstruction is string && data.paymentInstruction.size() <= 400 &&
+        data.storePhone is string && data.storePhone.size() <= 30 &&
+        data.updatedAt == request.time &&
+        data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
+    }
+
+    // 1. Public Store Catalog Metadata (/store/catalog) & Merchant Settings (/store/settings)
     match /store/{docId} {
-      allow get: if isValidId(docId) && docId == 'catalog';
+      allow get: if isValidId(docId) && (docId == 'catalog' || docId == 'settings');
       allow list: if false;
-      allow create: if isAdmin() && isValidId(docId) && docId == 'catalog' && isValidStoreCatalog(incoming());
-      allow update: if isAdmin() && isValidId(docId) && docId == 'catalog' && isValidStoreCatalog(incoming()) &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['cats', 'ecat', 'colors', 'chunkCount', 'productCount', 'updatedAt', 'updatedBy']);
+      allow create: if isAdmin() && isValidId(docId) && (
+        (docId == 'catalog' && isValidStoreCatalog(incoming())) ||
+        (docId == 'settings' && isValidStoreSettings(incoming()))
+      );
+      allow update: if isAdmin() && isValidId(docId) && (
+        (docId == 'catalog' && isValidStoreCatalog(incoming()) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['cats', 'ecat', 'colors', 'chunkCount', 'productCount', 'updatedAt', 'updatedBy'])) ||
+        (docId == 'settings' && isValidStoreSettings(incoming()) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'updatedAt', 'updatedBy']))
+      );
       allow delete: if false;
     }
 

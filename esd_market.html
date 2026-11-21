@@ -405,6 +405,20 @@ body.in #hint.gone{opacity:0;visibility:hidden}
 .sales-summary-box{background:#fbf7ef;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin:10px 0;font-variant-numeric:tabular-nums}
 .sales-sum-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13.5px;padding:3px 0}
 .sales-sum-row.final{font-size:17px;font-weight:900;color:var(--p);border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.pay-box{background:#fbf7ef;border:1px solid #e5d8c0;border-radius:12px;padding:10px 12px;margin:6px 0 10px}
+.pay-box-title{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;display:block}
+.pay-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;margin-bottom:6px}
+.pay-row:last-of-type{margin-bottom:0}
+.pay-row-info{min-width:0}
+.pay-row-lbl{display:block;font-size:11.5px;color:var(--mut);font-weight:700}
+.pay-row-num{display:inline-block;font-size:14.5px;font-weight:900;color:var(--p);direction:ltr;unicode-bidi:bidi-override;font-variant-numeric:tabular-nums;word-break:break-all}
+.pay-copy{flex:0 0 auto;padding:5px 10px;font-size:12px;border-radius:8px;font-weight:800;background:#fff;border:1px solid var(--line)}
+.cfg-item{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fcfaf6;margin-bottom:7px}
+.cfg-item.on{border-color:#16a34a;background:#f0fdf4}
+.cfg-item-main{min-width:0;flex:1}
+.cfg-item-main b{display:block;font-size:13.5px;color:var(--ink)}
+.cfg-item-main span{display:inline-block;font-size:13px;font-weight:800;color:var(--p);direction:ltr;unicode-bidi:bidi-override;font-variant-numeric:tabular-nums}
+.cfg-badge-on{background:#16a34a;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
 @media(max-width:640px){
   .sales-4grid,.sales-pay-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sales-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -2133,6 +2147,74 @@ function openWaUrl(waUrl) {
 function normDigits(s) {
   return String(s || "").replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660)).replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06F0));
 }
+function normalizeWaPhone(raw) {
+  let d = normDigits(raw).replace(/[^0-9]/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  if (/^01[0125]\d{8}$/.test(d)) d = "2" + d;
+  return /^[0-9]{8,20}$/.test(d) ? d : "";
+}
+function formatWaLocal(raw) {
+  const d = normalizeWaPhone(raw);
+  if (/^201[0125]\d{8}$/.test(d)) return "0" + d.slice(2);
+  return d || String(raw || "").trim();
+}
+const DEFAULT_PAY_INSTRUCTION = "بعد التحويل يرجى إرسال صورة الدفع/الإيصال في محادثة الواتساب لتأكيد الطلب فوراً.";
+function normalizeStoreSettings(raw) {
+  const s = raw && typeof raw === "object" ? raw : {};
+  const wa = normalizeWaPhone(s.whatsappOrderPhone) || normalizeWaPhone(CONFIG.WHATSAPP_PHONE) || "20111915613";
+  const staff = Array.isArray(s.whatsappStaff)
+    ? s.whatsappStaff.slice(0, 10).map(x => ({
+        label: String((x && x.label) || "مسؤول الطلبات").trim().slice(0, 60) || "مسؤول الطلبات",
+        phone: formatWaLocal((x && x.phone) || "")
+      })).filter(x => normalizeWaPhone(x.phone))
+    : [{ label: "الرقم الرئيسي", phone: formatWaLocal(wa) }];
+  if (!staff.length) staff.push({ label: "الرقم الرئيسي", phone: formatWaLocal(wa) });
+  const vf = Array.isArray(s.vodafoneNumbers)
+    ? s.vodafoneNumbers.slice(0, 10).map(x => ({
+        label: String((x && x.label) || "فودافون كاش").trim().slice(0, 60) || "فودافون كاش",
+        number: normDigits((x && (x.number || x.phone)) || "").trim().slice(0, 40)
+      })).filter(x => x.number.length >= 4)
+    : [];
+  const ip = Array.isArray(s.instaPayNumbers)
+    ? s.instaPayNumbers.slice(0, 10).map(x => ({
+        label: String((x && x.label) || "إنستا باي").trim().slice(0, 60) || "إنستا باي",
+        number: normDigits((x && (x.number || x.phone || x.handle)) || "").trim().slice(0, 80)
+      })).filter(x => x.number.length >= 3)
+    : [];
+  const paymentInstruction = typeof s.paymentInstruction === "string" && s.paymentInstruction.trim()
+    ? s.paymentInstruction.trim().slice(0, 400)
+    : DEFAULT_PAY_INSTRUCTION;
+  const storePhone = String(s.storePhone !== undefined ? s.storePhone : formatWaLocal(wa)).trim().slice(0, 30);
+  return {
+    whatsappOrderPhone: wa,
+    whatsappStaff: staff,
+    vodafoneNumbers: vf,
+    instaPayNumbers: ip,
+    paymentInstruction,
+    storePhone
+  };
+}
+let STORE_SETTINGS = normalizeStoreSettings(load("_cfg", null));
+function getActiveWhatsappPhone() {
+  return normalizeWaPhone(STORE_SETTINGS && STORE_SETTINGS.whatsappOrderPhone) || normalizeWaPhone(CONFIG.WHATSAPP_PHONE) || "20111915613";
+}
+function copyPayVal(val, btn) {
+  const txt = String(val || "").trim();
+  if (!txt) return;
+  const done = () => {
+    toast("تم نسخ الرقم ✔");
+    if (btn) {
+      const old = btn.textContent;
+      btn.textContent = "تم النسخ ✔";
+      setTimeout(() => { btn.textContent = old; }, 1400);
+    }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done).catch(() => { done(); });
+  } else {
+    done();
+  }
+}
 function showCheckoutErr(msg, focusId) {
   const errEl = $("cerr");
   if (errEl) {
@@ -2169,6 +2251,23 @@ function checkout() {
   <button type="button" style="width:100%;margin-top:8px" onclick="$('bCart').onclick()">العودة لعربة التسوق</button>`);
   pmc();
 }
+function renderPayAccountBox(method) {
+  const isVf = method === "vf";
+  const list = isVf ? STORE_SETTINGS.vodafoneNumbers : STORE_SETTINGS.instaPayNumbers;
+  const title = isVf ? "أرقام التحويل عبر فودافون كاش:" : "أرقام / حسابات التحويل عبر إنستا باي:";
+  const instr = esc(STORE_SETTINGS.paymentInstruction || DEFAULT_PAY_INSTRUCTION);
+  if (!list || !list.length) {
+    return `<div class="adm-note" style="margin:4px 0 8px">تم اختيار <b>${isVf ? "فودافون كاش" : "إنستا باي"}</b>. ${instr}</div>`;
+  }
+  return `<div class="pay-box">
+    <span class="pay-box-title">${title}</span>
+    ${list.map(it => `<div class="pay-row">
+      <div class="pay-row-info"><span class="pay-row-lbl">${esc(it.label)}</span><span class="pay-row-num">${esc(it.number)}</span></div>
+      <button type="button" class="pay-copy" onclick="copyPayVal('${esc(it.number).replace(/'/g, "&#39;")}',this)">نسخ</button>
+    </div>`).join("")}
+    <div style="font-size:12px;color:var(--mut);margin-top:7px;line-height:1.55">${instr}</div>
+  </div>`;
+}
 function pmc() {
   const pmEl = $("pm"), pmx = $("pmx");
   if (!pmEl || !pmx) return;
@@ -2176,8 +2275,7 @@ function pmc() {
   if (v === "cod") {
     pmx.innerHTML = `<div class="adm-note" style="margin:4px 0 8px">سيتم سداد قيمة الطلب نقداً عند الاستلام من مندوب التوصيل.</div>`;
   } else {
-    const label = v === "vf" ? "فودافون كاش" : "إنستا باي";
-    pmx.innerHTML = `<div class="adm-note" style="margin:4px 0 8px">تم اختيار <b>${label}</b>. عند فتح محادثة الواتساب، يرجى إرسال صورة الدفع/الإيصال قبل إرسال الطلب أو فور فتح المحادثة.</div>`;
+    pmx.innerHTML = renderPayAccountBox(v);
   }
 }
 function send() {
@@ -2252,9 +2350,13 @@ function send() {
     window.__esdFb.createOrderInCloud(o).catch(() => {});
   }
   const itemsText = items.map(i => `• ${i.name} × ${i.qty} = ${money(i.price * i.qty)}`).join("\n");
+  const payAccounts = pm === "vf" ? STORE_SETTINGS.vodafoneNumbers : pm === "ip" ? STORE_SETTINGS.instaPayNumbers : [];
+  const payAccText = payAccounts.length
+    ? `حساب/رقم التحويل (${pmt}): ${payAccounts.map(x => `${x.label}: ${x.number}`).join(" | ")}`
+    : "";
   const payEnding = pm === "cod"
     ? "الدفع: الدفع عند الاستلام (يتم سداد المبلغ عند استلام الطلب)."
-    : "يرجى إرسال صورة الدفع/الإيصال في محادثة الواتساب قبل إرسال الطلب أو فور فتح المحادثة.";
+    : "صورة الدفع/الإيصال المرفقة: يرجى إرفاق صورة إيصال التحويل في هذه المحادثة لتأكيد الطلب.";
   const msg = [
     `مرحباً بكم في ${CONFIG.STORE_NAME}`,
     `طلب جديد رقم: ${o.id}`,
@@ -2269,16 +2371,18 @@ function send() {
     ``,
     `*الإجمالي الكلي للطلب: ${money(tot)}*`,
     `طريقة الدفع: ${pmt}`,
+    payAccText,
     ``,
     payEnding
-  ].join("\n");
-  const waUrl = "https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(msg);
+  ].filter((line, idx, arr) => !(line === "" && arr[idx - 1] === "")).join("\n");
+  const targetWa = getActiveWhatsappPhone();
+  const waUrl = "https://wa.me/" + targetWa + "?text=" + encodeURIComponent(msg);
   openWaUrl(waUrl);
-  openM(`${X}<h3>تم تسجيل طلبك ✔</h3><p>رقم الطلب: <b>${esc(o.id)}</b></p><p>طريقة الدفع: <b>${esc(pmt)}</b> · الإجمالي: <b>${money(tot)}</b></p>${pm !== "cod" ? `<div class="adm-note" style="margin:8px 0">يرجى إرسال صورة الدفع/الإيصال في محادثة الواتساب قبل إرسال الطلب أو فور فتح المحادثة.</div>` : ""}<a class="pr" href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px;text-align:center;text-decoration:none;border-radius:10px;background:var(--p);color:#fff;font-weight:800;margin-top:8px">فتح محادثة واتساب الآن</a><p style="color:var(--mut);font-size:13px;margin-top:10px">تابع حالة طلبك من زر «طلباتي».</p>`);
+  openM(`${X}<h3>تم تسجيل طلبك ✔</h3><p>رقم الطلب: <b>${esc(o.id)}</b></p><p>طريقة الدفع: <b>${esc(pmt)}</b> · الإجمالي: <b>${money(tot)}</b></p>${pm !== "cod" ? renderPayAccountBox(pm) : ""}<a class="pr" href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px;text-align:center;text-decoration:none;border-radius:10px;background:var(--p);color:#fff;font-weight:800;margin-top:8px">فتح محادثة واتساب الآن</a><p style="color:var(--mut);font-size:13px;margin-top:10px">تابع حالة طلبك من زر «طلباتي».</p>`);
 }
 const ST = ["قيد الانتظار", "جاري التجهيز", "خرج للتوصيل", "تم التسليم", "مرتجع جزئي", "ملغي / مرتجع"];
-$("bOrd").onclick = () => openM(`${X}<h3>طلباتي</h3>${orders.map((o, i) => `<div class="row" style="display:block"><b>${esc(o.orderNumber || o.id)}</b> · ${money(o.total)}<div style="font-size:12px;color:var(--mut);margin:3px 0">${esc(o.payLabel || o.pay || "")} · ${new Date(o.createdAtMs || o.t || Date.now()).toLocaleDateString("ar-EG")}</div><span class="tag">${ST[o.status] || ST[0]}</span><br><button style="margin-top:6px" onclick="urg(${i})">استعجال / استفسار عن الطلب</button></div>`).join("") || "لا توجد طلبات بعد."}`);
-function urg(i) { const o = orders[i]; if (!o) return; openWaUrl("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(`مرحباً بكم في ${CONFIG.STORE_NAME}\nبخصوص الطلب ${o.orderNumber || o.id} باسم ${o.customerName || o.name} (هاتف: ${o.phone || ""}): من فضلك محتاج أعرف موعد التوصيل.`)) }
+$("bOrd").onclick = () => openM(`${X}<h3>طلباتي</h3>${STORE_SETTINGS.storePhone ? `<div class="adm-note" style="margin-bottom:8px">للتواصل والاستفسار عن أي طلب: <b dir="ltr">${esc(STORE_SETTINGS.storePhone)}</b></div>` : ""}${orders.map((o, i) => `<div class="row" style="display:block"><b>${esc(o.orderNumber || o.id)}</b> · ${money(o.total)}<div style="font-size:12px;color:var(--mut);margin:3px 0">${esc(o.payLabel || o.pay || "")} · ${new Date(o.createdAtMs || o.t || Date.now()).toLocaleDateString("ar-EG")}</div><span class="tag">${ST[o.status] || ST[0]}</span><br><button style="margin-top:6px" onclick="urg(${i})">استعجال / استفسار عن الطلب</button></div>`).join("") || "لا توجد طلبات بعد."}`);
+function urg(i) { const o = orders[i]; if (!o) return; openWaUrl("https://wa.me/" + getActiveWhatsappPhone() + "?text=" + encodeURIComponent(`مرحباً بكم في ${CONFIG.STORE_NAME}\nبخصوص الطلب ${o.orderNumber || o.id} باسم ${o.customerName || o.name} (هاتف: ${o.phone || ""}): من فضلك محتاج أعرف موعد التوصيل.`)) }
 
 /* ---------- الإدارة ---------- */
 let admCatFilter = "all";
@@ -2289,8 +2393,10 @@ const ADM_TABS = {
   offers: "العروض",
   sales: "المبيعات",
   orders: "الطلبات",
+  contact: "التواصل والدفع",
   publish: "المزامنة والأمان"
 };
+let contactDraft = null;
 let CLOUD_ORDERS = [];
 let CLOUD_ORDERS_LOADED = false;
 let salesPeriod = "all";
@@ -2503,6 +2609,7 @@ function setAdmin(on, silent) {
     CLOUD_ORDERS = [];
     CLOUD_ORDERS_LOADED = false;
     salesEditDraft = null;
+    contactDraft = null;
     if (window.__esdFb && typeof window.__esdFb.stopOrdersRealtimeSync === "function") {
       window.__esdFb.stopOrdersRealtimeSync();
     }
@@ -2525,13 +2632,17 @@ function adm(tab) {
   if (window.__esdFb && typeof window.__esdFb.startOrdersRealtimeSync === "function") {
     window.__esdFb.startOrdersRealtimeSync();
   }
-  if (typeof tab === "string" && ADM_TABS[tab]) admTab = tab;
+  if (typeof tab === "string" && ADM_TABS[tab]) {
+    if (admTab === "contact" && tab !== "contact") contactDraft = null;
+    admTab = tab;
+  }
   const offers = P.filter(hasDisc).length;
   const allOrders = getAdminOrders();
   const body = admTab === "categories" ? admCategories() :
     admTab === "offers" ? admOffers() :
     admTab === "sales" ? admSales() :
     admTab === "orders" ? admOrders() :
+    admTab === "contact" ? admContact() :
     admTab === "publish" ? admPublish() : admProducts();
   openM(`<div class="adm">
     <div class="adm-head"><div><b>لوحة الإدارة</b><small>${esc(CONFIG.STORE_NAME)} · تحكم ومزامنة فورية للجميع</small></div><div class="adm-head-actions"><button type="button" onclick="closeM()">← العودة للمتجر</button><button type="button" onclick="logoutAdminAll()" style="color:#c8102e;border-color:#c8102e44">تسجيل خروج الإدارة</button></div></div>
@@ -3111,6 +3222,176 @@ async function deleteOrderById(docId) {
   toast("تم حذف العملية وتحديث المبيعات ✔");
   adm(admTab === "orders" ? "orders" : "sales");
 }
+function ensureContactDraft() {
+  if (!contactDraft) contactDraft = normalizeStoreSettings(STORE_SETTINGS);
+  return contactDraft;
+}
+function syncContactInputsIntoDraft() {
+  const d = ensureContactDraft();
+  const waEl = $("cfgWaPhone");
+  if (waEl) {
+    const norm = normalizeWaPhone(waEl.value);
+    if (norm) d.whatsappOrderPhone = norm;
+  }
+  const supEl = $("cfgSupportPhone");
+  if (supEl) d.storePhone = supEl.value.trim().slice(0, 30);
+  const noteEl = $("cfgPayNote");
+  if (noteEl) d.paymentInstruction = noteEl.value.trim().slice(0, 400);
+}
+function admContact() {
+  const d = ensureContactDraft();
+  const activeNorm = normalizeWaPhone(d.whatsappOrderPhone) || getActiveWhatsappPhone();
+  const activeLocal = formatWaLocal(activeNorm);
+  return `<div class="adm-card">
+    <h4>رقم واتساب استلام الطلبات (الفواتير) <span class="cfg-badge-on" dir="ltr">${esc(activeLocal)}</span></h4>
+    <div class="adm-note" style="margin-top:0">كل طلب جديد (الاسم، العنوان، المنتجات، طريقة الدفع، وصورة الإيصال) يُرسل تلقائياً على هذا الرقم. يمكنك تغييره لرقمك أو رقم أي موظف يمسك المتجر.</div>
+    <div class="adm-form-grid">
+      <label>رقم الواتساب النشط لاستلام الطلبات<input id="cfgWaPhone" dir="ltr" style="text-align:right" value="${esc(activeLocal)}" placeholder="مثال: 01111915613"></label>
+      <label>رقم هاتف خدمة العملاء (اختياري للظهور في طلباتي)<input id="cfgSupportPhone" dir="ltr" style="text-align:right" value="${esc(d.storePhone || "")}" placeholder="مثال: 01111915613"></label>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--line);padding-top:9px">
+      <div style="font-size:13px;font-weight:800;margin-bottom:6px">أرقام فريق العمل / الإدارة المحفوظة (${d.whatsappStaff.length} / 10)</div>
+      ${d.whatsappStaff.map((st, idx) => {
+        const isAct = normalizeWaPhone(st.phone) === activeNorm;
+        return `<div class="cfg-item ${isAct ? "on" : ""}">
+          <div class="cfg-item-main"><b>${esc(st.label)}</b><span>${esc(formatWaLocal(st.phone))}</span></div>
+          <div class="adm-actions">
+            ${isAct ? `<span class="cfg-badge-on">نشط للاستلام ✔</span>` : `<button type="button" class="pr" onclick="cfgActivateStaff(${idx})">تفعيل للاستلام</button>`}
+            <button type="button" onclick="cfgRemoveStaff(${idx})" style="color:#c8102e"${d.whatsappStaff.length <= 1 ? " disabled" : ""}>حذف</button>
+          </div>
+        </div>`;
+      }).join("")}
+      <div class="adm-toolbar" style="margin-top:8px;margin-bottom:0">
+        <input id="newStaffLbl" placeholder="الاسم (مثال: محمد - مسؤول الموقع)" style="flex:1;min-width:140px;margin:0">
+        <input id="newStaffNum" dir="ltr" style="text-align:right;flex:1;min-width:130px;margin:0" placeholder="رقم الواتساب (010...)">
+        <button type="button" class="pr" onclick="cfgAddStaff()">＋ إضافة رقم</button>
+      </div>
+    </div>
+  </div>
+  <div class="adm-card">
+    <h4>أرقام فودافون كاش للدفع <small>${d.vodafoneNumbers.length} / 10</small></h4>
+    <div class="adm-note" style="margin-top:0">تظهر هذه الأرقام تلقائياً للعملاء عند اختيار <b>فودافون كاش</b> أثناء إتمام الطلب، مع زر نسخ سريع.</div>
+    ${d.vodafoneNumbers.map((it, idx) => `<div class="cfg-item">
+      <div class="cfg-item-main"><b>${esc(it.label)}</b><span>${esc(it.number)}</span></div>
+      <div class="adm-actions"><button type="button" onclick="cfgRemovePayNum('vf',${idx})" style="color:#c8102e">حذف</button></div>
+    </div>`).join("") || `<p style="color:var(--mut);font-size:13px;margin:4px 0 8px">لا توجد أرقام فودافون كاش مضافة بعد.</p>`}
+    <div class="adm-toolbar" style="margin-bottom:0">
+      <input id="newVfLbl" placeholder="الوصف (مثال: فودافون كاش الأساسي)" style="flex:1;min-width:140px;margin:0">
+      <input id="newVfNum" dir="ltr" style="text-align:right;flex:1;min-width:130px;margin:0" placeholder="رقم فودافون كاش (010...)">
+      <button type="button" class="pr" onclick="cfgAddPayNum('vf')">＋ إضافة</button>
+    </div>
+  </div>
+  <div class="adm-card">
+    <h4>أرقام / حسابات إنستا باي (InstaPay) <small>${d.instaPayNumbers.length} / 10</small></h4>
+    <div class="adm-note" style="margin-top:0">تظهر هذه الأرقام أو الحسابات للعملاء عند اختيار <b>إنستا باي</b> لإرسال المبلغ وإرفاق صورة التحويل على واتساب.</div>
+    ${d.instaPayNumbers.map((it, idx) => `<div class="cfg-item">
+      <div class="cfg-item-main"><b>${esc(it.label)}</b><span>${esc(it.number)}</span></div>
+      <div class="adm-actions"><button type="button" onclick="cfgRemovePayNum('ip',${idx})" style="color:#c8102e">حذف</button></div>
+    </div>`).join("") || `<p style="color:var(--mut);font-size:13px;margin:4px 0 8px">لا توجد أرقام أو حسابات إنستا باي مضافة بعد.</p>`}
+    <div class="adm-toolbar" style="margin-bottom:0">
+      <input id="newIpLbl" placeholder="الوصف (مثال: حساب إنستا باي)" style="flex:1;min-width:140px;margin:0">
+      <input id="newIpNum" dir="ltr" style="text-align:right;flex:1;min-width:140px;margin:0" placeholder="الرقم أو name@instapay">
+      <button type="button" class="pr" onclick="cfgAddPayNum('ip')">＋ إضافة</button>
+    </div>
+  </div>
+  <div class="adm-card">
+    <h4>رسالة تعليمات الدفع الإلكتروني وإرفاق الإيصال</h4>
+    <label style="display:block;font-weight:700;font-size:13px">تظهر للعميل عند اختيار الدفع الإلكتروني (فودافون كاش / إنستا باي)
+      <textarea id="cfgPayNote" rows="2" style="margin-top:5px" placeholder="${esc(DEFAULT_PAY_INSTRUCTION)}">${esc(d.paymentInstruction || DEFAULT_PAY_INSTRUCTION)}</textarea>
+    </label>
+  </div>
+  <button id="cfgSaveBtn" type="button" class="pr adm-save" onclick="saveContactSettings(false)">💾 حفظ أرقام التواصل والدفع ومزامنتها للجميع</button>`;
+}
+async function cfgAddStaff() {
+  syncContactInputsIntoDraft();
+  const d = ensureContactDraft();
+  if (d.whatsappStaff.length >= 10) { toast("الحد الأقصى 10 أرقام محفوظة"); return }
+  const lbl = ($("newStaffLbl") ? $("newStaffLbl").value : "").trim() || ("موظف " + (d.whatsappStaff.length + 1));
+  const raw = ($("newStaffNum") ? $("newStaffNum").value : "").trim();
+  const norm = normalizeWaPhone(raw);
+  if (!norm) { toast("أدخل رقم واتساب صحيحاً (مثال: 01012345678)"); return }
+  if (!d.whatsappStaff.some(x => normalizeWaPhone(x.phone) === norm)) {
+    d.whatsappStaff.push({ label: lbl.slice(0, 60), phone: formatWaLocal(norm) });
+  }
+  d.whatsappOrderPhone = norm;
+  await saveContactSettings(true);
+}
+async function cfgActivateStaff(idx) {
+  syncContactInputsIntoDraft();
+  const d = ensureContactDraft();
+  const item = d.whatsappStaff[idx];
+  if (!item) return;
+  const norm = normalizeWaPhone(item.phone);
+  if (!norm) return;
+  d.whatsappOrderPhone = norm;
+  await saveContactSettings(true);
+}
+async function cfgRemoveStaff(idx) {
+  syncContactInputsIntoDraft();
+  const d = ensureContactDraft();
+  if (d.whatsappStaff.length <= 1) { toast("يجب الإبقاء على رقم واحد على الأقل"); return }
+  const removedNorm = normalizeWaPhone(d.whatsappStaff[idx]?.phone);
+  d.whatsappStaff.splice(idx, 1);
+  if (removedNorm === d.whatsappOrderPhone && d.whatsappStaff[0]) {
+    d.whatsappOrderPhone = normalizeWaPhone(d.whatsappStaff[0].phone) || d.whatsappOrderPhone;
+  }
+  await saveContactSettings(true);
+}
+async function cfgAddPayNum(kind) {
+  syncContactInputsIntoDraft();
+  const d = ensureContactDraft();
+  const list = kind === "vf" ? d.vodafoneNumbers : d.instaPayNumbers;
+  if (list.length >= 10) { toast("الحد الأقصى 10 أرقام"); return }
+  const lblEl = $(kind === "vf" ? "newVfLbl" : "newIpLbl");
+  const numEl = $(kind === "vf" ? "newVfNum" : "newIpNum");
+  const lbl = (lblEl ? lblEl.value : "").trim() || (kind === "vf" ? "فودافون كاش" : "إنستا باي");
+  const num = normDigits(numEl ? numEl.value : "").trim();
+  if (num.length < 4) { toast(kind === "vf" ? "أدخل رقم فودافون كاش صحيحاً" : "أدخل رقم أو حساب إنستا باي صحيحاً"); return }
+  list.push({ label: lbl.slice(0, 60), number: num.slice(0, 80) });
+  await saveContactSettings(true);
+}
+async function cfgRemovePayNum(kind, idx) {
+  syncContactInputsIntoDraft();
+  const d = ensureContactDraft();
+  const list = kind === "vf" ? d.vodafoneNumbers : d.instaPayNumbers;
+  list.splice(idx, 1);
+  await saveContactSettings(true);
+}
+async function saveContactSettings(silentListOp) {
+  syncContactInputsIntoDraft();
+  const d = ensureContactDraft();
+  const waInput = $("cfgWaPhone");
+  const typedWa = waInput ? normalizeWaPhone(waInput.value) : d.whatsappOrderPhone;
+  const finalWa = silentListOp ? (d.whatsappOrderPhone || typedWa) : typedWa;
+  if (!finalWa) {
+    toast("من فضلك أدخل رقم واتساب صحيح لاستلام الطلبات (مثال: 01111915613)");
+    if (waInput) waInput.focus();
+    return;
+  }
+  d.whatsappOrderPhone = finalWa;
+  if (!d.whatsappStaff.some(x => normalizeWaPhone(x.phone) === finalWa)) {
+    d.whatsappStaff.unshift({ label: "الرقم النشط", phone: formatWaLocal(finalWa) });
+    d.whatsappStaff = d.whatsappStaff.slice(0, 10);
+  }
+  const clean = normalizeStoreSettings(d);
+  STORE_SETTINGS = clean;
+  contactDraft = normalizeStoreSettings(clean);
+  save("_cfg", clean);
+  const btn = $("cfgSaveBtn");
+  if (btn && !silentListOp) { btn.disabled = true; btn.textContent = "جاري الحفظ والمزامنة..."; }
+  const fb = window.__esdFb;
+  if (fb && typeof fb.saveStoreSettingsToCloud === "function") {
+    try {
+      await fb.saveStoreSettingsToCloud(clean);
+      toast("تم حفظ الأرقام والإعدادات ومزامنتها للجميع ✔");
+    } catch (err) {
+      toast("تم الحفظ محلياً — تعذرت المزامنة السحابية: " + (err && err.message ? err.message : "تحقق من الصلاحيات"));
+    }
+  } else {
+    toast("تم حفظ الإعدادات ✔");
+  }
+  adm("contact");
+}
 function admPublish() {
   const fb = window.__esdFb;
   const st = fb ? fb.getStatus() : { state: "offline", projectId: "", databaseId: "", userEmail: "", cloudCount: 0 };
@@ -3590,6 +3871,16 @@ window.__esdStoreBridge = {
     CLOUD_ORDERS_LOADED = true;
     if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft && (admTab === "sales" || admTab === "orders")) {
       adm(admTab);
+    }
+  },
+  applyCloudSettings(raw) {
+    if (!raw || typeof raw !== "object") return;
+    STORE_SETTINGS = normalizeStoreSettings(raw);
+    save("_cfg", STORE_SETTINGS);
+    if (!contactDraft && ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && admTab === "contact") {
+      adm("contact");
+    } else if ($("pmx") && $("pm")) {
+      pmc();
     }
   },
   getCurrentCatalog() {
@@ -4160,6 +4451,64 @@ function startCatalogRealtimeSync() {
 
 startCatalogRealtimeSync();
 
+function sanitizeStoreSettingsForCloud(raw) {
+  const s = raw && typeof raw === "object" ? raw : {};
+  let wa = String(s.whatsappOrderPhone || "").replace(/[^0-9]/g, "");
+  if (wa.startsWith("00")) wa = wa.slice(2);
+  if (/^01[0125]\d{8}$/.test(wa)) wa = "2" + wa;
+  if (!/^[0-9]{8,20}$/.test(wa)) wa = "20111915613";
+  const whatsappStaff = (Array.isArray(s.whatsappStaff) ? s.whatsappStaff : []).slice(0, 10).map(x => ({
+    label: String((x && x.label) || "مسؤول الطلبات").trim().slice(0, 60) || "مسؤول الطلبات",
+    phone: String((x && x.phone) || "").trim().slice(0, 25)
+  })).filter(x => x.phone.length >= 7);
+  const vodafoneNumbers = (Array.isArray(s.vodafoneNumbers) ? s.vodafoneNumbers : []).slice(0, 10).map(x => ({
+    label: String((x && x.label) || "فودافون كاش").trim().slice(0, 60) || "فودافون كاش",
+    number: String((x && x.number) || "").trim().slice(0, 40)
+  })).filter(x => x.number.length >= 4);
+  const instaPayNumbers = (Array.isArray(s.instaPayNumbers) ? s.instaPayNumbers : []).slice(0, 10).map(x => ({
+    label: String((x && x.label) || "إنستا باي").trim().slice(0, 60) || "إنستا باي",
+    number: String((x && x.number) || "").trim().slice(0, 80)
+  })).filter(x => x.number.length >= 3);
+  const paymentInstruction = String(s.paymentInstruction || "").trim().slice(0, 400);
+  const storePhone = String(s.storePhone || "").trim().slice(0, 30);
+  return {
+    whatsappOrderPhone: wa,
+    whatsappStaff,
+    vodafoneNumbers,
+    instaPayNumbers,
+    paymentInstruction,
+    storePhone
+  };
+}
+
+async function saveStoreSettingsToCloud(raw) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("يجب تسجيل الدخول بحساب الإدارة أولاً");
+  const clean = sanitizeStoreSettingsForCloud(raw);
+  try {
+    await setDoc(doc(db, "store", "settings"), {
+      ...clean,
+      updatedAt: serverTimestamp(),
+      updatedBy: user.uid
+    });
+    return { ok: true };
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, "store/settings");
+  }
+}
+
+function startSettingsRealtimeSync() {
+  onSnapshot(doc(db, "store", "settings"), (snap) => {
+    if (snap.metadata && snap.metadata.hasPendingWrites) return;
+    if (!snap.exists()) return;
+    window.__esdStoreBridge?.applyCloudSettings(snap.data());
+  }, (err) => {
+    try { handleFirestoreError(err, OperationType.GET, "store/settings"); } catch (_) {}
+  });
+}
+
+startSettingsRealtimeSync();
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     cloudStatus.userEmail = "";
@@ -4473,6 +4822,7 @@ window.__esdFb = {
   resolveProductImage,
   deleteProductImage,
   syncCatalogToCloud,
+  saveStoreSettingsToCloud,
   createOrderInCloud,
   startOrdersRealtimeSync,
   stopOrdersRealtimeSync,
