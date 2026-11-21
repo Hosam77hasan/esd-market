@@ -1,6 +1,6 @@
 /* ESD Market — Service Worker (PWA)
    يخزّن هيكل التطبيق والأيقونات، ويترك ملفات الفيديو/الصوت للمتصفح (Range). */
-const CACHE = "esd-market-v4";
+const CACHE = "esd-market-v8";
 
 const CORE = [
   "./",
@@ -54,8 +54,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  /* كتالوج المنتجات: دائماً من الشبكة حتى تظهر التحديثات فوراً */
-  if (/products\.json$/i.test(url.pathname)) return;
+  /* كتالوج المنتجات وإعدادات Firebase: دائماً من الشبكة حتى تظهر التحديثات فوراً */
+  if (/(products|firebase-applet-config)\.json$/i.test(url.pathname)) return;
 
   /* الوسائط الكبيرة تُدار من المتصفح مباشرة (طلبات Range) */
   if (/\.(mp4|webm|mp3)$/i.test(url.pathname)) return;

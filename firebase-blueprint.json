@@ -1,0 +1,209 @@
+{
+  "entities": {
+    "StoreCatalog": {
+      "title": "StoreCatalog",
+      "description": "Public store categories, icons, accent colors, and chunk metadata synced in real time.",
+      "type": "object",
+      "properties": {
+        "cats": {
+          "type": "array",
+          "description": "Ordered list of category titles (max 40)."
+        },
+        "ecat": {
+          "type": "array",
+          "description": "Ordered list of category emojis matching cats."
+        },
+        "colors": {
+          "type": "array",
+          "description": "Ordered list of hex accent colors matching cats."
+        },
+        "chunkCount": {
+          "type": "integer",
+          "description": "Number of catalog_chunks documents currently active (1-20)."
+        },
+        "productCount": {
+          "type": "integer",
+          "description": "Total number of products across all chunks."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last catalog publish."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who updated the catalog."
+        }
+      },
+      "required": ["cats", "ecat", "colors", "chunkCount", "productCount", "updatedAt", "updatedBy"]
+    },
+    "CatalogChunk": {
+      "title": "CatalogChunk",
+      "description": "Bounded batch of up to 100 products using image URLs or fbimg:// references (zero raw Base64 blobs in catalog chunks).",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Zero-based chunk index (0-19)."
+        },
+        "items": {
+          "type": "array",
+          "description": "Bounded list of product objects (<= 100 items)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of chunk write."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who wrote the chunk."
+        }
+      },
+      "required": ["index", "items", "updatedAt", "updatedBy"]
+    },
+    "ProductImage": {
+      "title": "ProductImage",
+      "description": "Compressed product photo uploaded by admin and referenced via fbimg://{imageId} link from catalog chunks.",
+      "type": "object",
+      "properties": {
+        "dataUrl": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 250000,
+          "pattern": "^data:image/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$",
+          "description": "Compressed WebP/JPEG/PNG data URL (<= 250 KB)."
+        },
+        "mime": {
+          "type": "string",
+          "enum": ["image/webp", "image/jpeg", "image/png"],
+          "description": "MIME type of the compressed product photo."
+        },
+        "width": {
+          "type": "integer",
+          "description": "Image width in pixels (1-2048)."
+        },
+        "height": {
+          "type": "integer",
+          "description": "Image height in pixels (1-2048)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when photo was uploaded."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last photo update."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who uploaded the photo."
+        }
+      },
+      "required": ["dataUrl", "mime", "width", "height", "createdAt", "updatedAt", "updatedBy"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized admin user record keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 128,
+          "description": "Verified Google account email."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"],
+          "description": "Role granted to the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when admin entry was created."
+        }
+      },
+      "required": ["email", "role", "createdAt"]
+    },
+    "AdminEmailEntry": {
+      "title": "AdminEmailEntry",
+      "description": "Authorized admin Google email allowlist entry keyed by lowercase email.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 128,
+          "description": "Lowercase Google email address."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether this email is authorized for admin login."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when email entry was added."
+        }
+      },
+      "required": ["email", "active", "createdAt"]
+    },
+    "AdminAuthSecret": {
+      "title": "AdminAuthSecret",
+      "description": "Private second-factor admin password hash stored exclusively in Firestore.",
+      "type": "object",
+      "properties": {
+        "pinHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of 'esd-market:' + admin password."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when admin password hash was updated."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who updated the password hash."
+        }
+      },
+      "required": ["pinHash", "updatedAt", "updatedBy"]
+    }
+  },
+  "firestore": {
+    "/store/{docId}": {
+      "schema": { "$ref": "#/entities/StoreCatalog" },
+      "description": "Public store metadata document (/store/catalog); readable by visitors, writable only by verified admins."
+    },
+    "/catalog_chunks/{chunkId}": {
+      "schema": { "$ref": "#/entities/CatalogChunk" },
+      "description": "Chunked product catalog documents (/catalog_chunks/chunk_0..chunk_19); readable by visitors, writable only by verified admins."
+    },
+    "/product_images/{imageId}": {
+      "schema": { "$ref": "#/entities/ProductImage" },
+      "description": "Compressed product images referenced by fbimg://{imageId} links; individual doc readable by visitors, writable/deletable only by verified admins."
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "UID-keyed admin roster; readable only by owner UID or another admin."
+    },
+    "/admin_emails/{emailId}": {
+      "schema": { "$ref": "#/entities/AdminEmailEntry" },
+      "description": "Lowercase email allowlist for Google Sign-In; individual doc readable only by matching verified email or admin."
+    },
+    "/store_private/{docId}": {
+      "schema": { "$ref": "#/entities/AdminAuthSecret" },
+      "description": "Admin password hash (/store_private/admin_auth); strictly restricted to verified admins."
+    }
+  }
+}
