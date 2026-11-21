@@ -364,6 +364,51 @@ body.in #hint.gone{opacity:0;visibility:hidden}
 .adm-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:11px;padding:9px 11px;font-size:13px;font-weight:700;line-height:1.6;margin:8px 0}
 .adm-sync-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}
 .adm-sync-row:last-child{border-bottom:0}
+/* ===== قسم المبيعات والمرتجعات ===== */
+.sales-tabs{display:flex;gap:4px;flex-wrap:wrap;background:#efe6d6;padding:4px;border-radius:12px;margin-bottom:10px}
+.sales-ptab{flex:1;min-width:68px;border:0;background:transparent;color:var(--mut);border-radius:9px;padding:7px 8px;font-size:12.5px;font-weight:800;white-space:nowrap}
+.sales-ptab.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.sales-4grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.sales-pcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;cursor:pointer;text-align:right;transition:border-color .15s ease}
+.sales-pcard:hover{border-color:#c8102e66}
+.sales-pcard.on{border-color:var(--p);background:#fff9f5}
+.sales-pcard .sp-lbl{font-size:11.5px;color:var(--mut);font-weight:700;display:block}
+.sales-pcard .sp-val{font-size:17px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;display:block;margin:2px 0}
+.sales-pcard .sp-sub{font-size:11px;color:var(--mut);font-weight:700;font-variant-numeric:tabular-nums}
+.sales-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.sales-kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.sales-kpi small{display:block;font-size:11.5px;color:var(--mut);font-weight:700}
+.sales-kpi b{display:block;font-size:20px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
+.sales-kpi .sk-sub{font-size:11px;color:var(--mut);font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.sales-pay-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.sales-pay-item{background:#fbf7ef;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.sales-pay-item small{display:block;font-size:11px;color:var(--mut);font-weight:700}
+.sales-pay-item b{display:block;font-size:14.5px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:1px}
+.sales-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:8px;transition:border-color .15s ease}
+.sales-card:hover{border-color:#c8102e55}
+.sales-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.sales-cname{font-weight:800;font-size:15px;color:var(--ink)}
+.sales-cmeta{font-size:12px;color:var(--mut);font-weight:700;margin-top:3px;line-height:1.55;font-variant-numeric:tabular-nums}
+.sales-amt{text-align:left;flex:0 0 auto;font-variant-numeric:tabular-nums}
+.sales-amt b{display:block;font-size:17px;font-weight:900;color:var(--p);white-space:nowrap}
+.sales-amt del{display:block;font-size:11.5px;color:var(--mut);font-weight:700}
+.sales-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid #f0e8da;font-size:12px}
+.sales-st{font-weight:800;padding:3px 8px;border-radius:7px;font-size:11.5px}
+.sales-st-done{background:#f0fdf4;color:#15803d}
+.sales-st-pend{background:#fffbeb;color:#b45309}
+.sales-st-ret{background:#fff7ed;color:#c2410c}
+.sales-st-can{background:#fef2f2;color:#b91c1c}
+.sales-item-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.sales-item-row:last-child{border-bottom:0}
+.sales-qty-ctrl{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sales-qty-ctrl button{padding:5px 9px;font-size:12px;border-radius:8px;min-width:30px}
+.sales-summary-box{background:#fbf7ef;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin:10px 0;font-variant-numeric:tabular-nums}
+.sales-sum-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13.5px;padding:3px 0}
+.sales-sum-row.final{font-size:17px;font-weight:900;color:var(--p);border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+@media(max-width:640px){
+  .sales-4grid,.sales-pay-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sales-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media(max-width:520px){
   .adm-tabs{flex-wrap:wrap;overflow:visible}
   .adm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -372,6 +417,7 @@ body.in #hint.gone{opacity:0;visibility:hidden}
   .adm-form-grid{grid-template-columns:1fr}
   .adm-cat{grid-template-columns:40px minmax(0,1fr) 40px;}.adm-cat .adm-cat-count{grid-column:2/4}
   .adm-actions{justify-content:flex-start}
+  .sales-item-row{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -1908,6 +1954,7 @@ function closeM() {
   document.documentElement.classList.remove("mlock");
   mb.className = "box";
   SELOBJ = null;
+  salesEditDraft = null;
   forceRender = true;
   if (wasAdminView && ADMIN) setAdmin(false, true);
 }
@@ -2166,10 +2213,44 @@ function send() {
   }
   const cartItems = cartList();
   if (!cartItems.length) return;
-  const items = cartItems.map(i => ({ name: i.p.name + (vr(i.p)[i.vi] ? " (" + vr(i.p)[i.vi] + ")" : ""), qty: i.q, price: unit(i.p, i.vi) }));
-  const tot = cartTot();
-  const o = { id: "#" + CONFIG.ORDER_PREFIX + "-" + (1045 + orders.length), name: n, phone: pAscii, address: a, items, total: tot, pay: pmt, status: 0, t: Date.now() };
+  const items = cartItems.map(i => ({
+    productId: Number(i.p.id) || 0,
+    name: String(i.p.name + (vr(i.p)[i.vi] ? " (" + vr(i.p)[i.vi] + ")" : "")).slice(0, 140),
+    qty: Math.max(1, Number(i.q) || 1),
+    price: Math.round(unit(i.p, i.vi) * 100) / 100,
+    returnedQty: 0
+  }));
+  const tot = Math.round(cartTot() * 100) / 100;
+  if (!(tot > 0)) return;
+  const nowMs = Date.now();
+  const docId = "ord_" + nowMs + "_" + Math.random().toString(36).slice(2, 7);
+  const orderNum = "#" + CONFIG.ORDER_PREFIX + "-" + String(nowMs).slice(-6);
+  const o = {
+    docId,
+    id: orderNum,
+    orderNumber: orderNum,
+    name: n,
+    customerName: n,
+    phone: pAscii,
+    address: a,
+    items,
+    subtotal: tot,
+    discountDeduction: 0,
+    returnedTotal: 0,
+    total: tot,
+    pay: pmt,
+    payMethod: pm,
+    payLabel: pmt,
+    paymentPaid: false,
+    notes: "",
+    status: 0,
+    t: nowMs,
+    createdAtMs: nowMs
+  };
   orders.unshift(o); save("_o", orders); save("_u", { n, p: pAscii, a }); cart = {}; upd();
+  if (window.__esdFb && typeof window.__esdFb.createOrderInCloud === "function") {
+    window.__esdFb.createOrderInCloud(o).catch(() => {});
+  }
   const itemsText = items.map(i => `• ${i.name} × ${i.qty} = ${money(i.price * i.qty)}`).join("\n");
   const payEnding = pm === "cod"
     ? "الدفع: الدفع عند الاستلام (يتم سداد المبلغ عند استلام الطلب)."
@@ -2195,9 +2276,9 @@ function send() {
   openWaUrl(waUrl);
   openM(`${X}<h3>تم تسجيل طلبك ✔</h3><p>رقم الطلب: <b>${esc(o.id)}</b></p><p>طريقة الدفع: <b>${esc(pmt)}</b> · الإجمالي: <b>${money(tot)}</b></p>${pm !== "cod" ? `<div class="adm-note" style="margin:8px 0">يرجى إرسال صورة الدفع/الإيصال في محادثة الواتساب قبل إرسال الطلب أو فور فتح المحادثة.</div>` : ""}<a class="pr" href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px;text-align:center;text-decoration:none;border-radius:10px;background:var(--p);color:#fff;font-weight:800;margin-top:8px">فتح محادثة واتساب الآن</a><p style="color:var(--mut);font-size:13px;margin-top:10px">تابع حالة طلبك من زر «طلباتي».</p>`);
 }
-const ST = ["قيد الانتظار", "جاري التجهيز", "خرج للتوصيل", "تم التسليم"];
-$("bOrd").onclick = () => openM(`${X}<h3>طلباتي</h3>${orders.map((o, i) => `<div class="row" style="display:block"><b>${esc(o.id)}</b> · ${money(o.total)}<br><span class="tag">${ST[o.status]}</span><br><button onclick="urg(${i})">استعجال / استفسار عن الطلب</button></div>`).join("") || "لا توجد طلبات بعد."}`);
-function urg(i) { const o = orders[i]; if (!o) return; openWaUrl("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(`مرحباً بكم في ${CONFIG.STORE_NAME}\nبخصوص الطلب ${o.id} باسم ${o.name} (هاتف: ${o.phone || ""}): من فضلك محتاج أعرف موعد التوصيل.`)) }
+const ST = ["قيد الانتظار", "جاري التجهيز", "خرج للتوصيل", "تم التسليم", "مرتجع جزئي", "ملغي / مرتجع"];
+$("bOrd").onclick = () => openM(`${X}<h3>طلباتي</h3>${orders.map((o, i) => `<div class="row" style="display:block"><b>${esc(o.orderNumber || o.id)}</b> · ${money(o.total)}<div style="font-size:12px;color:var(--mut);margin:3px 0">${esc(o.payLabel || o.pay || "")} · ${new Date(o.createdAtMs || o.t || Date.now()).toLocaleDateString("ar-EG")}</div><span class="tag">${ST[o.status] || ST[0]}</span><br><button style="margin-top:6px" onclick="urg(${i})">استعجال / استفسار عن الطلب</button></div>`).join("") || "لا توجد طلبات بعد."}`);
+function urg(i) { const o = orders[i]; if (!o) return; openWaUrl("https://wa.me/" + CONFIG.WHATSAPP_PHONE + "?text=" + encodeURIComponent(`مرحباً بكم في ${CONFIG.STORE_NAME}\nبخصوص الطلب ${o.orderNumber || o.id} باسم ${o.customerName || o.name} (هاتف: ${o.phone || ""}): من فضلك محتاج أعرف موعد التوصيل.`)) }
 
 /* ---------- الإدارة ---------- */
 let admCatFilter = "all";
@@ -2206,9 +2287,17 @@ const ADM_TABS = {
   products: "المنتجات",
   categories: "الأقسام",
   offers: "العروض",
+  sales: "المبيعات",
   orders: "الطلبات",
   publish: "المزامنة والأمان"
 };
+let CLOUD_ORDERS = [];
+let CLOUD_ORDERS_LOADED = false;
+let salesPeriod = "all";
+let salesStatusFilter = "all";
+let salesPayFilter = "all";
+let salesSearch = "";
+let salesEditDraft = null;
 let admLoginState = { step: "loading", email: "", uid: "", hasPin: true, err: "" };
 function isAllowedImgUrl(u) {
   const s = String(u || "").trim();
@@ -2411,6 +2500,16 @@ function setAdmin(on, silent) {
   ADMIN = !!on;
   if (!ADMIN) {
     try { sessionStorage.removeItem("esd_admin_pin_uid") } catch (e) {}
+    CLOUD_ORDERS = [];
+    CLOUD_ORDERS_LOADED = false;
+    salesEditDraft = null;
+    if (window.__esdFb && typeof window.__esdFb.stopOrdersRealtimeSync === "function") {
+      window.__esdFb.stopOrdersRealtimeSync();
+    }
+  } else {
+    if (window.__esdFb && typeof window.__esdFb.startOrdersRealtimeSync === "function") {
+      window.__esdFb.startOrdersRealtimeSync();
+    }
   }
   rebuildWorld();
   if (!ADMIN && !silent) toast("تم الخروج من وضع الإدارة");
@@ -2423,10 +2522,15 @@ function logoutAdminAll() {
 }
 function adm(tab) {
   if (!ADMIN) { openAdminLogin(); return }
+  if (window.__esdFb && typeof window.__esdFb.startOrdersRealtimeSync === "function") {
+    window.__esdFb.startOrdersRealtimeSync();
+  }
   if (typeof tab === "string" && ADM_TABS[tab]) admTab = tab;
   const offers = P.filter(hasDisc).length;
+  const allOrders = getAdminOrders();
   const body = admTab === "categories" ? admCategories() :
     admTab === "offers" ? admOffers() :
+    admTab === "sales" ? admSales() :
     admTab === "orders" ? admOrders() :
     admTab === "publish" ? admPublish() : admProducts();
   openM(`<div class="adm">
@@ -2436,7 +2540,7 @@ function adm(tab) {
       <div class="adm-stat"><b>${CATS.length}</b><span>قسم</span></div>
       <div class="adm-stat"><b>${P.length}</b><span>منتج</span></div>
       <div class="adm-stat"><b>${offers}</b><span>عرض نشط</span></div>
-      <div class="adm-stat"><b>${orders.length}</b><span>طلب</span></div>
+      <div class="adm-stat"><b>${allOrders.length}</b><span>طلب مسجل</span></div>
     </div>
     ${body}
   </div>`, "admin");
@@ -2490,10 +2594,522 @@ function admOffers() {
     <div class="adm-note">اختر المنتج ثم حدّد السعر الأساسي ونوع الخصم (نسبة أو قيمة ثابتة) وشاهد السعر النهائي قبل الحفظ.</div>
   </div>`;
 }
-function admOrders() {
-  return `<div class="adm-card"><h4>الطلبات الواردة <small>${orders.length}</small></h4>
-    ${orders.map((o, i) => `<div class="adm-offer"><div><b>${esc(o.id)}</b> · ${esc(o.name)}<div class="adm-meta">${money(o.total)} · ${o.items.length} صنف · ${esc(o.phone || "")}</div></div><select style="width:auto;margin:0" onchange="orders[${i}].status=+this.value;save('_o',orders);toast('تم تحديث حالة الطلب ✔')">${ST.map((s, j) => `<option value="${j}" ${o.status == j ? "selected" : ""}>${s}</option>`).join("")}</select></div>`).join("") || `<p style="color:var(--mut);text-align:center;padding:14px">لا توجد طلبات مسجلة حالياً.</p>`}
+function normalizeOrderObj(raw) {
+  const o = raw || {};
+  const items = Array.isArray(o.items) ? o.items.map(it => {
+    const qty = Math.max(0, Math.round(Number(it && it.qty) || 0));
+    const ret = Math.max(0, Math.min(qty, Math.round(Number(it && it.returnedQty) || 0)));
+    const price = Math.max(0, Math.round((Number(it && it.price) || 0) * 100) / 100);
+    return {
+      productId: Number(it && it.productId) || 0,
+      name: String((it && it.name) || "منتج"),
+      qty,
+      price,
+      returnedQty: ret
+    };
+  }) : [];
+  const calcGross = Math.round(items.reduce((s, it) => s + it.price * it.qty, 0) * 100) / 100;
+  const subtotal = o.subtotal != null ? Math.max(0, Math.round((Number(o.subtotal) || 0) * 100) / 100) : calcGross;
+  const itemsRet = Math.round(items.reduce((s, it) => s + it.price * it.returnedQty, 0) * 100) / 100;
+  const discDed = Math.max(0, Math.round((Number(o.discountDeduction) || 0) * 100) / 100);
+  const returnedTotal = o.returnedTotal != null ? Math.max(0, Math.round((Number(o.returnedTotal) || 0) * 100) / 100) : Math.round((itemsRet + discDed) * 100) / 100;
+  const total = o.total != null ? Math.max(0, Math.round((Number(o.total) || 0) * 100) / 100) : Math.max(0, Math.round((subtotal - returnedTotal) * 100) / 100);
+  const payLabel = String(o.payLabel || o.pay || "الدفع عند الاستلام");
+  const payMethod = o.payMethod || (payLabel.includes("فودافون") ? "vf" : payLabel.includes("إنستا") ? "ip" : "cod");
+  const createdAtMs = Number(o.createdAtMs || o.t) || Date.now();
+  const orderNumber = String(o.orderNumber || o.id || "#ESD-0000");
+  const docId = String(o.docId || ("local_" + orderNumber.replace(/[^a-zA-Z0-9_\-]/g, "") + "_" + createdAtMs));
+  return {
+    docId,
+    isCloud: !!o.isCloud,
+    orderNumber,
+    id: orderNumber,
+    customerName: String(o.customerName || o.name || "عميل"),
+    name: String(o.customerName || o.name || "عميل"),
+    phone: String(o.phone || ""),
+    address: String(o.address || ""),
+    payMethod,
+    payLabel,
+    pay: payLabel,
+    items,
+    subtotal,
+    discountDeduction: discDed,
+    returnedTotal,
+    total,
+    status: Math.max(0, Math.min(5, Math.round(Number(o.status) || 0))),
+    paymentPaid: !!o.paymentPaid,
+    notes: String(o.notes || ""),
+    createdAtMs,
+    t: createdAtMs
+  };
+}
+function getAdminOrders() {
+  const map = new Map();
+  CLOUD_ORDERS.forEach(raw => {
+    const n = normalizeOrderObj({ ...raw, isCloud: true });
+    map.set(n.docId, n);
+  });
+  orders.forEach(raw => {
+    const n = normalizeOrderObj(raw);
+    const existsByNum = Array.from(map.values()).some(x => x.docId === n.docId || (x.orderNumber === n.orderNumber && Math.abs(x.createdAtMs - n.createdAtMs) < 5000));
+    if (!existsByNum) map.set(n.docId, n);
+  });
+  return Array.from(map.values()).sort((a, b) => b.createdAtMs - a.createdAtMs);
+}
+function findAdminOrder(key) {
+  return getAdminOrders().find(o => o.docId === key || o.orderNumber === key) || null;
+}
+function fmtOrderDate(ms) {
+  try {
+    return new Intl.DateTimeFormat("ar-EG", {
+      year: "numeric", month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit"
+    }).format(new Date(ms));
+  } catch (e) {
+    return new Date(ms).toLocaleString("ar-EG");
+  }
+}
+function getPeriodRange(periodKey) {
+  const now = new Date();
+  if (periodKey === "day") {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  }
+  if (periodKey === "week") {
+    return Date.now() - 7 * 86400000;
+  }
+  if (periodKey === "month") {
+    return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  }
+  if (periodKey === "year") {
+    return new Date(now.getFullYear(), 0, 1).getTime();
+  }
+  return 0;
+}
+function calcSalesStats(list) {
+  let netSales = 0, grossSales = 0, returnsVal = 0, completedCount = 0, completedVal = 0, pendingCount = 0, pendingVal = 0, cancelledCount = 0, itemsSold = 0;
+  let codVal = 0, vfVal = 0, ipVal = 0, paidVal = 0, unpaidVal = 0;
+  list.forEach(o => {
+    const isCancelled = o.status === 5;
+    const isDone = o.status === 3 || o.status === 4;
+    if (isCancelled) {
+      cancelledCount++;
+      returnsVal += o.subtotal;
+      return;
+    }
+    grossSales += o.subtotal;
+    netSales += o.total;
+    returnsVal += o.returnedTotal;
+    if (isDone) { completedCount++; completedVal += o.total; }
+    else { pendingCount++; pendingVal += o.total; }
+    o.items.forEach(it => { itemsSold += Math.max(0, it.qty - it.returnedQty); });
+    if (o.payMethod === "vf") vfVal += o.total;
+    else if (o.payMethod === "ip") ipVal += o.total;
+    else codVal += o.total;
+    if (o.paymentPaid) paidVal += o.total;
+    else unpaidVal += o.total;
+  });
+  const r2 = n => Math.round(n * 100) / 100;
+  return {
+    totalOrders: list.length,
+    netSales: r2(netSales),
+    grossSales: r2(grossSales),
+    returnsVal: r2(returnsVal),
+    completedCount,
+    completedVal: r2(completedVal),
+    pendingCount,
+    pendingVal: r2(pendingVal),
+    cancelledCount,
+    itemsSold,
+    codVal: r2(codVal),
+    vfVal: r2(vfVal),
+    ipVal: r2(ipVal),
+    paidVal: r2(paidVal),
+    unpaidVal: r2(unpaidVal)
+  };
+}
+function orderStatusClass(st) {
+  if (st === 3) return "sales-st sales-st-done";
+  if (st === 4) return "sales-st sales-st-ret";
+  if (st === 5) return "sales-st sales-st-can";
+  return "sales-st sales-st-pend";
+}
+function getSalesFiltered(all) {
+  const since = getPeriodRange(salesPeriod);
+  const inPeriod = all.filter(o => o.createdAtMs >= since);
+  const stStats = calcSalesStats(inPeriod);
+  const q = salesSearch.trim().toLowerCase();
+  const filtered = inPeriod.filter(o => {
+    if (salesStatusFilter === "done" && o.status !== 3 && o.status !== 4) return false;
+    if (salesStatusFilter === "pending" && (o.status !== 0 && o.status !== 1 && o.status !== 2)) return false;
+    if (salesStatusFilter !== "all" && salesStatusFilter !== "done" && salesStatusFilter !== "pending" && o.status !== +salesStatusFilter) return false;
+    if (salesPayFilter !== "all" && o.payMethod !== salesPayFilter) return false;
+    if (q) {
+      const hay = `${o.customerName} ${o.phone} ${o.address} ${o.orderNumber} ${o.notes}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  return { inPeriod, stStats, filtered };
+}
+function renderSalesCardsHtml(filtered) {
+  return filtered.map(o => {
+    const qtySum = o.items.reduce((s, it) => s + Math.max(0, it.qty - it.returnedQty), 0);
+    return `<div class="sales-card" style="cursor:pointer" onclick="openOrderDetail('${esc(o.docId)}')">
+      <div class="sales-card-top">
+        <div style="min-width:0">
+          <div class="sales-cname">${esc(o.customerName)} · <span style="color:var(--mut);font-weight:700;font-size:13px">${esc(o.orderNumber)}</span></div>
+          <div class="sales-cmeta">
+            الهاتف: <span dir="ltr">${esc(o.phone || "—")}</span> · ${esc(fmtOrderDate(o.createdAtMs))}<br>
+            العنوان: ${esc(o.address || "—")}<br>
+            الدفع: <b>${esc(o.payLabel)}</b> (${o.paymentPaid ? "تم التحصيل ✔" : "لم يُحصّل بعد"}) · ${o.items.length} صنف (${qtySum} قطعة)
+            ${o.returnedTotal > 0 ? `<br><span style="color:#c2410c">مرتجع / خصم: −${money(o.returnedTotal)}</span>` : ""}
+            ${o.notes ? `<br><span style="color:var(--ink)">ملاحظة: ${esc(o.notes)}</span>` : ""}
+          </div>
+        </div>
+        <div class="sales-amt">
+          <b>${money(o.total)}</b>
+          ${o.returnedTotal > 0 ? `<del>${money(o.subtotal)}</del>` : ""}
+        </div>
+      </div>
+      <div class="sales-card-foot">
+        <span class="${orderStatusClass(o.status)}">${esc(ST[o.status] || ST[0])}</span>
+        <button type="button" class="pr" style="padding:6px 12px;font-size:12.5px" onclick="event.stopPropagation();openOrderDetail('${esc(o.docId)}')">تفاصيل ومرتجع / تعديل</button>
+      </div>
+    </div>`;
+  }).join("") || `<p style="color:var(--mut);text-align:center;padding:18px">لا توجد عمليات بيع مطابقة للبحث أو الفترة المحددة.</p>`;
+}
+function refreshSalesListOnly() {
+  const all = getAdminOrders();
+  const { filtered } = getSalesFiltered(all);
+  const box = $("salesListBox");
+  const cnt = $("salesCountLbl");
+  const shown = $("salesShownVal");
+  if (box) box.innerHTML = renderSalesCardsHtml(filtered);
+  if (cnt) cnt.textContent = `${filtered.length} من ${all.length}`;
+  if (shown) shown.textContent = `${filtered.length} عملية`;
+}
+function admSales() {
+  const all = getAdminOrders();
+  const periods = [
+    ["day", "اليوم"],
+    ["week", "هذا الأسبوع"],
+    ["month", "هذا الشهر"],
+    ["year", "هذه السنة"],
+    ["all", "الإجمالي الكلي"]
+  ];
+  const dayStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("day")));
+  const weekStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("week")));
+  const monthStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("month")));
+  const yearStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("year")));
+  const { stStats, filtered } = getSalesFiltered(all);
+
+  return `
+  <div class="sales-tabs" role="tablist" aria-label="فترة المبيعات">
+    ${periods.map(([k, lbl]) => `<button type="button" class="sales-ptab ${salesPeriod === k ? "on" : ""}" onclick="salesPeriod='${k}';adm('sales')">${lbl}</button>`).join("")}
+  </div>
+  <div class="sales-4grid">
+    <button type="button" class="sales-pcard ${salesPeriod === "day" ? "on" : ""}" onclick="salesPeriod='day';adm('sales')"><span class="sp-lbl">مبيعات اليوم</span><span class="sp-val">${money(dayStats.netSales)}</span><span class="sp-sub">${dayStats.totalOrders} طلب</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "week" ? "on" : ""}" onclick="salesPeriod='week';adm('sales')"><span class="sp-lbl">مبيعات الأسبوع</span><span class="sp-val">${money(weekStats.netSales)}</span><span class="sp-sub">${weekStats.totalOrders} طلب</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "month" ? "on" : ""}" onclick="salesPeriod='month';adm('sales')"><span class="sp-lbl">مبيعات الشهر</span><span class="sp-val">${money(monthStats.netSales)}</span><span class="sp-sub">${monthStats.totalOrders} طلب</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "year" ? "on" : ""}" onclick="salesPeriod='year';adm('sales')"><span class="sp-lbl">مبيعات السنة</span><span class="sp-val">${money(yearStats.netSales)}</span><span class="sp-sub">${yearStats.totalOrders} طلب</span></button>
+  </div>
+  <div class="sales-kpis">
+    <div class="sales-kpi"><small>صافي المبيعات (${periods.find(x => x[0] === salesPeriod)[1]})</small><b style="color:var(--p)">${money(stStats.netSales)}</b><div class="sk-sub">قبل المرتجع: ${money(stStats.grossSales)}</div></div>
+    <div class="sales-kpi"><small>الطلبات المكتملة</small><b style="color:#15803d">${stStats.completedCount}</b><div class="sk-sub">${money(stStats.completedVal)}</div></div>
+    <div class="sales-kpi"><small>طلبات لم تكتمل بعد</small><b style="color:#b45309">${stStats.pendingCount}</b><div class="sk-sub">${money(stStats.pendingVal)}</div></div>
+    <div class="sales-kpi"><small>إجمالي المرتجعات والخصومات</small><b style="color:#c2410c">${money(stStats.returnsVal)}</b><div class="sk-sub">${stStats.cancelledCount} طلب ملغي/مرتجع</div></div>
+    <div class="sales-kpi"><small>القطع المباعة</small><b>${stStats.itemsSold}</b><div class="sk-sub">من أصل ${stStats.totalOrders} عملية</div></div>
+    <div class="sales-kpi"><small>حالة التحصيل</small><b style="color:#15803d">${money(stStats.paidVal)}</b><div class="sk-sub">غير محصل: ${money(stStats.unpaidVal)}</div></div>
+  </div>
+  <div class="sales-pay-strip">
+    <div class="sales-pay-item"><small>الدفع عند الاستلام</small><b>${money(stStats.codVal)}</b></div>
+    <div class="sales-pay-item"><small>فودافون كاش</small><b>${money(stStats.vfVal)}</b></div>
+    <div class="sales-pay-item"><small>إنستا باي</small><b>${money(stStats.ipVal)}</b></div>
+    <div class="sales-pay-item"><small>إجمالي المعروض</small><b id="salesShownVal">${filtered.length} عملية</b></div>
+  </div>
+  <div class="adm-card">
+    <h4>سجل المبيعات والعملاء <small id="salesCountLbl">${filtered.length} من ${all.length}</small></h4>
+    <div class="adm-toolbar">
+      <input type="search" value="${esc(salesSearch)}" placeholder="ابحث بالاسم أو التليفون أو العنوان أو رقم الطلب..." oninput="salesSearch=this.value;refreshSalesListOnly()" style="flex:1;min-width:190px;margin:0">
+      <select onchange="salesStatusFilter=this.value;adm('sales')" style="margin:0">
+        <option value="all" ${salesStatusFilter === "all" ? "selected" : ""}>كل الحالات</option>
+        <option value="pending" ${salesStatusFilter === "pending" ? "selected" : ""}>لم تكتمل (${stStats.pendingCount})</option>
+        <option value="done" ${salesStatusFilter === "done" ? "selected" : ""}>المكتملة (${stStats.completedCount})</option>
+        ${ST.map((s, idx) => `<option value="${idx}" ${salesStatusFilter === String(idx) ? "selected" : ""}>${s}</option>`).join("")}
+      </select>
+      <select onchange="salesPayFilter=this.value;adm('sales')" style="margin:0">
+        <option value="all" ${salesPayFilter === "all" ? "selected" : ""}>كل طرق الدفع</option>
+        <option value="cod" ${salesPayFilter === "cod" ? "selected" : ""}>الدفع عند الاستلام</option>
+        <option value="vf" ${salesPayFilter === "vf" ? "selected" : ""}>فودافون كاش</option>
+        <option value="ip" ${salesPayFilter === "ip" ? "selected" : ""}>إنستا باي</option>
+      </select>
+    </div>
+    ${!CLOUD_ORDERS_LOADED ? `<div class="adm-note">جاري مزامنة الطلبات من Firestore...</div>` : ""}
+    <div id="salesListBox">${renderSalesCardsHtml(filtered)}</div>
   </div>`;
+}
+function admOrders() {
+  const all = getAdminOrders();
+  return `<div class="adm-card"><h4>الطلبات الواردة <small>${all.length}</small></h4>
+    ${all.map(o => `<div class="adm-offer">
+      <div style="min-width:0">
+        <b>${esc(o.orderNumber)}</b> · ${esc(o.customerName)}
+        <div class="adm-meta">${money(o.total)} · ${esc(o.payLabel)} · ${o.items.length} صنف · <span dir="ltr">${esc(o.phone || "")}</span></div>
+        <div class="adm-meta">${esc(fmtOrderDate(o.createdAtMs))} · ${esc(o.address || "")}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <select style="width:auto;margin:0" onchange="quickUpdateOrderStatus('${esc(o.docId)}', +this.value)">${ST.map((s, j) => `<option value="${j}" ${o.status == j ? "selected" : ""}>${s}</option>`).join("")}</select>
+        <button type="button" onclick="openOrderDetail('${esc(o.docId)}')" style="padding:7px 10px;font-size:12px">تفاصيل / مرتجع</button>
+      </div>
+    </div>`).join("") || `<p style="color:var(--mut);text-align:center;padding:14px">لا توجد طلبات مسجلة حالياً.</p>`}
+  </div>`;
+}
+async function quickUpdateOrderStatus(docId, newStatus) {
+  const o = findAdminOrder(docId);
+  if (!o) return;
+  const st = Math.max(0, Math.min(5, Math.round(Number(newStatus) || 0)));
+  o.status = st;
+  if (st === 3 && !o.paymentPaid) o.paymentPaid = true;
+  await persistOrderUpdate(o, "تم تحديث حالة الطلب ✔");
+}
+function openOrderDetail(docId) {
+  if (!ADMIN) { openAdminLogin(); return }
+  const o = findAdminOrder(docId);
+  if (!o) { toast("لم يتم العثور على هذا الطلب"); adm("sales"); return }
+  salesEditDraft = JSON.parse(JSON.stringify(o));
+  renderOrderDetailModal();
+}
+function computeDraftTotals(d) {
+  const r2 = n => Math.round(n * 100) / 100;
+  const subtotal = r2(d.items.reduce((s, it) => s + Math.max(0, Number(it.price) || 0) * Math.max(0, Number(it.qty) || 0), 0));
+  const itemsRet = r2(d.items.reduce((s, it) => s + Math.max(0, Number(it.price) || 0) * Math.max(0, Math.min(Number(it.qty) || 0, Number(it.returnedQty) || 0)), 0));
+  const discDed = Math.max(0, r2(Number(d.discountDeduction) || 0));
+  const returnedTotal = Math.min(subtotal, r2(itemsRet + discDed));
+  const total = Math.max(0, r2(subtotal - returnedTotal));
+  return { subtotal, itemsRet, discDed, returnedTotal, total };
+}
+function renderOrderDetailModal() {
+  const d = salesEditDraft;
+  if (!d) return;
+  const calc = computeDraftTotals(d);
+  const waPhone = normDigits(d.phone).replace(/[^0-9]/g, "");
+  const waLink = waPhone ? ("https://wa.me/" + (waPhone.startsWith("0") ? "2" + waPhone : waPhone) + "?text=" + encodeURIComponent(`مرحباً أ/ ${d.customerName}، بخصوص طلبك رقم ${d.orderNumber} من ${CONFIG.STORE_NAME}`)) : "";
+  openM(`<div class="adm">
+    <div class="adm-head">
+      <div><b>تفاصيل العملية ${esc(d.orderNumber)}</b><small>${esc(fmtOrderDate(d.createdAtMs))}</small></div>
+      <div class="adm-head-actions"><button type="button" onclick="salesEditDraft=null;adm(admTab==='orders'?'orders':'sales')">← رجوع للمبيعات</button></div>
+    </div>
+    <div class="adm-card">
+      <h4>بيانات العميل والدفع</h4>
+      <div class="adm-form-grid">
+        <label>اسم العميل<input id="ordName" value="${esc(d.customerName)}" oninput="salesEditDraft.customerName=this.value"></label>
+        <label>رقم الهاتف<input id="ordPhone" dir="ltr" style="text-align:right" value="${esc(d.phone)}" oninput="salesEditDraft.phone=this.value"></label>
+        <label class="full">عنوان التوصيل<input id="ordAddr" value="${esc(d.address)}" oninput="salesEditDraft.address=this.value"></label>
+        <label>طريقة الدفع
+          <select id="ordPay" onchange="salesEditDraft.payMethod=this.value;salesEditDraft.payLabel=this.options[this.selectedIndex].text">
+            <option value="cod" ${d.payMethod === "cod" ? "selected" : ""}>الدفع عند الاستلام</option>
+            <option value="vf" ${d.payMethod === "vf" ? "selected" : ""}>فودافون كاش</option>
+            <option value="ip" ${d.payMethod === "ip" ? "selected" : ""}>إنستا باي</option>
+          </select>
+        </label>
+        <label>حالة الطلب
+          <select id="ordStatus" onchange="salesEditDraft.status=+this.value">
+            ${ST.map((s, j) => `<option value="${j}" ${d.status == j ? "selected" : ""}>${s}</option>`).join("")}
+          </select>
+        </label>
+        <label class="full" style="display:flex;align-items:center;gap:8px;padding-top:4px">
+          <input id="ordPaid" type="checkbox" style="width:auto;margin:0" ${d.paymentPaid ? "checked" : ""} onchange="salesEditDraft.paymentPaid=this.checked">
+          <span>تم تحصيل المبلغ / تأكيد الدفع</span>
+        </label>
+      </div>
+    </div>
+    <div class="adm-card">
+      <h4>المنتجات والمرتجعات <small>${d.items.length} صنف</small></h4>
+      <div class="adm-note">لإرجاع صنف أو تعديل كمية: زوّد «الكمية المرتجعة»، أو عدّل الكمية المطلوبة، أو احذف الصنف من الفاتورة وسيتم إعادة حساب صافي المبيعات تلقائياً.</div>
+      ${d.items.map((it, idx) => {
+        const netQty = Math.max(0, it.qty - it.returnedQty);
+        const lineNet = Math.round(it.price * netQty * 100) / 100;
+        const lineRet = Math.round(it.price * it.returnedQty * 100) / 100;
+        return `<div class="sales-item-row">
+          <div style="min-width:0">
+            <b>${esc(it.name)}</b>
+            <div class="adm-meta">سعر القطعة: ${money(it.price)} · المطلوب: ${it.qty} · الصافي: ${netQty} = <b>${money(lineNet)}</b>${lineRet > 0 ? ` <span style="color:#c2410c">(مرتجع ${it.returnedQty} = −${money(lineRet)})</span>` : ""}</div>
+          </div>
+          <div class="sales-qty-ctrl">
+            <small style="color:var(--mut);font-weight:700">مرتجع:</small>
+            <button type="button" onclick="ordItemReturn(${idx}, -1)" ${it.returnedQty <= 0 ? "disabled" : ""}>−</button>
+            <b style="min-width:22px;text-align:center">${it.returnedQty}</b>
+            <button type="button" onclick="ordItemReturn(${idx}, 1)" ${it.returnedQty >= it.qty ? "disabled" : ""}>＋</button>
+            ${it.returnedQty < it.qty ? `<button type="button" onclick="ordItemReturnAll(${idx})" style="color:#c2410c">إرجاع الكل</button>` : ""}
+            <button type="button" onclick="ordItemRemove(${idx})" style="color:#c8102e" title="حذف الصنف من الطلب">حذف</button>
+          </div>
+        </div>`;
+      }).join("") || `<p style="color:var(--mut);text-align:center;padding:12px">تم إزالة كل الأصناف من هذه العملية.</p>`}
+    </div>
+    <div class="adm-card">
+      <h4>التسوية المالية والخصم المباشر</h4>
+      <div class="adm-form-grid">
+        <label>خصم / تسوية إضافية (${CONFIG.CURRENCY})<input id="ordDed" type="number" min="0" step="0.01" value="${calc.discDed}" oninput="ordSetDeduction(this.value)"></label>
+        <label>أو اكتب الصافي النهائي مباشرة (${CONFIG.CURRENCY})<input id="ordTargetTot" type="number" min="0" step="0.01" value="${calc.total}" oninput="ordSetTargetTotal(this.value)"></label>
+        <label class="full">ملاحظات (سبب المرتجع / باقي للعميل / صلاحية منتج...)<textarea id="ordNotes" rows="2" maxlength="500" placeholder="مثال: العميل رجّع قطعة واحدة عند الاستلام، أو له باقي..." oninput="salesEditDraft.notes=this.value">${esc(d.notes)}</textarea></label>
+      </div>
+      <div class="sales-summary-box" id="ordSummaryBox">
+        ${renderOrderSummaryInner(calc)}
+      </div>
+      <button type="button" id="ordSaveBtn" class="pr adm-save" onclick="saveOrderDetail()">حفظ التعديلات في السحابة وتحديث المبيعات ✔</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        ${waLink ? `<a href="${esc(waLink)}" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:160px;text-align:center;text-decoration:none;border:1px solid #16a34a;color:#166534;background:#f0fdf4;border-radius:10px;padding:10px;font-weight:800;font-size:13.5px">مراسلة العميل واتساب</a>` : ""}
+        <button type="button" onclick="deleteOrderById('${esc(d.docId)}')" style="flex:1;min-width:140px;color:#c8102e;border-color:#c8102e55;padding:10px;font-weight:800">حذف العملية نهائياً 🗑</button>
+      </div>
+    </div>
+  </div>`, "editor");
+}
+function renderOrderSummaryInner(calc) {
+  return `<div class="sales-sum-row"><span>إجمالي الطلب الأصلي</span><b>${money(calc.subtotal)}</b></div>
+    <div class="sales-sum-row"><span>قيمة الأصناف المرتجعة</span><b style="color:#c2410c">− ${money(calc.itemsRet)}</b></div>
+    <div class="sales-sum-row"><span>خصم / تسوية إضافية</span><b style="color:#c2410c">− ${money(calc.discDed)}</b></div>
+    <div class="sales-sum-row final"><span>الصافي النهائي المسجل بالمبيعات</span><b>${money(calc.total)}</b></div>`;
+}
+function refreshOrderSummaryOnly() {
+  if (!salesEditDraft) return;
+  const calc = computeDraftTotals(salesEditDraft);
+  const box = $("ordSummaryBox");
+  if (box) box.innerHTML = renderOrderSummaryInner(calc);
+}
+function ordItemReturn(idx, delta) {
+  if (!salesEditDraft || !salesEditDraft.items[idx]) return;
+  const it = salesEditDraft.items[idx];
+  it.returnedQty = Math.max(0, Math.min(it.qty, (it.returnedQty || 0) + delta));
+  autoAdjustReturnStatus();
+  renderOrderDetailModal();
+}
+function ordItemReturnAll(idx) {
+  if (!salesEditDraft || !salesEditDraft.items[idx]) return;
+  salesEditDraft.items[idx].returnedQty = salesEditDraft.items[idx].qty;
+  autoAdjustReturnStatus();
+  renderOrderDetailModal();
+}
+function ordItemRemove(idx) {
+  if (!salesEditDraft || !salesEditDraft.items[idx]) return;
+  if (!confirm(`حذف «${salesEditDraft.items[idx].name}» من الفاتورة؟`)) return;
+  salesEditDraft.items.splice(idx, 1);
+  autoAdjustReturnStatus();
+  renderOrderDetailModal();
+}
+function ordSetDeduction(val) {
+  if (!salesEditDraft) return;
+  salesEditDraft.discountDeduction = Math.max(0, Math.round((Number(val) || 0) * 100) / 100);
+  const calc = computeDraftTotals(salesEditDraft);
+  const tgt = $("ordTargetTot");
+  if (tgt) tgt.value = calc.total;
+  autoAdjustReturnStatus(true);
+  refreshOrderSummaryOnly();
+}
+function ordSetTargetTotal(val) {
+  if (!salesEditDraft) return;
+  const desired = Math.max(0, Math.round((Number(val) || 0) * 100) / 100);
+  const subtotal = Math.round(salesEditDraft.items.reduce((s, it) => s + it.price * it.qty, 0) * 100) / 100;
+  const itemsRet = Math.round(salesEditDraft.items.reduce((s, it) => s + it.price * it.returnedQty, 0) * 100) / 100;
+  const maxAfterItems = Math.max(0, Math.round((subtotal - itemsRet) * 100) / 100);
+  const ded = Math.max(0, Math.round((maxAfterItems - desired) * 100) / 100);
+  salesEditDraft.discountDeduction = ded;
+  const dedInp = $("ordDed");
+  if (dedInp) dedInp.value = ded;
+  autoAdjustReturnStatus(true);
+  refreshOrderSummaryOnly();
+}
+function autoAdjustReturnStatus(keepSelect) {
+  if (!salesEditDraft) return;
+  const calc = computeDraftTotals(salesEditDraft);
+  if (calc.total <= 0) {
+    salesEditDraft.status = 5;
+  } else if (calc.returnedTotal > 0 && salesEditDraft.status !== 5) {
+    salesEditDraft.status = 4;
+  }
+  const stSel = $("ordStatus");
+  if (keepSelect && stSel) stSel.value = String(salesEditDraft.status);
+}
+async function persistOrderUpdate(orderObj, okMsg) {
+  const n = normalizeOrderObj(orderObj);
+  const calc = computeDraftTotals(n);
+  n.subtotal = calc.subtotal;
+  n.discountDeduction = calc.discDed;
+  n.returnedTotal = calc.returnedTotal;
+  n.total = calc.total;
+  const localIdx = orders.findIndex(x => x.docId === n.docId || x.orderNumber === n.orderNumber || x.id === n.orderNumber);
+  if (localIdx >= 0) {
+    orders[localIdx] = { ...orders[localIdx], ...n };
+    save("_o", orders);
+  }
+  const fb = window.__esdFb;
+  if (fb && typeof fb.updateOrderInCloud === "function") {
+    try {
+      const savedId = await fb.updateOrderInCloud(n);
+      if (savedId) {
+        n.docId = savedId;
+        n.isCloud = true;
+        if (localIdx >= 0) {
+          orders[localIdx].docId = savedId;
+          orders[localIdx].isCloud = true;
+          save("_o", orders);
+        }
+        const cIdx = CLOUD_ORDERS.findIndex(x => x.docId === savedId);
+        if (cIdx >= 0) CLOUD_ORDERS[cIdx] = { ...CLOUD_ORDERS[cIdx], ...n };
+        else CLOUD_ORDERS.unshift(n);
+      }
+      toast(okMsg || "تم حفظ التعديلات ✔");
+      return true;
+    } catch (err) {
+      toast("تعذر الحفظ في السحابة: " + (err && err.message ? err.message : "تحقق من الصلاحيات"));
+      return false;
+    }
+  }
+  toast(okMsg || "تم الحفظ محلياً ✔");
+  return true;
+}
+async function saveOrderDetail() {
+  if (!salesEditDraft) return;
+  const name = ($("ordName") ? $("ordName").value : salesEditDraft.customerName).trim();
+  const phone = ($("ordPhone") ? $("ordPhone").value : salesEditDraft.phone).trim();
+  const addr = ($("ordAddr") ? $("ordAddr").value : salesEditDraft.address).trim();
+  if (name.length < 2 || phone.length < 7 || addr.length < 5) {
+    toast("تأكد من صحة الاسم ورقم الهاتف والعنوان");
+    return;
+  }
+  salesEditDraft.customerName = name.slice(0, 120);
+  salesEditDraft.name = salesEditDraft.customerName;
+  salesEditDraft.phone = phone.slice(0, 25);
+  salesEditDraft.address = addr.slice(0, 300);
+  const btn = $("ordSaveBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; }
+  const ok = await persistOrderUpdate(salesEditDraft, "تم حفظ التعديلات وتحديث المبيعات ✔");
+  if (ok) {
+    salesEditDraft = null;
+    adm(admTab === "orders" ? "orders" : "sales");
+  } else if (btn) {
+    btn.disabled = false;
+    btn.textContent = "حفظ التعديلات في السحابة وتحديث المبيعات ✔";
+  }
+}
+async function deleteOrderById(docId) {
+  const o = findAdminOrder(docId);
+  if (!o) return;
+  if (!confirm(`هل أنت متأكد من حذف العملية ${o.orderNumber} (${o.customerName}) نهائياً؟ سيتم خصمها بالكامل من المبيعات.`)) return;
+  const idx = orders.findIndex(x => x.docId === o.docId || x.orderNumber === o.orderNumber || x.id === o.orderNumber);
+  if (idx >= 0) { orders.splice(idx, 1); save("_o", orders); }
+  CLOUD_ORDERS = CLOUD_ORDERS.filter(x => x.docId !== o.docId);
+  const fb = window.__esdFb;
+  if (o.isCloud && fb && typeof fb.deleteOrderInCloud === "function") {
+    try {
+      await fb.deleteOrderInCloud(o.docId);
+    } catch (err) {
+      toast("تعذر حذف العملية من السحابة");
+      return;
+    }
+  }
+  salesEditDraft = null;
+  toast("تم حذف العملية وتحديث المبيعات ✔");
+  adm(admTab === "orders" ? "orders" : "sales");
 }
 function admPublish() {
   const fb = window.__esdFb;
@@ -2967,7 +3583,14 @@ window.__esdStoreBridge = {
     save("_cats", CATS); save("_ecat", ECAT); save("_cols", CAT_COLORS); persist();
     rebuildWorld();
     upd();
-    if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm")) adm(admTab);
+    if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft) adm(admTab);
+  },
+  applyCloudOrders(list) {
+    CLOUD_ORDERS = Array.isArray(list) ? list : [];
+    CLOUD_ORDERS_LOADED = true;
+    if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft && (admTab === "sales" || admTab === "orders")) {
+      adm(admTab);
+    }
   },
   getCurrentCatalog() {
     return { cats: CATS, ecat: ECAT, colors: CAT_COLORS, products: P };
@@ -2977,6 +3600,9 @@ window.__esdStoreBridge = {
       if (uid && sessionStorage.getItem("esd_admin_pin_uid") === uid) {
         ADMIN = true;
         rebuildWorld();
+        if (window.__esdFb && typeof window.__esdFb.startOrdersRealtimeSync === "function") {
+          window.__esdFb.startOrdersRealtimeSync();
+        }
       }
     } catch (e) {}
   },
@@ -3165,12 +3791,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebas
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import {
   getFirestore,
+  collection,
   doc,
   getDoc,
   getDocFromServer,
   setDoc,
   updateDoc,
   deleteDoc,
+  query,
+  orderBy,
+  limit,
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
@@ -3545,6 +4175,174 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+let ordersUnsub = null;
+
+function sanitizeOrderItemsForCloud(items) {
+  return (Array.isArray(items) ? items : []).slice(0, 100).map(it => {
+    const qty = Math.max(0, Math.round(Number(it && it.qty) || 0));
+    const ret = Math.max(0, Math.min(qty, Math.round(Number(it && it.returnedQty) || 0)));
+    const price = Math.max(0, Math.round((Number(it && it.price) || 0) * 100) / 100);
+    return {
+      productId: Number(it && it.productId) || 0,
+      name: String((it && it.name) || "منتج").trim().slice(0, 140),
+      qty,
+      price,
+      returnedQty: ret
+    };
+  });
+}
+
+async function createOrderInCloud(orderObj) {
+  const o = orderObj || {};
+  const orderId = String(o.docId || ("ord_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7)))
+    .replace(/[^a-zA-Z0-9_\-]/g, "").slice(0, 128);
+  const cleanItems = sanitizeOrderItemsForCloud(o.items).filter(it => it.qty >= 1);
+  if (!cleanItems.length) throw new Error("لا توجد أصناف صالحة في الطلب");
+  const subtotal = Math.max(0.01, Math.min(10000000, Math.round(cleanItems.reduce((s, it) => s + it.price * it.qty, 0) * 100) / 100));
+  const payMethod = ["cod", "vf", "ip"].includes(o.payMethod) ? o.payMethod : "cod";
+  const payLabel = String(o.payLabel || o.pay || "الدفع عند الاستلام").trim().slice(0, 40) || "الدفع عند الاستلام";
+  const orderNumber = String(o.orderNumber || o.id || "#ESD-1000").trim().slice(0, 32);
+  const customerName = String(o.customerName || o.name || "عميل").trim().slice(0, 120);
+  const phone = String(o.phone || "").trim().slice(0, 25);
+  const address = String(o.address || "").trim().slice(0, 300);
+  const createdAtMs = Math.max(1, Math.round(Number(o.createdAtMs || o.t) || Date.now()));
+  const docPath = "orders/" + orderId;
+  try {
+    await setDoc(doc(db, "orders", orderId), {
+      orderNumber,
+      customerName,
+      phone,
+      address,
+      payMethod,
+      payLabel,
+      items: cleanItems.map(it => ({ ...it, returnedQty: 0 })),
+      subtotal,
+      discountDeduction: 0,
+      returnedTotal: 0,
+      total: subtotal,
+      status: 0,
+      paymentPaid: false,
+      notes: "",
+      createdAtMs,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return orderId;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.CREATE, docPath);
+  }
+}
+
+function startOrdersRealtimeSync() {
+  const user = auth.currentUser;
+  if (!user || ordersUnsub) return;
+  const q = query(collection(db, "orders"), orderBy("createdAtMs", "desc"), limit(500));
+  ordersUnsub = onSnapshot(q, (snap) => {
+    const list = [];
+    snap.forEach(d => {
+      const data = d.data() || {};
+      list.push({ ...data, docId: d.id, isCloud: true });
+    });
+    window.__esdStoreBridge?.applyCloudOrders(list);
+  }, (err) => {
+    try { handleFirestoreError(err, OperationType.LIST, "orders"); } catch (_) {}
+  });
+}
+
+function stopOrdersRealtimeSync() {
+  if (ordersUnsub) {
+    try { ordersUnsub(); } catch (_) {}
+    ordersUnsub = null;
+  }
+}
+
+async function updateOrderInCloud(orderObj) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("يجب تسجيل الدخول بحساب الإدارة أولاً");
+  const o = orderObj || {};
+  const isNewCloudDoc = !o.isCloud || String(o.docId || "").startsWith("local_");
+  const orderId = (isNewCloudDoc
+    ? ("ord_" + (Number(o.createdAtMs) || Date.now()) + "_" + Math.random().toString(36).slice(2, 6))
+    : String(o.docId || "")
+  ).replace(/[^a-zA-Z0-9_\-]/g, "").slice(0, 128);
+  const cleanItems = sanitizeOrderItemsForCloud(o.items);
+  const subtotal = Math.max(0, Math.min(10000000, Math.round(cleanItems.reduce((s, it) => s + it.price * it.qty, 0) * 100) / 100));
+  const itemsRet = Math.round(cleanItems.reduce((s, it) => s + it.price * it.returnedQty, 0) * 100) / 100;
+  const discountDeduction = Math.max(0, Math.min(10000000, Math.round((Number(o.discountDeduction) || 0) * 100) / 100));
+  const returnedTotal = Math.min(subtotal, Math.round((itemsRet + discountDeduction) * 100) / 100);
+  const total = Math.max(0, Math.round((subtotal - returnedTotal) * 100) / 100);
+  const payMethod = ["cod", "vf", "ip"].includes(o.payMethod) ? o.payMethod : "cod";
+  const payLabel = String(o.payLabel || "الدفع عند الاستلام").trim().slice(0, 40) || "الدفع عند الاستلام";
+  const status = Math.max(0, Math.min(5, Math.round(Number(o.status) || 0)));
+  const notes = String(o.notes || "").trim().slice(0, 500);
+  const safeName = String(o.customerName || "عميل").trim().slice(0, 120);
+  const customerName = safeName.length >= 2 ? safeName : "عميل";
+  const rawPhone = String(o.phone || "").trim().slice(0, 25);
+  const phone = rawPhone.length >= 7 ? rawPhone : "0000000";
+  const rawAddr = String(o.address || "").trim().slice(0, 300);
+  const address = rawAddr.length >= 5 ? rawAddr : "غير محدد";
+  const safeNum = String(o.orderNumber || "#ESD-1000").trim().slice(0, 32);
+  const orderNumber = safeNum.length >= 3 ? safeNum : "#ESD-1000";
+  const docPath = "orders/" + orderId;
+  try {
+    if (isNewCloudDoc) {
+      await setDoc(doc(db, "orders", orderId), {
+        orderNumber,
+        customerName,
+        phone,
+        address,
+        payMethod,
+        payLabel,
+        items: cleanItems,
+        subtotal,
+        discountDeduction,
+        returnedTotal,
+        total,
+        status,
+        paymentPaid: !!o.paymentPaid,
+        notes,
+        createdAtMs: Math.max(1, Math.round(Number(o.createdAtMs) || Date.now())),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        updatedBy: user.uid
+      });
+    } else {
+      await updateDoc(doc(db, "orders", orderId), {
+        customerName,
+        phone,
+        address,
+        payMethod,
+        payLabel,
+        items: cleanItems,
+        subtotal,
+        discountDeduction,
+        returnedTotal,
+        total,
+        status,
+        paymentPaid: !!o.paymentPaid,
+        notes,
+        updatedAt: serverTimestamp(),
+        updatedBy: user.uid
+      });
+    }
+    return orderId;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, docPath);
+  }
+}
+
+async function deleteOrderInCloud(docId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("يجب تسجيل الدخول بحساب الإدارة أولاً");
+  const cleanId = String(docId || "").replace(/[^a-zA-Z0-9_\-]/g, "").slice(0, 128);
+  if (!cleanId) return;
+  try {
+    await deleteDoc(doc(db, "orders", cleanId));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, "orders/" + cleanId);
+  }
+}
+
 window.__esdFb = {
   ready: true,
   getStatus() {
@@ -3667,13 +4465,19 @@ window.__esdFb = {
     }
   },
   async signOutAdmin() {
+    stopOrdersRealtimeSync();
     try { sessionStorage.removeItem("esd_admin_pin_uid"); } catch (e) {}
     await signOut(auth);
   },
   uploadProductImage,
   resolveProductImage,
   deleteProductImage,
-  syncCatalogToCloud
+  syncCatalogToCloud,
+  createOrderInCloud,
+  startOrdersRealtimeSync,
+  stopOrdersRealtimeSync,
+  updateOrderInCloud,
+  deleteOrderInCloud
 };
 document.dispatchEvent(new CustomEvent("esd:fb-ready"));
 </script>

@@ -53,6 +53,34 @@ export async function runDirtyDozenTests() {
   await assertFails(getDocs(collection(guestDb, 'product_images')));
   await assertFails(setDoc(doc(attackerDb, 'product_images', 'pimg_1'), { dataUrl: 'data:image/webp;base64,AAAA', mime: 'image/webp', width: 100, height: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: attackerUid }));
 
+  // Orders collection assertions (guest create allowed only with strict initial state; PII reads & admin edits locked to admin)
+  const validOrder = {
+    orderNumber: '#ESD-1045',
+    customerName: 'أحمد محمد',
+    phone: '01012345678',
+    address: 'المعادي، شارع 9، عمارة 12',
+    payMethod: 'cod',
+    payLabel: 'الدفع عند الاستلام',
+    items: [{ productId: 1, name: 'لبن جهينة', qty: 2, price: 45, returnedQty: 0 }],
+    subtotal: 90,
+    discountDeduction: 0,
+    returnedTotal: 0,
+    total: 90,
+    status: 0,
+    paymentPaid: false,
+    notes: '',
+    createdAtMs: Date.now(),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+  await assertSucceeds(setDoc(doc(guestDb, 'orders', 'ord_1'), validOrder));
+  await assertFails(setDoc(doc(guestDb, 'orders', 'ord_bad'), { ...validOrder, status: 3, paymentPaid: true }));
+  await assertFails(setDoc(doc(guestDb, 'orders', 'ord_bad2'), { ...validOrder, total: 1 }));
+  await assertFails(getDoc(doc(guestDb, 'orders', 'ord_1')));
+  await assertFails(getDocs(collection(attackerDb, 'orders')));
+  await assertFails(setDoc(doc(attackerDb, 'orders', 'ord_1'), { ...validOrder, status: 3, updatedBy: attackerUid }));
+  await assertSucceeds(getDocs(collection(adminDb, 'orders')));
+
   // Authorized admin & public guest reads pass
   await assertSucceeds(setDoc(doc(adminDb, 'store', 'catalog'), { cats: ['الألبان'], ecat: ['🧀'], colors: ['#ffc107'], chunkCount: 1, productCount: 1, updatedAt: serverTimestamp(), updatedBy: adminUid }));
   await assertSucceeds(setDoc(doc(adminDb, 'product_images', 'pimg_1'), { dataUrl: 'data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=', mime: 'image/webp', width: 100, height: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: adminUid }));

@@ -178,6 +178,101 @@
         }
       },
       "required": ["pinHash", "updatedAt", "updatedBy"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer checkout order and admin sales/returns ledger entry.",
+      "type": "object",
+      "properties": {
+        "orderNumber": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "description": "Human-readable order code (e.g., #ESD-1045)."
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Customer full name."
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 25,
+          "description": "Customer delivery phone number."
+        },
+        "address": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 300,
+          "description": "Customer delivery address."
+        },
+        "payMethod": {
+          "type": "string",
+          "enum": ["cod", "vf", "ip"],
+          "description": "Payment method code."
+        },
+        "payLabel": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "Display label for payment method."
+        },
+        "items": {
+          "type": "array",
+          "description": "Bounded list of ordered line items (max 100)."
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "Gross order subtotal before returns or deductions."
+        },
+        "discountDeduction": {
+          "type": "number",
+          "description": "Manual return/billing adjustment amount deducted by admin."
+        },
+        "returnedTotal": {
+          "type": "number",
+          "description": "Total deducted amount from returned items and admin adjustments."
+        },
+        "total": {
+          "type": "number",
+          "description": "Net final order total after returns and adjustments."
+        },
+        "status": {
+          "type": "integer",
+          "description": "Order status index (0=pending, 1=preparing, 2=out, 3=completed, 4=partial_return, 5=cancelled_returned)."
+        },
+        "paymentPaid": {
+          "type": "boolean",
+          "description": "Whether payment has been collected/verified by admin."
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Admin notes regarding delivery, billing adjustment, or returned items."
+        },
+        "createdAtMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds timestamp of order placement."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of order creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last order update."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of admin who last modified the order (set on admin updates)."
+        }
+      },
+      "required": ["orderNumber", "customerName", "phone", "address", "payMethod", "payLabel", "items", "subtotal", "discountDeduction", "returnedTotal", "total", "status", "paymentPaid", "notes", "createdAtMs", "createdAt", "updatedAt"]
     }
   },
   "firestore": {
@@ -192,6 +287,10 @@
     "/product_images/{imageId}": {
       "schema": { "$ref": "#/entities/ProductImage" },
       "description": "Compressed product images referenced by fbimg://{imageId} links; individual doc readable by visitors, writable/deletable only by verified admins."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders and admin sales/returns ledger; customers may create valid initial orders only, while reading, listing, updating returns/totals, and deleting are strictly restricted to verified admins."
     },
     "/admins/{uid}": {
       "schema": { "$ref": "#/entities/AdminUser" },
