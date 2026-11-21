@@ -105,6 +105,17 @@ service cloud.firestore {
         data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
     }
 
+    function isValidOrderItemMap(it) {
+      return it is map &&
+        it.keys().hasAll(['productId', 'name', 'qty', 'price', 'returnedQty']) &&
+        it.keys().hasOnly(['productId', 'name', 'qty', 'price', 'returnedQty']) &&
+        it.productId is number &&
+        it.name is string && it.name.size() >= 1 && it.name.size() <= 140 &&
+        it.qty is int && it.qty >= 0 && it.qty <= 10000 &&
+        it.returnedQty is int && it.returnedQty >= 0 && it.returnedQty <= it.qty &&
+        it.price is number && it.price >= 0 && it.price <= 10000000;
+    }
+
     function isValidNewOrder(data) {
       return data.keys().hasAll(['orderNumber', 'customerName', 'phone', 'address', 'payMethod', 'payLabel', 'items', 'subtotal', 'discountDeduction', 'returnedTotal', 'total', 'status', 'paymentPaid', 'notes', 'createdAtMs', 'createdAt', 'updatedAt']) &&
         data.keys().hasOnly(['orderNumber', 'customerName', 'phone', 'address', 'payMethod', 'payLabel', 'items', 'subtotal', 'discountDeduction', 'returnedTotal', 'total', 'status', 'paymentPaid', 'notes', 'createdAtMs', 'createdAt', 'updatedAt']) &&
@@ -114,7 +125,8 @@ service cloud.firestore {
         data.address is string && data.address.size() >= 5 && data.address.size() <= 300 &&
         data.payMethod is string && data.payMethod in ['cod', 'vf', 'ip'] &&
         data.payLabel is string && data.payLabel.size() >= 2 && data.payLabel.size() <= 40 &&
-        data.items is list && data.items.size() >= 1 && data.items.size() <= 100 && data.items[0] is map &&
+        data.items is list && data.items.size() >= 1 && data.items.size() <= 100 &&
+        isValidOrderItemMap(data.items[0]) && data.items[0].qty >= 1 && data.items[0].returnedQty == 0 &&
         data.subtotal is number && data.subtotal > 0 && data.subtotal <= 10000000 &&
         data.discountDeduction is number && data.discountDeduction == 0 &&
         data.returnedTotal is number && data.returnedTotal == 0 &&
@@ -136,11 +148,12 @@ service cloud.firestore {
         data.address is string && data.address.size() >= 5 && data.address.size() <= 300 &&
         data.payMethod is string && data.payMethod in ['cod', 'vf', 'ip'] &&
         data.payLabel is string && data.payLabel.size() >= 2 && data.payLabel.size() <= 40 &&
-        data.items is list && data.items.size() >= 0 && data.items.size() <= 100 && (data.items.size() == 0 || data.items[0] is map) &&
+        data.items is list && data.items.size() >= 0 && data.items.size() <= 100 &&
+        (data.items.size() == 0 || isValidOrderItemMap(data.items[0])) &&
         data.subtotal is number && data.subtotal >= 0 && data.subtotal <= 10000000 &&
         data.discountDeduction is number && data.discountDeduction >= 0 && data.discountDeduction <= 10000000 &&
-        data.returnedTotal is number && data.returnedTotal >= 0 && data.returnedTotal <= 10000000 &&
-        data.total is number && data.total >= 0 && data.total <= 10000000 &&
+        data.returnedTotal is number && data.returnedTotal >= 0 && data.returnedTotal <= data.subtotal &&
+        data.total is number && data.total >= 0 && data.total <= data.subtotal &&
         data.status is int && data.status >= 0 && data.status <= 5 &&
         data.paymentPaid is bool &&
         data.notes is string && data.notes.size() <= 500 &&
@@ -150,19 +163,37 @@ service cloud.firestore {
         data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
     }
 
+    function isValidStaffEntry(entry) {
+      return entry is map &&
+        entry.keys().hasAll(['label', 'phone']) &&
+        entry.keys().hasOnly(['label', 'phone']) &&
+        entry.label is string && entry.label.size() >= 1 && entry.label.size() <= 60 &&
+        entry.phone is string && entry.phone.size() >= 7 && entry.phone.size() <= 25;
+    }
+
+    function isValidPaymentAccountEntry(entry, maxLen) {
+      return entry is map &&
+        entry.keys().hasAll(['label', 'number']) &&
+        entry.keys().hasOnly(['label', 'number']) &&
+        entry.label is string && entry.label.size() >= 1 && entry.label.size() <= 60 &&
+        entry.number is string && entry.number.size() >= 3 && entry.number.size() <= maxLen;
+    }
+
     function isValidStoreSettings(data) {
-      return data.keys().hasAll(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'updatedAt', 'updatedBy']) &&
-        data.keys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'updatedAt', 'updatedBy']) &&
+      return data.keys().hasAll(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'landingNoticeText', 'landingNoticeEnabled', 'updatedAt', 'updatedBy']) &&
+        data.keys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'landingNoticeText', 'landingNoticeEnabled', 'updatedAt', 'updatedBy']) &&
         data.whatsappOrderPhone is string && data.whatsappOrderPhone.size() >= 8 && data.whatsappOrderPhone.size() <= 20 &&
         data.whatsappOrderPhone.matches('^[0-9]{8,20}$') &&
         data.whatsappStaff is list && data.whatsappStaff.size() <= 10 &&
-        (data.whatsappStaff.size() == 0 || data.whatsappStaff[0] is map) &&
+        (data.whatsappStaff.size() == 0 || isValidStaffEntry(data.whatsappStaff[0])) &&
         data.vodafoneNumbers is list && data.vodafoneNumbers.size() <= 10 &&
-        (data.vodafoneNumbers.size() == 0 || data.vodafoneNumbers[0] is map) &&
+        (data.vodafoneNumbers.size() == 0 || isValidPaymentAccountEntry(data.vodafoneNumbers[0], 40)) &&
         data.instaPayNumbers is list && data.instaPayNumbers.size() <= 10 &&
-        (data.instaPayNumbers.size() == 0 || data.instaPayNumbers[0] is map) &&
+        (data.instaPayNumbers.size() == 0 || isValidPaymentAccountEntry(data.instaPayNumbers[0], 80)) &&
         data.paymentInstruction is string && data.paymentInstruction.size() <= 400 &&
         data.storePhone is string && data.storePhone.size() <= 30 &&
+        data.landingNoticeText is string && data.landingNoticeText.size() <= 220 &&
+        data.landingNoticeEnabled is bool &&
         data.updatedAt == request.time &&
         data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
     }
@@ -171,49 +202,63 @@ service cloud.firestore {
     match /store/{docId} {
       allow get: if isValidId(docId) && (docId == 'catalog' || docId == 'settings');
       allow list: if false;
-      allow create: if isAdmin() && isValidId(docId) && (
+      allow create: if isVerifiedUser() && isValidId(docId) && (
         (docId == 'catalog' && isValidStoreCatalog(incoming())) ||
         (docId == 'settings' && isValidStoreSettings(incoming()))
-      );
-      allow update: if isAdmin() && isValidId(docId) && (
+      ) && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(docId) && (
         (docId == 'catalog' && isValidStoreCatalog(incoming()) &&
           incoming().diff(existing()).affectedKeys().hasOnly(['cats', 'ecat', 'colors', 'chunkCount', 'productCount', 'updatedAt', 'updatedBy'])) ||
         (docId == 'settings' && isValidStoreSettings(incoming()) &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'updatedAt', 'updatedBy']))
-      );
+          incoming().diff(existing()).affectedKeys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'landingNoticeText', 'landingNoticeEnabled', 'updatedAt', 'updatedBy']))
+      ) && isAdmin();
       allow delete: if false;
     }
 
     // 2. Chunked Product Catalog (/catalog_chunks/chunk_0..19)
     match /catalog_chunks/{chunkId} {
-      allow get: if isValidId(chunkId) && chunkId.matches('^chunk_[0-9]{1,2}$');
+      allow get: if isValidId(chunkId) && chunkId.matches('^chunk_([0-9]|1[0-9])$');
       allow list: if resource.data.index is int && resource.data.index >= 0 && resource.data.index < 20;
-      allow create: if isAdmin() && isValidId(chunkId) && chunkId.matches('^chunk_[0-9]{1,2}$') && isValidCatalogChunk(incoming());
-      allow update: if isAdmin() && isValidId(chunkId) && chunkId.matches('^chunk_[0-9]{1,2}$') && isValidCatalogChunk(incoming()) &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['index', 'items', 'updatedAt', 'updatedBy']);
-      allow delete: if isAdmin() && isValidId(chunkId) && chunkId.matches('^chunk_[0-9]{1,2}$');
+      allow create: if isVerifiedUser() && isValidId(chunkId) &&
+        chunkId.matches('^chunk_([0-9]|1[0-9])$') &&
+        isValidCatalogChunk(incoming()) &&
+        chunkId == ('chunk_' + string(incoming().index)) &&
+        isAdmin();
+      allow update: if isVerifiedUser() && isValidId(chunkId) &&
+        chunkId.matches('^chunk_([0-9]|1[0-9])$') &&
+        isValidCatalogChunk(incoming()) &&
+        chunkId == ('chunk_' + string(incoming().index)) &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['index', 'items', 'updatedAt', 'updatedBy']) &&
+        isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(chunkId) &&
+        chunkId.matches('^chunk_([0-9]|1[0-9])$') &&
+        isAdmin();
     }
 
     // 2b. Compressed Product Images (/product_images/{imageId})
     match /product_images/{imageId} {
       allow get: if isValidId(imageId);
       allow list: if false;
-      allow create: if isAdmin() && isValidId(imageId) && isValidProductImage(incoming()) && incoming().createdAt == request.time;
-      allow update: if isAdmin() && isValidId(imageId) && isValidProductImage(incoming()) &&
+      allow create: if isVerifiedUser() && isValidId(imageId) &&
+        isValidProductImage(incoming()) && incoming().createdAt == request.time &&
+        isAdmin();
+      allow update: if isVerifiedUser() && isValidId(imageId) &&
+        isValidProductImage(incoming()) &&
         incoming().createdAt == existing().createdAt &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['dataUrl', 'mime', 'width', 'height', 'updatedAt', 'updatedBy']);
-      allow delete: if isAdmin() && isValidId(imageId);
+        incoming().diff(existing()).affectedKeys().hasOnly(['dataUrl', 'mime', 'width', 'height', 'updatedAt', 'updatedBy']) &&
+        isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(imageId) && isAdmin();
     }
 
     // 2c. Customer Orders & Admin Sales/Returns Ledger (/orders/{orderId})
     match /orders/{orderId} {
-      allow get: if isAdmin() && isValidId(orderId);
-      allow list: if isAdmin();
+      allow get: if isVerifiedUser() && isValidId(orderId) && isAdmin();
+      allow list: if isVerifiedUser() && isAdmin();
       allow create: if isValidId(orderId) && (
-        isValidNewOrder(incoming()) ||
-        (isAdmin() && isValidOrderUpdate(incoming()) && incoming().createdAt == request.time)
+        (orderId.matches('^ord_[a-zA-Z0-9_\\-]+$') && isValidNewOrder(incoming())) ||
+        (isVerifiedUser() && isValidOrderUpdate(incoming()) && incoming().createdAt == request.time && isAdmin())
       );
-      allow update: if isAdmin() && isValidId(orderId) && isValidOrderUpdate(incoming()) &&
+      allow update: if isVerifiedUser() && isValidId(orderId) && isValidOrderUpdate(incoming()) &&
         incoming().createdAt == existing().createdAt &&
         incoming().createdAtMs == existing().createdAtMs &&
         incoming().orderNumber == existing().orderNumber &&
@@ -221,19 +266,22 @@ service cloud.firestore {
           'items', 'subtotal', 'discountDeduction', 'returnedTotal', 'total',
           'status', 'paymentPaid', 'payMethod', 'payLabel', 'notes',
           'customerName', 'phone', 'address', 'updatedAt', 'updatedBy'
-        ]);
-      allow delete: if isAdmin() && isValidId(orderId);
+        ]) &&
+        isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(orderId) && isAdmin();
     }
 
     // 3. UID-Keyed Admin Allowlist (/admins/{uid})
     match /admins/{uid} {
       allow get: if isVerifiedUser() && isValidId(uid) && (request.auth.uid == uid || isAdmin());
       allow list: if false;
-      allow create: if isAdmin() && isValidId(uid) && isValidAdminUser(incoming()) && incoming().createdAt == request.time;
-      allow update: if isAdmin() && isValidId(uid) && isValidAdminUser(incoming()) &&
+      allow create: if isVerifiedUser() && isValidId(uid) && isValidAdminUser(incoming()) &&
+        incoming().createdAt == request.time && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(uid) && isValidAdminUser(incoming()) &&
         incoming().createdAt == existing().createdAt &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['email', 'role']);
-      allow delete: if isAdmin() && isValidId(uid) && uid != request.auth.uid;
+        incoming().diff(existing()).affectedKeys().hasOnly(['email', 'role']) &&
+        isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(uid) && uid != request.auth.uid && isAdmin();
     }
 
     // 4. Email-Keyed Admin Allowlist (/admin_emails/{emailId})
@@ -241,22 +289,27 @@ service cloud.firestore {
       allow get: if isVerifiedUser() && isValidEmailId(emailId) &&
         ((request.auth.token.email != null && emailId == request.auth.token.email.lower()) || isAdmin());
       allow list: if false;
-      allow create: if isAdmin() && isValidEmailId(emailId) && isValidAdminEmail(incoming(), emailId) &&
-        incoming().createdAt == request.time;
-      allow update: if isAdmin() && isValidEmailId(emailId) && isValidAdminEmail(incoming(), emailId) &&
+      allow create: if isVerifiedUser() && isValidEmailId(emailId) && isValidAdminEmail(incoming(), emailId) &&
+        incoming().createdAt == request.time && isAdmin();
+      allow update: if isVerifiedUser() && isValidEmailId(emailId) && isValidAdminEmail(incoming(), emailId) &&
         incoming().createdAt == existing().createdAt &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['active', 'email']);
-      allow delete: if isAdmin() && isValidEmailId(emailId) &&
-        (request.auth.token.email == null || request.auth.token.email.lower() != emailId);
+        incoming().diff(existing()).affectedKeys().hasOnly(['active', 'email']) &&
+        isAdmin();
+      allow delete: if isVerifiedUser() && isValidEmailId(emailId) &&
+        (request.auth.token.email == null || request.auth.token.email.lower() != emailId) &&
+        isAdmin();
     }
 
     // 5. Private Second-Factor Admin Password Hash (/store_private/admin_auth)
     match /store_private/{docId} {
-      allow get: if isAdmin() && isValidId(docId) && docId == 'admin_auth';
+      allow get: if isVerifiedUser() && isValidId(docId) && docId == 'admin_auth' && isAdmin();
       allow list: if false;
-      allow create: if isAdmin() && isValidId(docId) && docId == 'admin_auth' && isValidAdminAuth(incoming());
-      allow update: if isAdmin() && isValidId(docId) && docId == 'admin_auth' && isValidAdminAuth(incoming()) &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['pinHash', 'updatedAt', 'updatedBy']);
+      allow create: if isVerifiedUser() && isValidId(docId) && docId == 'admin_auth' &&
+        isValidAdminAuth(incoming()) && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(docId) && docId == 'admin_auth' &&
+        isValidAdminAuth(incoming()) &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['pinHash', 'updatedAt', 'updatedBy']) &&
+        isAdmin();
       allow delete: if false;
     }
   }

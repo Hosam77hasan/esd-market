@@ -48,6 +48,8 @@ export async function runDirtyDozenTests() {
   await assertFails(setDoc(doc(adminDb, 'store', 'catalog'), { cats: ['A'], ecat: ['🛒'], colors: ['#ffffff'], chunkCount: 1, productCount: 0, updatedAt: new Date(0), updatedBy: adminUid }));
   await assertFails(setDoc(doc(adminDb, 'store', 'catalog'), { cats: ['A'], ecat: ['🛒'], colors: ['#ffffff'], chunkCount: 1, productCount: 0, updatedAt: serverTimestamp(), updatedBy: attackerUid }));
   await assertFails(setDoc(doc(adminDb, 'catalog_chunks', 'chunk_0'), { index: 0, items: Array.from({ length: 101 }, () => ({ id: 1 })), updatedAt: serverTimestamp(), updatedBy: adminUid }));
+  await assertFails(setDoc(doc(adminDb, 'catalog_chunks', 'chunk_20'), { index: 19, items: [], updatedAt: serverTimestamp(), updatedBy: adminUid }));
+  await assertFails(setDoc(doc(adminDb, 'catalog_chunks', 'chunk_1'), { index: 0, items: [], updatedAt: serverTimestamp(), updatedBy: adminUid }));
   await assertFails(setDoc(doc(adminDb, 'store', 'x'.repeat(200)), { cats: ['A'], ecat: ['🛒'], colors: ['#ffffff'], chunkCount: 1, productCount: 0, updatedAt: serverTimestamp(), updatedBy: adminUid }));
   await assertFails(setDoc(doc(adminDb, 'store_private', 'admin_auth'), { pin: '3317167', updatedAt: serverTimestamp(), updatedBy: adminUid }));
   await assertFails(getDocs(collection(guestDb, 'product_images')));
@@ -74,11 +76,14 @@ export async function runDirtyDozenTests() {
     updatedAt: serverTimestamp()
   };
   await assertSucceeds(setDoc(doc(guestDb, 'orders', 'ord_1'), validOrder));
+  await assertFails(setDoc(doc(guestDb, 'orders', 'evil_id'), validOrder));
   await assertFails(setDoc(doc(guestDb, 'orders', 'ord_bad'), { ...validOrder, status: 3, paymentPaid: true }));
   await assertFails(setDoc(doc(guestDb, 'orders', 'ord_bad2'), { ...validOrder, total: 1 }));
+  await assertFails(setDoc(doc(guestDb, 'orders', 'ord_bad3'), { ...validOrder, items: [{ productId: 1, name: 'لبن جهينة', qty: 2, price: 45, returnedQty: 0, extra: 1 }] }));
   await assertFails(getDoc(doc(guestDb, 'orders', 'ord_1')));
   await assertFails(getDocs(collection(attackerDb, 'orders')));
   await assertFails(setDoc(doc(attackerDb, 'orders', 'ord_1'), { ...validOrder, status: 3, updatedBy: attackerUid }));
+  await assertFails(setDoc(doc(adminDb, 'orders', 'ord_bad_total'), { ...validOrder, total: 999, updatedBy: adminUid }));
   await assertSucceeds(getDocs(collection(adminDb, 'orders')));
 
   // Store settings assertions (admin-only write with strict schema, public visitor read)
@@ -89,12 +94,16 @@ export async function runDirtyDozenTests() {
     instaPayNumbers: [{ label: 'إنستا باي', number: '01111915613' }],
     paymentInstruction: 'أرفق صورة الإيصال على واتساب.',
     storePhone: '01111915613',
+    landingNoticeText: 'متوفر الآن شحن في محافظات السويس',
+    landingNoticeEnabled: true,
     updatedAt: serverTimestamp(),
     updatedBy: adminUid
   };
   await assertFails(setDoc(doc(guestDb, 'store', 'settings'), validSettings));
   await assertFails(setDoc(doc(attackerDb, 'store', 'settings'), { ...validSettings, updatedBy: attackerUid }));
   await assertFails(setDoc(doc(adminDb, 'store', 'settings'), { ...validSettings, whatsappOrderPhone: 'abc' }));
+  await assertFails(setDoc(doc(adminDb, 'store', 'settings'), { ...validSettings, whatsappStaff: [{ label: 'الإدارة', phone: '01111915613', ghost: true }] }));
+  await assertFails(setDoc(doc(adminDb, 'store', 'settings'), { ...validSettings, landingNoticeText: 'أ'.repeat(221) }));
   await assertSucceeds(setDoc(doc(adminDb, 'store', 'settings'), validSettings));
   await assertSucceeds(getDoc(doc(guestDb, 'store', 'settings')));
 

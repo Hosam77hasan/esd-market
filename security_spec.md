@@ -8,8 +8,9 @@
 5. **Bounded Catalog Chunks & Product Images**: `/store/catalog` arrays (`cats`, `ecat`, `colors`) are capped at `<= 40` entries; `/catalog_chunks/{chunkId}` `items` array is strictly capped at `<= 100` items; catalog chunks store image URLs or `fbimg://{imageId}` links (never raw Base64 inside chunk docs). Uploaded compressed images in `/product_images/{imageId}` are strictly bounded (`<= 250 KB`, admin-only write/delete, `allow list: if false`).
 6. **Strict Schema & Server Timestamps**: Every write enforces `hasAll` + `hasOnly` (no shadow ghost fields), field type checks, `.size()` caps, and `request.time` server timestamp equality.
 7. **Self-Removal & Email Spoofing Protection**: Admins cannot delete their own UID or own allowlist email; unverified email tokens are unconditionally rejected; users can only check their own `admin_emails/{email}` or `admins/{uid}` doc.
-8. **Order PII Isolation & Integrity**: Customers can only `create` initial orders in `/orders/{orderId}` (`status == 0`, `returnedTotal == 0`, `discountDeduction == 0`, `paymentPaid == false`, `total == subtotal > 0`, `createdAt == request.time`). Reading (`get`/`list`), updating (returns, deductions, payment collection, status), and deleting orders are strictly restricted to `isAdmin()`.
-9. **Merchant Contact & Payment Numbers Integrity**: `/store/settings` stores the active WhatsApp order receiving phone, staff WhatsApp presets (`<= 10`), Vodafone Cash numbers (`<= 10`), InstaPay accounts (`<= 10`), support phone, and checkout payment note; publicly readable (`get`) for checkout, writable solely by `isAdmin()` with strict phone regex (`^[0-9]{8,20}$`), array bounds, and `hasAll`/`hasOnly`.
+8. **Order PII Isolation & Integrity**: Customers can only `create` initial orders under `/orders/ord_*` (`status == 0`, `returnedTotal == 0`, `discountDeduction == 0`, `paymentPaid == false`, `total == subtotal > 0`, `createdAt == request.time`, validated line-item map keys). Reading (`get`/`list`), updating (returns, deductions, payment collection, status, with `returnedTotal <= subtotal && total <= subtotal`), and deleting orders are strictly restricted to `isAdmin()`.
+9. **Merchant Contact & Payment Numbers Integrity**: `/store/settings` stores the active WhatsApp order receiving phone, staff WhatsApp presets (`<= 10`, strictly `{label, phone}`), Vodafone Cash numbers (`<= 10`, strictly `{label, number}`), InstaPay accounts (`<= 10`, strictly `{label, number}`), support phone, checkout payment note, and landing announcement settings (`landingNoticeText <= 220`, `landingNoticeEnabled` bool); publicly readable (`get`) for checkout and storefront welcome, writable solely by `isAdmin()` with strict phone regex (`^[0-9]{8,20}$`), array bounds, and `hasAll`/`hasOnly`.
+10. **Chunk Range & Cost-Optimized Evaluation Order**: `/catalog_chunks/{chunkId}` is restricted strictly to `chunk_0`..`chunk_19` with `chunkId == 'chunk_' + string(incoming().index)`. Every protected rule checks `isVerifiedUser()`, path ID syntax, and static payload schema BEFORE invoking DB lookups inside `isAdmin()` (Denial-of-Wallet prevention).
 
 ## 2. The "Dirty Dozen" Attack Payloads
 1. **Unauthenticated catalog write**: `setDoc('/store/catalog', {...})` with `auth = null` -> `PERMISSION_DENIED`.
@@ -21,16 +22,17 @@
 7. **Shadow ghost field on `/store/catalog`**: admin writes extra `isHacked: true` field -> `PERMISSION_DENIED` (`hasOnly` rejects).
 8. **Client timestamp forgery**: admin writes `updatedAt: new Date(0)` instead of `serverTimestamp()` -> `PERMISSION_DENIED`.
 9. **Identity spoofing on `updatedBy`**: admin writes `updatedBy: 'other_uid'` -> `PERMISSION_DENIED`.
-10. **Unbounded array / Denial-of-Wallet**: admin writes `items` with 101 items or `cats` with 41 entries -> `PERMISSION_DENIED`.
+10. **Unbounded array / Denial-of-Wallet / chunk drift**: admin writes `items` with 101 items or `chunk_20` / `chunk_1` with `index: 0` -> `PERMISSION_DENIED`.
 11. **ID poisoning**: read/write to `/store/catalog/../../etc` or 200-char doc ID -> `PERMISSION_DENIED`.
 12. **Plaintext PIN overwrite on `/store_private/admin_auth`**: admin tries writing `{ pin: '3317167' }` instead of 64-char hex `pinHash` -> `PERMISSION_DENIED`.
 13. **Guest/Non-Admin PII Scrape on `/orders`**: guest or regular user calls `getDoc('/orders/ord_1')` or `getDocs('/orders')` -> `PERMISSION_DENIED`.
-14. **Tampered Initial Order State**: visitor creates order with `status: 3`, `paymentPaid: true`, `total: 0`, or `isAdminOverride: true` -> `PERMISSION_DENIED`.
-15. **Non-admin hijacking `/store/settings` payment numbers**: guest or non-admin tries writing `{ whatsappOrderPhone: '20199999999', ... }` to `/store/settings` -> `PERMISSION_DENIED`.
+14. **Tampered Initial Order State / Non-`ord_` Prefix / Over-Total Update**: visitor creates order outside `ord_*`, injects shadow key inside `items[0]`, or sets `status: 3`, `paymentPaid: true`, `total: 0`; or admin update sets `total > subtotal` -> `PERMISSION_DENIED`.
+15. **Non-admin hijacking `/store/settings` or nested shadow fields**: guest/non-admin writes `/store/settings`, or admin inserts unexpected key into `whatsappStaff[0]` -> `PERMISSION_DENIED`.
 
 ## 3. Red Team Audit Summary
 - **Identity Spoofing**: Closed via `updatedBy == request.auth.uid` and `emailId == request.auth.token.email.lower()`.
 - **Email Spoofing**: Closed via `request.auth.token.email_verified == true` inside `isVerifiedUser()`.
 - **PII / Secret Isolation**: `/admin_emails` and `/store_private` reject non-admin `list`; `/store_private/admin_auth` rejects all non-admin reads/writes; `/admins/{uid}` and `/admin_emails/{emailId}` restrict `get` strictly to the matching user or an admin; `/orders/{orderId}` restricts all `get`, `list`, `update`, and `delete` strictly to `isAdmin()`.
-- **Query Enforcer**: `/catalog_chunks` `allow list` validates `resource.data.index >= 0 && resource.data.index < 20` with zero `get()`/`exists()` inside `list`; `/orders` `allow list` is restricted solely to `isAdmin()`.
-- **Shadow Update & Value Poisoning**: Closed via `isValid*(incoming())` wrapped on both `create` and `update` alongside `hasAll`/`hasOnly`/`affectedKeys().hasOnly()`.
+- **Query Enforcer & Cost Guard**: `/catalog_chunks` `allow list` validates `resource.data.index >= 0 && resource.data.index < 20` with zero `get()`/`exists()` inside `list`; static auth, path ID, and schema checks run before `isAdmin()` across all match blocks; `/orders` `allow list` is restricted solely to `isAdmin()`.
+- **Shadow Update & Value Poisoning**: Closed via `isValid*(incoming())`, nested map validators (`isValidOrderItemMap`, `isValidStaffEntry`, `isValidPaymentAccountEntry`), `hasAll`/`hasOnly`/`affectedKeys().hasOnly()`, and `chunkId == 'chunk_' + string(incoming().index)`.
+

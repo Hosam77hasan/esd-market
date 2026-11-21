@@ -213,6 +213,15 @@
           "maxLength": 30,
           "description": "Optional public customer support phone number."
         },
+        "landingNoticeText": {
+          "type": "string",
+          "maxLength": 220,
+          "description": "Public announcement text shown briefly on the landing screen (e.g., delivery coverage notice)."
+        },
+        "landingNoticeEnabled": {
+          "type": "boolean",
+          "description": "Whether the landing screen announcement is active."
+        },
         "updatedAt": {
           "type": "string",
           "format": "date-time",
@@ -224,7 +233,7 @@
           "description": "UID of the authorized admin who updated store settings."
         }
       },
-      "required": ["whatsappOrderPhone", "whatsappStaff", "vodafoneNumbers", "instaPayNumbers", "paymentInstruction", "storePhone", "updatedAt", "updatedBy"]
+      "required": ["whatsappOrderPhone", "whatsappStaff", "vodafoneNumbers", "instaPayNumbers", "paymentInstruction", "storePhone", "landingNoticeText", "landingNoticeEnabled", "updatedAt", "updatedBy"]
     },
     "Order": {
       "title": "Order",
