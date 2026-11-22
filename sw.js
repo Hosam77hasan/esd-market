@@ -1,6 +1,6 @@
 /* ESD Market — Service Worker (PWA)
    يخزّن هيكل التطبيق والأيقونات، ويترك ملفات الفيديو/الصوت للمتصفح (Range). */
-const CACHE = "esd-market-v16";
+const CACHE = "esd-market-v17";
 
 const CORE = [
   "./",
@@ -41,7 +41,7 @@ self.addEventListener("fetch", (event) => {
   if (req.mode === "navigate") {
     event.respondWith((async () => {
       try {
-        const res = await fetch(req);
+        const res = await fetch(req, { cache: "no-cache" });
         if (res && res.ok) {
           const cache = await caches.open(CACHE);
           cache.put("./", res.clone()).catch(() => {});

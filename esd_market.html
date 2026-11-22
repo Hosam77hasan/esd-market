@@ -266,9 +266,11 @@ body.in #rail{opacity:1}
 #rail button:hover{transform:scale(1.15)}
 #rail button.on{background:var(--a);border-color:var(--a);transform:scale(1.22)}
 @media(max-width:760px){#rail{display:none}}
-.look{position:absolute;z-index:4;bottom:calc(118px + env(safe-area-inset-bottom,0px));width:46px;height:46px;padding:0;border-radius:50%;font-size:26px;line-height:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff;backdrop-filter:blur(8px);opacity:0;pointer-events:none;touch-action:none;transition:opacity .6s}
-body.in .look{opacity:.85;pointer-events:auto}
-#lookL{left:max(12px,env(safe-area-inset-left,0px))}#lookR{right:max(12px,env(safe-area-inset-right,0px))}
+.look{position:absolute;z-index:4;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:46px;height:46px;padding:0;border-radius:50%;font-size:26px;line-height:1;display:grid;place-items:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.30);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;touch-action:none;transition:opacity .6s,transform .15s,background .2s,border-color .2s}
+.look:hover,.look:active{background:rgba(255,255,255,.26);border-color:rgba(242,201,76,.72);opacity:1}
+.look:active{transform:scale(.94)}
+body.in .look{opacity:.88;pointer-events:auto}
+#lookL{left:max(14px,env(safe-area-inset-left,0px))}#lookR{right:max(14px,env(safe-area-inset-right,0px))}
 #hint{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;padding:64px 14px calc(108px + env(safe-area-inset-bottom,0px));opacity:0;visibility:hidden;transition:opacity .55s ease,visibility .55s ease;pointer-events:none}
 body.in #hint{opacity:1;visibility:visible}
 body.in #hint.gone{opacity:0;visibility:hidden}
@@ -491,6 +493,8 @@ body.in #hint.gone{opacity:0;visibility:hidden}
     </div>
   </div>
   <div id="hud"><div class="t" id="ht"></div><div class="n" id="hn"></div><div class="d" id="hd"></div></div>
+  <button type="button" class="look" id="lookL" aria-label="التفات لليسار" title="التفات لليسار">‹</button>
+  <button type="button" class="look" id="lookR" aria-label="التفات لليمين" title="التفات لليمين">›</button>
 </div></div>
 <div id="load">
   <main class="sp-stage sp-play" id="splashStage">
@@ -512,7 +516,26 @@ body.in #hint.gone{opacity:0;visibility:hidden}
   </main>
   <p class="sp-powered"><span class="sp-powered-by">Powered by</span><span class="sp-company">Emperor Software Development</span></p>
 </div>
-<script>window.__esdSplashAt = Date.now();</script>
+<script>
+window.__esdSplashAt = Date.now();
+(function () {
+  function fallbackHideSplash() {
+    var ld = document.getElementById("load");
+    if (!ld || ld.style.display === "none") return;
+    if (typeof dismissSplashNow === "function") { dismissSplashNow(); return; }
+    ld.style.opacity = "0";
+    ld.style.pointerEvents = "none";
+    setTimeout(function () { if (ld) ld.style.display = "none"; }, 850);
+  }
+  setTimeout(fallbackHideSplash, 5600);
+  var ld = document.getElementById("load");
+  if (ld) {
+    ld.addEventListener("click", function () {
+      if (Date.now() - (window.__esdSplashAt || 0) >= 800) fallbackHideSplash();
+    });
+  }
+})();
+</script>
 <div id="iosInstallHelp" hidden role="dialog" aria-modal="true" aria-labelledby="iosHelpTitle">
   <div class="help-card">
     <h2 id="iosHelpTitle">تثبيت التطبيق على الآيفون</h2>
@@ -1382,10 +1405,10 @@ function buildTurnBoardAssets(w, h, o, k) {
     ...offers.map(p => ({ kind: "prod", p }))
   ];
   const wallSlot = o.wallSlot || 0;
-  let ordered = rawItems;
-  if (wallSlot > 0 && rawItems.length > 1) {
-    const rot = Math.min(rawItems.length - 1, Math.max(1, Math.floor(rawItems.length / 2)));
-    ordered = rawItems.slice(rot).concat(rawItems.slice(0, rot));
+  let ordered = rawItems.slice(0, 12);
+  if (wallSlot > 0 && ordered.length > 1) {
+    const rot = Math.min(ordered.length - 1, Math.max(1, Math.floor(ordered.length / 2)));
+    ordered = ordered.slice(rot).concat(ordered.slice(0, rot));
   }
 
   const gridTop = 228, ftrH = 98, gridBot = h - ftrH, gridH = gridBot - gridTop;
@@ -1554,7 +1577,7 @@ function texFor(o) {
     if (builds >= 5) { pendingTex = true; return null; }
     if (texCache.size > 30) trimTexCache(68e6);
     builds++;
-    const k = clamp(Math.max(DPR, 1.35), 1.35, 1.85);
+    const k = COARSE ? 1.0 : clamp(Math.max(DPR, 1.25), 1.25, 1.6);
     const turnAssets = buildTurnBoardAssets(w, h, o, k);
     const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
     const ne = { c, w: c.width, h: c.height, u: frameNo, turnAssets, liveRects: [], rects: [], lastScroll: -1 };
@@ -1713,6 +1736,18 @@ function roundedOutline(w, h, r, seg) {
 }
 
 /* ---------- الرسم ---------- */
+const videoEl = $("videoIntro");
+const videoBgEl = $("videoIntroBg");
+const musicEl = $("bgMusic");
+const landingEl = $("landing");
+const VIDEO_LAND_SRC = "esd_market_hypermarket_transition.mp4";
+const VIDEO_PORT_SRC = "esd_market_hypermarket_transition_portrait.mp4";
+const isPortraitView = () => innerHeight >= innerWidth;
+const introSrcForView = () => isPortraitView() ? VIDEO_PORT_SRC : VIDEO_LAND_SRC;
+const MUSIC_VOL = 0.16;        // موسيقى الخلفية داخل المتجر هادئة (10%)
+const MUSIC_INTRO_VOL = 0.10;  // الموسيقى مع فيديو الدخلة بمستوى هادئ (10%)
+let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
+let sceneReady = false, mediaReady = false, loaderHidden = false, splashDismissed = false;
 let lookHold = 0, camHd = null, camS = 0, prevS = 0, vel = 0, lookT = 0, lookC = 0, btnLook = 0, keyLook = 0, mx = 0, my = 0, mouseIn = false, drag = null, hover = null, hoverSub = -1, lastFrame = 0, curHud = -2, drawn = [];
 let rsRaf = 0;
 function rsNow() {
@@ -1729,7 +1764,7 @@ function rsNow() {
   cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = "high";
   sizeScene(); forceRender = true;
   try {
-    if (typeof videoEl !== "undefined" && videoEl && !introStarted && !entered && typeof introSrcForView === "function") {
+    if (videoEl && !introStarted && !entered) {
       const want = introSrcForView();
       if (videoEl.getAttribute("src") !== want) videoEl.src = want;
     }
@@ -2150,22 +2185,29 @@ cv.addEventListener("pointerdown", e => {
   dismissHint(); cancelNav(); touchVelY = 0;
   try { cv.setPointerCapture(e.pointerId); } catch (err) {}
   const nowT = performance.now();
-  drag = { x: e.clientX, y: e.clientY, prevY: e.clientY, prevT: nowT, samples: [], look: lookT, moved: false, axis: "", id: e.pointerId, ptr: e.pointerType };
+  drag = { x: e.clientX, y: e.clientY, prevX: e.clientX, prevY: e.clientY, prevT: nowT, samples: [], look: lookT, moved: false, startedX: false, startedY: false, axis: "", id: e.pointerId, ptr: e.pointerType };
 });
 cv.addEventListener("pointermove", e => {
   mx = e.clientX; my = e.clientY; mouseIn = e.pointerType === "mouse";
   if (drag && e.pointerId === drag.id) {
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!drag.axis) {
-      if (Math.abs(dy) > 6 && Math.abs(dy) >= Math.abs(dx) * .85) { drag.axis = "y"; drag.moved = true; drag.prevY = e.clientY; drag.prevT = performance.now(); }
-      else if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.15) { drag.axis = "x"; drag.moved = true; }
+    const stepX = e.clientX - drag.prevX, rawStepY = e.clientY - drag.prevY;
+    drag.prevX = e.clientX;
+    if (!drag.startedX && (Math.abs(dx) > 6 || (Math.abs(stepX) > 3 && Math.abs(stepX) > Math.abs(rawStepY) * 1.15))) {
+      drag.startedX = true; drag.moved = true;
     }
-    if (drag.axis === "x") {
-      const xSensitivity = IS_IOS ? 2.0 : (COARSE ? 2.25 : 2.6);
-      lookT = clamp(drag.look - dx / W * xSensitivity, -1.55, 1.55);
-    } else if (drag.axis === "y") {
+    if (!drag.startedY && (Math.abs(dy) > 6 || (Math.abs(rawStepY) > 3 && Math.abs(rawStepY) > Math.abs(stepX) * 1.15))) {
+      drag.startedY = true; drag.moved = true; drag.prevY = e.clientY; drag.prevT = performance.now();
+    }
+    if (drag.startedX) {
+      drag.axis = drag.startedY ? "xy" : "x";
+      const xSensitivity = IS_IOS ? 2.15 : (COARSE ? 2.4 : 2.8);
+      const effX = stepX || 0;
+      if (effX) lookT = clamp(lookT - effX / Math.max(W, 280) * xSensitivity, -1.55, 1.55);
+    }
+    if (drag.startedY) {
+      if (!drag.startedX) drag.axis = "y";
       const nowT = performance.now();
-      const rawStepY = e.clientY - drag.prevY;
       const stepY = clamp(rawStepY, -54, 54);
       drag.prevY = e.clientY; drag.prevT = nowT;
       if (stepY) {
@@ -2179,7 +2221,7 @@ cv.addEventListener("pointermove", e => {
   }
 });
 function computeTouchReleaseVel(d, nowT) {
-  if (!d || d.axis !== "y" || d.ptr === "mouse" || !d.samples || !d.samples.length) return 0;
+  if (!d || !d.startedY || d.ptr === "mouse" || !d.samples || !d.samples.length) return 0;
   const recent = d.samples.filter(s => nowT - s.t <= 90);
   if (recent.length < 2) return 0;
   const spanMs = nowT - recent[0].t;
@@ -2227,36 +2269,66 @@ function activate(o, x, y) {
   }
   else if (o.k === "sign" && o.link != null && o.link >= 0) jumpSec(o.link);
 }
+/* أزرار الالتفات يمين/يسار (تعمل بالضغط المستمر أو النقرة السريعة على الجوال والكمبيوتر) */
+[["lookL", -1], ["lookR", 1]].forEach(([id, dir]) => {
+  const el = $(id);
+  if (!el) return;
+  let heldId = null, downAt = 0;
+  const endHold = (nudge) => {
+    if (heldId !== null) {
+      try { if (el.hasPointerCapture && el.hasPointerCapture(heldId)) el.releasePointerCapture(heldId); } catch (e) {}
+      heldId = null;
+    }
+    if (nudge && performance.now() - downAt < 220) {
+      lookT = clamp(lookT + dir * 0.28, -1.55, 1.55);
+    }
+    if (btnLook === dir) btnLook = 0;
+    lookHold = 0;
+  };
+  el.addEventListener("pointerdown", e => {
+    if (!entered) return;
+    e.preventDefault(); e.stopPropagation();
+    dismissHint();
+    heldId = e.pointerId; downAt = performance.now();
+    btnLook = dir; lookHold = downAt;
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  el.addEventListener("pointerup", () => endHold(true));
+  el.addEventListener("pointercancel", () => endHold(false));
+  el.addEventListener("lostpointercapture", () => endHold(false));
+  el.addEventListener("pointerleave", () => { if (heldId === null && btnLook === dir) btnLook = 0; });
+});
 /* سكرول يمين/شمال (لوحة اللمس أو Shift + عجلة الماوس) = التفات؛ السكرول العمودي = التقدم/الرجوع */
 addEventListener("wheel", e => {
   if (!entered || mm.classList.contains("on")) return;
   dismissHint(); touchVelY = 0;
   if (navRaf) cancelNav();
-  const adx = Math.abs(e.deltaX), ady = Math.abs(e.deltaY);
-  const dx = (adx > ady * 1.15 && adx > 2) ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
+  const unitScale = e.deltaMode === 1 ? 16 : 1;
+  const rawX = e.deltaX * unitScale, rawY = e.deltaY * unitScale;
+  const dx = Math.abs(rawX) > 1.5 ? rawX : (e.shiftKey ? rawY : 0);
   if (!dx) return;
-  e.preventDefault(); lookT = clamp(lookT + dx * .0035, -1.55, 1.55);
+  e.preventDefault(); lookT = clamp(lookT + dx * .0038, -1.55, 1.55);
 }, { passive: false });
 addEventListener("scroll", () => {
   if (!entered) return;
   const sy = getScrollY();
   if (sy > 10) dismissHint();
-  if (performance.now() > ignoreScrollUntil && (!drag || drag.axis !== "y")) {
+  if (performance.now() > ignoreScrollUntil && (!drag || !drag.startedY)) {
     navY = clamp(sy, 0, maxScrollY());
   }
 }, { passive: true });
 addEventListener("keydown", e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName || "")) return;
-  if (e.key === "ArrowLeft") { keyLook = -1; dismissHint(); }
-  else if (e.key === "ArrowRight") { keyLook = 1; dismissHint(); }
+  if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") { keyLook = -1; dismissHint(); }
+  else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") { keyLook = 1; dismissHint(); }
   else if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") { keyMove = 1; dismissHint(); }
   else if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") { keyMove = -1; dismissHint(); }
 });
 addEventListener("keyup", e => {
-  if (e.key === "ArrowLeft" || e.key === "ArrowRight") keyLook = 0;
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "a" || e.key === "A" || e.key === "d" || e.key === "D") keyLook = 0;
   if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "W" || e.key === "s" || e.key === "S") keyMove = 0;
 });
-addEventListener("blur", () => { keyLook = 0; keyMove = 0; touchVelY = 0 });
+addEventListener("blur", () => { keyLook = 0; btnLook = 0; keyMove = 0; touchVelY = 0 });
 function lockPortraitOrientation() {
   try {
     const o = screen.orientation;
@@ -2291,9 +2363,9 @@ addEventListener("fullscreenchange", lockPortraitOrientation);
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(.05, (now - lastFrame) / 1000 || .016); lastFrame = now; frameNo++; builds = 0;
-  /* قبل الدخول للمتجر: نرسم إطاراً تمهيدياً واحداً ثم نوقف الرسم لتعمل شاشة البداية والفيديو بسلاسة تامة */
+  /* قبل الدخول للمتجر: ننتظر انتهاء شاشة البداية ثم نرسم إطاراً تمهيدياً واحداً لتعمل البداية بسلاسة بلا ضغط ذاكرة */
   if (!entered) {
-    if (!worldWarmed && W > 0) {
+    if (!worldWarmed && splashDismissed && W > 0) {
       try {
         const [px, pz, ph] = pathAt(0);
         camX = px; camZ = pz; camHd = ph; camYaw = ph; sinY = Math.sin(ph); cosY = Math.cos(ph);
@@ -2315,7 +2387,8 @@ function frame(now) {
   camS += (target - camS) * (RM ? 1 : 1 - Math.exp(-dt * camFollowRate));
   if (Math.abs(target - camS) < .05) camS = target;
   vel += ((camS - prevS) / Math.max(dt, .001) - vel) * Math.min(1, dt * 8); prevS = camS;
-  if (keyLook) lookT = clamp(lookT + keyLook * dt * 1.7, -1.55, 1.55);
+  const turnInput = keyLook || btnLook;
+  if (turnInput && !mm.classList.contains("on")) lookT = clamp(lookT + turnInput * dt * 1.75, -1.55, 1.55);
   lookC += (lookT - lookC) * (1 - Math.exp(-dt * 9));
   if (Math.abs(lookT - lookC) < .0004) lookC = lookT;
   const [px, pz] = pathAt(camS), hd = pathAt(camS + 230)[2];
@@ -2343,14 +2416,6 @@ function rebuildWorld() { buildWorld(); texCache.clear(); buildRail(); sizeScene
 try { Promise.all([document.fonts.load('800 30px Cairo', 'سلة'), document.fonts.load('700 20px Cairo', 'ABC')]).then(() => { texCache.clear(); forceRender = true }) } catch (e) {}
 buildWorld(); rs(); buildRail();
 
-const videoEl = $("videoIntro");
-const videoBgEl = $("videoIntroBg");
-const musicEl = $("bgMusic");
-const landingEl = $("landing");
-const MUSIC_VOL = 0.16;        // موسيقى الخلفية داخل المتجر هادئة (10%)
-const MUSIC_INTRO_VOL = 0.10;  // الموسيقى مع فيديو الدخلة بمستوى هادئ (10%)
-let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
-
 musicEl.volume = MUSIC_VOL;
 /* إخفاء أي واجهة تحكم/كارت للموسيقى: تعمل كصوت خلفية خفي بالكامل (بلا أزرار تشغيل/إيقاف) */
 try { musicEl.removeAttribute("controls"); musicEl.setAttribute("playsinline", ""); musicEl.setAttribute("webkit-playsinline", ""); } catch (e) {}
@@ -2367,11 +2432,7 @@ hideMediaSession();
 try { musicEl.load(); } catch (e) {}
 /* سلّح تفاعلات المستخدم: يضمن تشغيل الموسيقى على الجوال والكمبيوتر فوراً */
 armMusicKick();
-/* اختيار فيديو الدخلة المتناسب مع أبعاد الشاشة + تفعيل قفل الوضع الرأسي قدر ما يسمح المتصفح */
-const VIDEO_LAND_SRC = "esd_market_hypermarket_transition.mp4";
-const VIDEO_PORT_SRC = "esd_market_hypermarket_transition_portrait.mp4";
-const isPortraitView = () => innerHeight >= innerWidth;
-const introSrcForView = () => isPortraitView() ? VIDEO_PORT_SRC : VIDEO_LAND_SRC;
+/* تهيئة فيديو الدخلة المتناسب مع أبعاد الشاشة + تفعيل قفل الوضع الرأسي قدر ما يسمح المتصفح */
 videoEl.src = introSrcForView();
 videoEl.muted = true; videoEl.volume = 0; videoEl.playsInline = true;
 try { videoEl.setAttribute("webkit-playsinline", ""); videoEl.setAttribute("x5-playsinline", "") } catch (e) {}
@@ -4922,7 +4983,6 @@ const bootAt = window.__esdBootAt || Date.now();
 const splashAt = window.__esdSplashAt || bootAt;
 const SPLASH_MS = 4400;
 const SPLASH_FADE_MS = 850;
-let sceneReady = false, mediaReady = false, loaderHidden = false, splashDismissed = false;
 let landingNoticeTimer = 0;
 let landingNoticePlayed = false;
 function renderLandingNotice() {
@@ -5103,11 +5163,14 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
-const cfgRes = await fetch("./firebase-applet-config.json", { cache: "no-store" });
-if (!cfgRes.ok) {
-  throw new Error("Failed to load firebase-applet-config.json (" + cfgRes.status + ")");
-}
-const firebaseConfig = await cfgRes.json();
+let firebaseConfig = null;
+try {
+  const cfgRes = await fetch("./firebase-applet-config.json", { cache: "no-store" });
+  if (cfgRes.ok) firebaseConfig = await cfgRes.json();
+} catch (e) {}
+if (!firebaseConfig || !firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.warn("Firebase config not found; running in local catalog mode.");
+} else {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5892,6 +5955,7 @@ window.__esdFb = {
   deleteOrderInCloud
 };
 document.dispatchEvent(new CustomEvent("esd:fb-ready"));
+}
 </script>
 </body>
 </html>
