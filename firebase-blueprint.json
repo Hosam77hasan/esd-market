@@ -235,6 +235,28 @@
       },
       "required": ["whatsappOrderPhone", "whatsappStaff", "vodafoneNumbers", "instaPayNumbers", "paymentInstruction", "storePhone", "landingNoticeText", "landingNoticeEnabled", "updatedAt", "updatedBy"]
     },
+    "StoreOffers": {
+      "title": "StoreOffers",
+      "description": "Public storefront promotional offer campaigns with dates, details, and optional section/product links managed by verified admins.",
+      "type": "object",
+      "properties": {
+        "campaigns": {
+          "type": "array",
+          "description": "Bounded list of promotional offer campaigns (max 40)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last offer campaigns update."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who updated offer campaigns."
+        }
+      },
+      "required": ["campaigns", "updatedAt", "updatedBy"]
+    },
     "Order": {
       "title": "Order",
       "description": "Customer checkout order and admin sales/returns ledger entry.",
@@ -334,7 +356,7 @@
   "firestore": {
     "/store/{docId}": {
       "schema": { "$ref": "#/entities/StoreCatalog" },
-      "description": "Public store metadata documents (/store/catalog and /store/settings); readable by visitors, writable only by verified admins."
+      "description": "Public store metadata documents (/store/catalog, /store/settings, and /store/offers); readable by visitors, writable only by verified admins."
     },
     "/catalog_chunks/{chunkId}": {
       "schema": { "$ref": "#/entities/CatalogChunk" },

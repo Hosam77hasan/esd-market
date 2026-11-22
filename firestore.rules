@@ -198,19 +198,46 @@ service cloud.firestore {
         data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
     }
 
-    // 1. Public Store Catalog Metadata (/store/catalog) & Merchant Settings (/store/settings)
+    function isValidOfferCampaignEntry(entry) {
+      return entry is map &&
+        entry.keys().hasAll(['id', 'title', 'details', 'dateLabel', 'startDate', 'endDate', 'sectionCi', 'productId', 'active']) &&
+        entry.keys().hasOnly(['id', 'title', 'details', 'dateLabel', 'startDate', 'endDate', 'sectionCi', 'productId', 'active']) &&
+        entry.id is string && entry.id.size() >= 1 && entry.id.size() <= 40 &&
+        entry.title is string && entry.title.size() >= 1 && entry.title.size() <= 100 &&
+        entry.details is string && entry.details.size() <= 300 &&
+        entry.dateLabel is string && entry.dateLabel.size() <= 80 &&
+        entry.startDate is string && entry.startDate.size() <= 20 &&
+        entry.endDate is string && entry.endDate.size() <= 20 &&
+        entry.sectionCi is int && entry.sectionCi >= -1 && entry.sectionCi <= 39 &&
+        entry.productId is int && entry.productId >= 0 &&
+        entry.active is bool;
+    }
+
+    function isValidStoreOffers(data) {
+      return data.keys().hasAll(['campaigns', 'updatedAt', 'updatedBy']) &&
+        data.keys().hasOnly(['campaigns', 'updatedAt', 'updatedBy']) &&
+        data.campaigns is list && data.campaigns.size() <= 40 &&
+        (data.campaigns.size() == 0 || isValidOfferCampaignEntry(data.campaigns[0])) &&
+        data.updatedAt == request.time &&
+        data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
+    }
+
+    // 1. Public Store Catalog Metadata (/store/catalog), Merchant Settings (/store/settings), & Offer Campaigns (/store/offers)
     match /store/{docId} {
-      allow get: if isValidId(docId) && (docId == 'catalog' || docId == 'settings');
+      allow get: if isValidId(docId) && (docId == 'catalog' || docId == 'settings' || docId == 'offers');
       allow list: if false;
       allow create: if isVerifiedUser() && isValidId(docId) && (
         (docId == 'catalog' && isValidStoreCatalog(incoming())) ||
-        (docId == 'settings' && isValidStoreSettings(incoming()))
+        (docId == 'settings' && isValidStoreSettings(incoming())) ||
+        (docId == 'offers' && isValidStoreOffers(incoming()))
       ) && isAdmin();
       allow update: if isVerifiedUser() && isValidId(docId) && (
         (docId == 'catalog' && isValidStoreCatalog(incoming()) &&
           incoming().diff(existing()).affectedKeys().hasOnly(['cats', 'ecat', 'colors', 'chunkCount', 'productCount', 'updatedAt', 'updatedBy'])) ||
         (docId == 'settings' && isValidStoreSettings(incoming()) &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'landingNoticeText', 'landingNoticeEnabled', 'updatedAt', 'updatedBy']))
+          incoming().diff(existing()).affectedKeys().hasOnly(['whatsappOrderPhone', 'whatsappStaff', 'vodafoneNumbers', 'instaPayNumbers', 'paymentInstruction', 'storePhone', 'landingNoticeText', 'landingNoticeEnabled', 'updatedAt', 'updatedBy'])) ||
+        (docId == 'offers' && isValidStoreOffers(incoming()) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['campaigns', 'updatedAt', 'updatedBy']))
       ) && isAdmin();
       allow delete: if false;
     }
