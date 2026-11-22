@@ -1,6 +1,6 @@
 /* ESD Market — Service Worker (PWA)
    يخزّن هيكل التطبيق والأيقونات، ويترك ملفات الفيديو/الصوت للمتصفح (Range). */
-const CACHE = "esd-market-v12";
+const CACHE = "esd-market-v15";
 
 const CORE = [
   "./",
