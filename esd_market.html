@@ -76,6 +76,10 @@ header.show{display:flex;animation:hdrIn 1.1s ease-out both}
 @keyframes hdrIn{from{opacity:0}to{opacity:1}}
 header b{font-size:clamp(12px,calc(var(--ui-w) * .042),18px);margin-inline-end:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 2px 8px #000;padding:3px 4px;border-radius:8px;flex:0 1 auto;-webkit-touch-callout:none}
 header button{flex:0 0 auto;white-space:nowrap;background:rgba(255,255,255,.13);color:#fff;border-color:rgba(255,255,255,.26);backdrop-filter:blur(12px) saturate(1.15);-webkit-backdrop-filter:blur(12px) saturate(1.15);padding:clamp(4px,calc(var(--ui-w) * .014),7px) clamp(6px,calc(var(--ui-w) * .022),11px);font-size:clamp(11px,calc(var(--ui-w) * .032),14px);border-radius:9px}
+header button.hdr-gear{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:3px;border-radius:50%;color:rgba(255,255,255,.92);line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.85));transition:transform .24s ease,color .18s ease,opacity .18s ease}
+header button.hdr-gear:hover,header button.hdr-gear:active{color:#f2c94c;transform:rotate(28deg) scale(1.06);background:transparent!important}
+header button.hdr-gear:focus-visible{outline:2px solid #f2c94c;outline-offset:2px}
+header button.hdr-gear svg{width:clamp(15px,calc(var(--ui-w) * .042),19px);height:clamp(15px,calc(var(--ui-w) * .042),19px);display:block}
 header button.pr{background:var(--p);border-color:var(--p)}
 header button[hidden]{display:none!important}
 #bShare{display:inline-flex;align-items:center;justify-content:center;width:clamp(28px,calc(var(--ui-w) * .08),36px);height:clamp(28px,calc(var(--ui-w) * .076),34px);padding:0;background:rgba(255,255,255,.12);border-color:rgba(248,233,201,.30);color:#f2c94c}
@@ -233,6 +237,24 @@ header button[hidden]{display:none!important}
 .modal{position:fixed;inset:0;z-index:75;background:rgba(5,5,8,.58);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:10px}
 .modal.on{display:flex}
 .box{background:linear-gradient(160deg,#fffffffa,#faf4e9fa);color:var(--ink);width:min(100%,660px);max-height:92vh;overflow:auto;border-radius:22px;padding:18px;box-shadow:0 30px 80px #000b,inset 0 0 0 1px #fff9;animation:pop .4s cubic-bezier(.2,.9,.3,1.15);user-select:text}
+.box.settings{width:min(100%,430px)}
+.set-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.set-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.set-meta{display:flex;align-items:center;gap:10px;min-width:0}
+.set-ico{width:38px;height:38px;border-radius:12px;background:#faf4e9;border:1px solid var(--line);display:grid;place-items:center;font-size:18px;flex:0 0 auto}
+.set-meta b{display:block;font-size:14.5px;color:var(--ink)}
+.set-meta small{display:block;font-size:12px;color:var(--mut);font-weight:600;margin-top:1px}
+.set-switch{display:inline-flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:#f8f5ef;color:var(--ink);font-weight:800;font-size:12.5px;flex:0 0 auto;transition:background .2s,border-color .2s}
+.set-switch.on{background:#f0fdf4;border-color:#86efac;color:#166534}
+.set-switch-track{position:relative;width:42px;height:24px;border-radius:999px;background:#cbd5e1;transition:background .2s ease;display:inline-block;flex:0 0 auto}
+.set-switch.on .set-switch-track{background:#16a34a}
+.set-switch-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.22);transition:transform .2s cubic-bezier(.22,.85,.35,1)}
+.set-switch.on .set-switch-thumb{transform:translateX(18px)}
+.set-about-card{display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 14px;box-shadow:0 2px 10px rgba(0,0,0,.04);transition:border-color .18s ease,transform .15s ease,box-shadow .18s ease}
+.set-about-card:hover{border-color:var(--p);box-shadow:0 6px 18px rgba(200,16,46,.1);transform:translateY(-1px)}
+.set-about-card:active{transform:scale(.99)}
+.set-about-arrow{font-size:18px;font-weight:900;color:var(--p);flex:0 0 auto}
 @keyframes pop{from{opacity:0;transform:translateY(30px) scale(.92)}}
 .box h3{margin:0 0 10px;font-size:21px}
 .pc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start}
@@ -575,8 +597,11 @@ window.__esdSplashAt = Date.now();
 </script>
 <header>
   <b id="nm"></b>
+  <button type="button" id="bSet" class="hdr-gear" onclick="openSettingsModal()" title="الإعدادات" aria-label="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  <button id="bShare" type="button" onclick="shareStore()" title="مشاركة المتجر" aria-label="مشاركة المتجر"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button>
   <button id="bCat">الأقسام</button>
-  <button id="bOrd">طلباتي</button><button id="bShare" type="button" onclick="shareStore()" title="مشاركة المتجر" aria-label="مشاركة المتجر"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></button><button class="pr" id="bCart" title="عربة التسوق" aria-label="عربة التسوق (0)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6" fill="#fff" stroke="none"/><circle cx="18" cy="20" r="1.6" fill="#fff" stroke="none"/><path d="M2.5 4h2.6l2.3 10.6a1.5 1.5 0 0 0 1.5 1.2h8.9a1.5 1.5 0 0 0 1.5-1.1L21 7.5H6.2"/></svg><span id="cartCnt" class="cart-cnt" hidden>0</span></button>
+  <button id="bOrd">طلباتي</button>
+  <button class="pr" id="bCart" title="عربة التسوق" aria-label="عربة التسوق (0)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6" fill="#fff" stroke="none"/><circle cx="18" cy="20" r="1.6" fill="#fff" stroke="none"/><path d="M2.5 4h2.6l2.3 10.6a1.5 1.5 0 0 0 1.5 1.2h8.9a1.5 1.5 0 0 0 1.5-1.1L21 7.5H6.2"/></svg><span id="cartCnt" class="cart-cnt" hidden>0</span></button>
 </header>
 <div id="toast"></div>
 <div class="modal" id="m"><div class="box" id="mb"></div></div>
@@ -1746,7 +1771,7 @@ const isPortraitView = () => innerHeight >= innerWidth;
 const introSrcForView = () => isPortraitView() ? VIDEO_PORT_SRC : VIDEO_LAND_SRC;
 const MUSIC_VOL = 0.16;        // موسيقى الخلفية داخل المتجر هادئة (10%)
 const MUSIC_INTRO_VOL = 0.10;  // الموسيقى مع فيديو الدخلة بمستوى هادئ (10%)
-let entered = false, musicOn = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
+let entered = false, musicOn = false, musicUserMuted = false, introStarted = false, introTimer = null, musicKickAdded = false, introErrors = 0, musicFadeTimer = null, musicPausedByHide = false, musicShouldPlay = false;
 let sceneReady = false, mediaReady = false, loaderHidden = false, splashDismissed = false;
 let lookHold = 0, camHd = null, camS = 0, prevS = 0, vel = 0, lookT = 0, lookC = 0, btnLook = 0, keyLook = 0, mx = 0, my = 0, mouseIn = false, drag = null, hover = null, hoverSub = -1, lastFrame = 0, curHud = -2, drawn = [];
 let rsRaf = 0;
@@ -2445,6 +2470,7 @@ if (COARSE) {
 function playIntroMusic() { return; /* الموسيقى بعد الفيديو */
   clearInterval(musicFadeTimer);
   musicShouldPlay = true;
+  if (musicUserMuted) { musicEl.muted = true; return; }
   if (document.hidden) { musicPausedByHide = true; return; }
   if (musicOn && !musicEl.paused && !musicEl.muted) {
     musicEl.volume = MUSIC_INTRO_VOL;
@@ -2465,6 +2491,13 @@ function playIntroMusic() { return; /* الموسيقى بعد الفيديو */
 /* بعد الفيديو: نفس الموسيقى تكمل داخل المتجر بنفس المستوى الهادئ (10%) بلا انقطاع */
 function startMusic() {
   musicShouldPlay = true;
+  if (musicUserMuted) {
+    clearInterval(musicFadeTimer);
+    musicEl.muted = true;
+    try { musicEl.pause(); } catch (e) {}
+    musicOn = false;
+    return;
+  }
   if (document.hidden) { musicPausedByHide = true; return; }
   try {
     musicEl.muted = false;
@@ -2476,8 +2509,10 @@ function startMusic() {
 }
 function fadeMusic(to, ms) {
   clearInterval(musicFadeTimer);
+  if (musicUserMuted) return;
   const from = musicEl.volume, t0 = Date.now();
   musicFadeTimer = setInterval(() => {
+    if (musicUserMuted) { clearInterval(musicFadeTimer); return; }
     const k = Math.min(1, (Date.now() - t0) / ms);
     try { musicEl.volume = from + (to - from) * k } catch (e) {}
     if (k >= 1) clearInterval(musicFadeTimer);
@@ -2489,6 +2524,7 @@ function armMusicKick() {
   musicKickAdded = true;
   const evs = ["touchend", "pointerup", "click", "keydown"];
   const kick = () => {
+    if (musicUserMuted) return;
     if (document.hidden) { musicPausedByHide = true; return; }
     if (!introStarted && !entered) return;
     musicShouldPlay = true;
@@ -2514,14 +2550,57 @@ function armMusicKick() {
   evs.forEach(ev => addEventListener(ev, kick, { passive: true }));
 }
 
+function setMusicMuted(mute) {
+  musicUserMuted = !!mute;
+  clearInterval(musicFadeTimer);
+  if (musicUserMuted) {
+    musicPausedByHide = false;
+    musicEl.muted = true;
+    try { musicEl.pause(); } catch (e) {}
+    musicOn = false;
+    hideMediaSession();
+  } else {
+    musicShouldPlay = true;
+    musicPausedByHide = false;
+    try {
+      musicEl.muted = false;
+      musicEl.volume = entered ? MUSIC_VOL : MUSIC_INTRO_VOL;
+      if (entered || introStarted) {
+        const p = musicEl.play();
+        if (p && p.then) p.then(() => { musicOn = true }).catch(() => { musicKickAdded = false; armMusicKick(); });
+        else musicOn = true;
+      }
+    } catch (e) { musicKickAdded = false; armMusicKick(); }
+  }
+  updateMusicToggleUI();
+}
+function toggleBgMusic() {
+  setMusicMuted(!musicUserMuted);
+}
+function updateMusicToggleUI() {
+  const btn = $("musicToggleBtn");
+  const lbl = $("musicToggleLbl");
+  const st = $("musicStateTxt");
+  const ico = $("musicStateIco");
+  const isOn = !musicUserMuted;
+  if (btn) {
+    btn.classList.toggle("on", isOn);
+    btn.setAttribute("aria-checked", isOn ? "true" : "false");
+  }
+  if (lbl) lbl.textContent = isOn ? "تشغيل" : "كتم";
+  if (st) st.textContent = isOn ? "شغّال تلقائياً في الخلفية" : "تم كتم الصوت";
+  if (ico) ico.textContent = isOn ? "🎵" : "🔇";
+}
+
 function pauseMusicForBackground() {
   clearInterval(musicFadeTimer);
-  if (musicShouldPlay) musicPausedByHide = true;
+  if (musicShouldPlay && !musicUserMuted) musicPausedByHide = true;
   hideMediaSession(); // إخفاء بطاقة الوسائط فوراً عند الإيقاف
   if (musicEl.paused) return;
   try { musicEl.pause(); } catch (e) {}
 }
 function resumeMusicForForeground() {
+  if (musicUserMuted) { musicPausedByHide = false; return; }
   if (!musicPausedByHide || document.hidden) return;
   if (!musicEl.paused) { musicPausedByHide = false; return; }
   musicPausedByHide = false;
@@ -2788,6 +2867,39 @@ async function copyStoreUrl() {
   } catch (e) {
     toast("انسخ الرابط من الخانة أعلاه");
   }
+}
+
+/* ---------- إعدادات المتجر ---------- */
+function openSettingsModal() {
+  const isOn = !musicUserMuted;
+  openM(`${X}<h3>الإعدادات</h3>
+  <div class="set-list">
+    <div class="set-card">
+      <div class="set-row">
+        <div class="set-meta">
+          <span class="set-ico" id="musicStateIco" aria-hidden="true">${isOn ? "🎵" : "🔇"}</span>
+          <div>
+            <b>صوت الموسيقى الخلفية</b>
+            <small id="musicStateTxt">${isOn ? "شغّال تلقائياً في الخلفية" : "تم كتم الصوت"}</small>
+          </div>
+        </div>
+        <button type="button" id="musicToggleBtn" class="set-switch${isOn ? " on" : ""}" role="switch" aria-checked="${isOn ? "true" : "false"}" aria-label="التحكم في صوت الموسيقى الخلفية" onclick="toggleBgMusic()">
+          <span class="set-switch-track"><span class="set-switch-thumb"></span></span>
+          <span class="set-switch-lbl" id="musicToggleLbl">${isOn ? "تشغيل" : "كتم"}</span>
+        </button>
+      </div>
+    </div>
+    <a class="set-about-card" href="https://hosam77hasan.github.io/emperor77/" target="_blank" rel="noopener noreferrer">
+      <div class="set-meta">
+        <span class="set-ico" aria-hidden="true">ℹ️</span>
+        <div>
+          <b>من نحن</b>
+          <small>تعرّف على الشركة المطوّرة للمتجر</small>
+        </div>
+      </div>
+      <span class="set-about-arrow" aria-hidden="true">←</span>
+    </a>
+  </div>`, "settings");
 }
 
 /* ---------- السلة ---------- */
