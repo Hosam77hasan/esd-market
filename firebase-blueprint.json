@@ -351,6 +351,36 @@
         }
       },
       "required": ["orderNumber", "customerName", "phone", "address", "payMethod", "payLabel", "items", "subtotal", "discountDeduction", "returnedTotal", "total", "status", "paymentPaid", "notes", "createdAtMs", "createdAt", "updatedAt"]
+    },
+    "SalesLedger": {
+      "title": "SalesLedger",
+      "description": "Compact monthly rolled-up sales ledger preserving historical monthly, yearly, and all-time totals after orders older than 14 days are archived and deleted.",
+      "type": "object",
+      "properties": {
+        "months": {
+          "type": "array",
+          "description": "Bounded list of monthly rolled-up ledger maps (max 120 entries, keyed by YYYY-MM)."
+        },
+        "archivedOrdersCount": {
+          "type": "integer",
+          "description": "Cumulative count of closed orders rolled into the ledger and purged from /orders."
+        },
+        "lastArchivedAtMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds timestamp of the last automatic archive batch."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last ledger roll-up."
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "UID of the authorized admin who performed the roll-up."
+        }
+      },
+      "required": ["months", "archivedOrdersCount", "lastArchivedAtMs", "updatedAt", "updatedBy"]
     }
   },
   "firestore": {
@@ -368,7 +398,7 @@
     },
     "/orders/{orderId}": {
       "schema": { "$ref": "#/entities/Order" },
-      "description": "Customer orders and admin sales/returns ledger; customers may create valid initial orders only, while reading, listing, updating returns/totals, and deleting are strictly restricted to verified admins."
+      "description": "Customer orders and 14-day recent admin sales/returns ledger; customers may create valid initial orders only, while reading, listing, updating returns/totals, and deleting are strictly restricted to verified admins."
     },
     "/admins/{uid}": {
       "schema": { "$ref": "#/entities/AdminUser" },
@@ -380,7 +410,7 @@
     },
     "/store_private/{docId}": {
       "schema": { "$ref": "#/entities/AdminAuthSecret" },
-      "description": "Admin password hash (/store_private/admin_auth); strictly restricted to verified admins."
+      "description": "Admin-only private documents (/store_private/admin_auth and /store_private/sales_ledger); strictly restricted to verified admins."
     }
   }
 }

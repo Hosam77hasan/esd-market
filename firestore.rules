@@ -92,6 +92,37 @@ service cloud.firestore {
         data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
     }
 
+    function isValidLedgerMonth(m) {
+      return m is map &&
+        m.keys().hasAll(['ym', 'totalOrders', 'netSales', 'grossSales', 'returnsVal', 'completedCount', 'completedVal', 'cancelledCount', 'itemsSold', 'codVal', 'vfVal', 'ipVal', 'paidVal', 'unpaidVal']) &&
+        m.keys().hasOnly(['ym', 'totalOrders', 'netSales', 'grossSales', 'returnsVal', 'completedCount', 'completedVal', 'cancelledCount', 'itemsSold', 'codVal', 'vfVal', 'ipVal', 'paidVal', 'unpaidVal']) &&
+        m.ym is string && m.ym.size() == 7 && m.ym.matches('^[0-9]{4}-[0-9]{2}$') &&
+        m.totalOrders is int && m.totalOrders >= 0 &&
+        m.netSales is number && m.netSales >= 0 &&
+        m.grossSales is number && m.grossSales >= 0 &&
+        m.returnsVal is number && m.returnsVal >= 0 &&
+        m.completedCount is int && m.completedCount >= 0 &&
+        m.completedVal is number && m.completedVal >= 0 &&
+        m.cancelledCount is int && m.cancelledCount >= 0 &&
+        m.itemsSold is int && m.itemsSold >= 0 &&
+        m.codVal is number && m.codVal >= 0 &&
+        m.vfVal is number && m.vfVal >= 0 &&
+        m.ipVal is number && m.ipVal >= 0 &&
+        m.paidVal is number && m.paidVal >= 0 &&
+        m.unpaidVal is number && m.unpaidVal >= 0;
+    }
+
+    function isValidSalesLedger(data) {
+      return data.keys().hasAll(['months', 'archivedOrdersCount', 'lastArchivedAtMs', 'updatedAt', 'updatedBy']) &&
+        data.keys().hasOnly(['months', 'archivedOrdersCount', 'lastArchivedAtMs', 'updatedAt', 'updatedBy']) &&
+        data.months is list && data.months.size() <= 120 &&
+        (data.months.size() == 0 || isValidLedgerMonth(data.months[0])) &&
+        data.archivedOrdersCount is int && data.archivedOrdersCount >= 0 &&
+        data.lastArchivedAtMs is int && data.lastArchivedAtMs >= 0 &&
+        data.updatedAt == request.time &&
+        data.updatedBy is string && data.updatedBy == request.auth.uid && data.updatedBy.size() <= 128;
+    }
+
     function isValidProductImage(data) {
       return data.keys().hasAll(['dataUrl', 'mime', 'width', 'height', 'createdAt', 'updatedAt', 'updatedBy']) &&
         data.keys().hasOnly(['dataUrl', 'mime', 'width', 'height', 'createdAt', 'updatedAt', 'updatedBy']) &&
@@ -327,16 +358,20 @@ service cloud.firestore {
         isAdmin();
     }
 
-    // 5. Private Second-Factor Admin Password Hash (/store_private/admin_auth)
+    // 5. Private Admin Secrets & Sales Ledger (/store_private/admin_auth, /store_private/sales_ledger)
     match /store_private/{docId} {
-      allow get: if isVerifiedUser() && isValidId(docId) && docId == 'admin_auth' && isAdmin();
+      allow get: if isVerifiedUser() && isValidId(docId) && (docId == 'admin_auth' || docId == 'sales_ledger') && isAdmin();
       allow list: if false;
-      allow create: if isVerifiedUser() && isValidId(docId) && docId == 'admin_auth' &&
-        isValidAdminAuth(incoming()) && isAdmin();
-      allow update: if isVerifiedUser() && isValidId(docId) && docId == 'admin_auth' &&
-        isValidAdminAuth(incoming()) &&
-        incoming().diff(existing()).affectedKeys().hasOnly(['pinHash', 'updatedAt', 'updatedBy']) &&
-        isAdmin();
+      allow create: if isVerifiedUser() && isValidId(docId) && (
+        (docId == 'admin_auth' && isValidAdminAuth(incoming())) ||
+        (docId == 'sales_ledger' && isValidSalesLedger(incoming()))
+      ) && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(docId) && (
+        (docId == 'admin_auth' && isValidAdminAuth(incoming()) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['pinHash', 'updatedAt', 'updatedBy'])) ||
+        (docId == 'sales_ledger' && isValidSalesLedger(incoming()) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['months', 'archivedOrdersCount', 'lastArchivedAtMs', 'updatedAt', 'updatedBy']))
+      ) && isAdmin();
       allow delete: if false;
     }
   }

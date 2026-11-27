@@ -236,8 +236,9 @@ header button[hidden]{display:none!important}
 }
 .modal{position:fixed;inset:0;z-index:75;background:rgba(5,5,8,.58);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:10px}
 .modal.on{display:flex}
-.box{background:linear-gradient(160deg,#fffffffa,#faf4e9fa);color:var(--ink);width:min(100%,660px);max-height:92vh;overflow:auto;border-radius:22px;padding:18px;box-shadow:0 30px 80px #000b,inset 0 0 0 1px #fff9;animation:pop .4s cubic-bezier(.2,.9,.3,1.15);user-select:text}
+.box{background:linear-gradient(160deg,#fffffffa,#faf4e9fa);color:var(--ink);width:min(100%,660px);max-height:92vh;max-height:calc(var(--fp-h,100dvh) * .93);overflow:auto;border-radius:22px;padding:18px;box-shadow:0 30px 80px #000b,inset 0 0 0 1px #fff9;animation:pop .4s cubic-bezier(.2,.9,.3,1.15);user-select:text}
 .box.settings{width:min(100%,430px)}
+.box.prod-card{width:min(100%,620px);padding:14px 16px}
 .set-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
 .set-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -257,17 +258,35 @@ header button[hidden]{display:none!important}
 .set-about-arrow{font-size:18px;font-weight:900;color:var(--p);flex:0 0 auto}
 @keyframes pop{from{opacity:0;transform:translateY(30px) scale(.92)}}
 .box h3{margin:0 0 10px;font-size:21px}
-.pc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start}
-@media(max-width:520px){.pc{grid-template-columns:1fr}}
-.pimg{aspect-ratio:4/5;border-radius:18px;background:radial-gradient(circle at 50% 35%,#fff,#e9dfcf);display:grid;place-items:center;overflow:hidden;box-shadow:0 14px 30px #0004,inset 0 0 0 1px #fff}
-.pimg img{width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 10px 12px #0005);animation:fl 5s ease-in-out infinite}
-@keyframes fl{50%{transform:translateY(-6px) rotate(-1deg)}}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}.chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.pc-head h3{margin:0;font-size:clamp(16px,4.1vw,20px);line-height:1.25;min-width:0}
+.pc-close{flex:0 0 auto;padding:5px 10px;font-size:12.5px;border-radius:9px;font-weight:700}
+.pc{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.15fr);gap:14px;align-items:start}
+.pc-info{min-width:0}
+.pc-meta{color:var(--mut);font-size:12.5px;line-height:1.45;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.pc-stock{color:#15803d;font-weight:700;font-size:12px}
+.pc-vlabel{margin-top:6px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;color:var(--ink)}
+.pc-vlabel small{color:var(--mut);font-weight:700;font-size:11.5px}
+.pc-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.pc-add{width:100%;padding:11px 14px;font-size:15px}
+.pimg{position:relative;height:clamp(132px,calc(var(--fp-h,100dvh) * .22),200px);border-radius:16px;background:radial-gradient(circle at 50% 35%,#fff,#ece3d4);overflow:hidden;box-shadow:0 8px 20px #0002,inset 0 0 0 1px #fff}
+.pimg-track{display:flex;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;direction:ltr}
+.pimg-track::-webkit-scrollbar{display:none}
+.pimg-slide{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:center;display:grid;place-items:center;padding:6px 28px;cursor:zoom-in}
+.pimg-slide img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 6px 10px #0003);animation:none!important;user-select:none;-webkit-user-drag:none}
+.pimg-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;padding:0;border-radius:50%;border:1px solid #e5ddd0;background:rgba(255,255,255,.9);color:var(--ink);font-size:17px;font-weight:900;line-height:1;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.14)}
+.pimg-arr.prev{left:6px}.pimg-arr.next{right:6px}
+.pimg-badge{position:absolute;bottom:6px;z-index:2;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(29,26,23,.72);color:#fff;backdrop-filter:blur(4px);pointer-events:none;line-height:1.35}
+.pimg-badge.cnt{left:7px;direction:ltr}
+.pimg-badge.zoom{right:7px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin:5px 0 6px}
+.chips button{padding:5px 10px;font-size:12.5px;font-weight:700;border-radius:9px}
+.chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
 input,select{font:inherit;width:100%;padding:9px;margin:4px 0 8px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
-.old{text-decoration:line-through;color:var(--mut);margin-inline-start:6px}.big{font-size:26px;font-weight:800;color:var(--p)}
-.tag{background:var(--p);color:#fff;border-radius:7px;padding:1px 8px;font-size:13px;display:inline-block}
-.sm{width:76px;display:inline-block;margin:0}.cats button{margin:3px}.qty{display:flex;gap:10px;align-items:center;margin-bottom:10px}.qty button{width:40px;height:40px;font-size:20px;padding:0}
+.old{text-decoration:line-through;color:var(--mut);font-size:13.5px}.big{font-size:23px;font-weight:900;color:var(--p)}
+.tag{background:var(--p);color:#fff;border-radius:7px;padding:1px 7px;font-size:12px;display:inline-block}
+.sm{width:76px;display:inline-block;margin:0}.cats button{margin:3px}.qty{display:flex;gap:10px;align-items:center;margin-bottom:8px}.qty button{width:34px;height:34px;font-size:18px;padding:0;border-radius:9px}
 /* ===== ممر التسوق (تمرير + كروت بيضاء) ===== */
 html.lock,html.mlock{overflow-y:hidden}
 html.touch-aisle,html.touch-aisle body{overflow:hidden;height:100%;overscroll-behavior:none}
@@ -333,9 +352,24 @@ body.in #hint.gone{opacity:0;visibility:hidden}
 #bCart.bump{animation:bump .4s ease}
 .crow{gap:10px}.cth{width:46px;height:58px;border-radius:9px;object-fit:contain;background:#f4f1ea;flex:0 0 auto}
 /* ===== معرض صور المنتج ===== */
-.pgal{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
-.pgal img{width:54px;height:68px;object-fit:contain;background:#f4f1ea;border-radius:9px;border:2px solid transparent;cursor:pointer;padding:2px}
+.pgal{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:6px;padding:2px 1px;justify-content:center}
+.pgal::-webkit-scrollbar{display:none}
+.pgal img{flex:0 0 auto;width:38px;height:38px;object-fit:contain;background:#f4f1ea;border-radius:8px;border:2px solid transparent;cursor:pointer;padding:2px}
 .pgal img.on{border-color:var(--p);box-shadow:0 0 0 2px #c8102e22}
+/* ===== عارض تكبير الصور التفاعلي ===== */
+.iz-modal{position:fixed;inset:0;z-index:90;background:rgba(5,6,11,.94);color:#fff;display:flex;flex-direction:column;touch-action:none;user-select:none}
+.iz-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px;z-index:3}
+.iz-pill{font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;direction:ltr;font-variant-numeric:tabular-nums}
+.iz-close{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.14);color:#fff;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:800}
+.iz-stage{position:relative;flex:1;min-height:0;display:grid;place-items:center;overflow:hidden;touch-action:none;padding:8px}
+.iz-stage img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none;transition:transform .12s ease-out}
+.iz-stage.dragging img{transition:none}
+.iz-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:38px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(20,22,30,.72);color:#fff;font-size:22px;font-weight:900;display:grid;place-items:center}
+.iz-arr.prev{left:10px}.iz-arr.next{right:10px}
+.iz-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px calc(12px + env(safe-area-inset-bottom,0px));z-index:3}
+.iz-bar button{min-width:40px;height:38px;padding:0 12px;border-radius:11px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.13);color:#fff;font-size:16px;font-weight:800}
+.iz-bar button:disabled{opacity:.35;cursor:default}
+.iz-hint{text-align:center;font-size:11px;color:rgba(255,255,255,.68);padding-bottom:6px;pointer-events:none}
 /* ===== لوحة الإدارة ===== */
 .box.admin{width:min(100%,980px);background:linear-gradient(160deg,#fbf7effa,#f4ecdefa)}
 .box.editor{width:min(100%,820px)}
@@ -343,8 +377,12 @@ body.in #hint.gone{opacity:0;visibility:hidden}
 .adm-head-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
 .adm-head b{font-size:22px;display:block}.adm-head small{color:var(--mut);font-weight:700}
 .adm-tabs{display:flex;gap:6px;overflow:auto;padding:3px 0 10px;scrollbar-width:thin}
-.adm-tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px}
+.adm-tab{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px}
 .adm-tab.on{background:var(--p);border-color:var(--p);color:#fff;box-shadow:0 6px 16px #c8102e2e}
+.adm-tab-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--p);color:#fff;font-size:11.5px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.adm-tab-badge.zero{background:#e5ddd0;color:var(--mut)}
+.adm-tab.on .adm-tab-badge{background:#fff;color:var(--p)}
+.adm-tab.on .adm-tab-badge.zero{background:rgba(255,255,255,.28);color:#fff}
 .adm-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .adm-stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
 .adm-stat b{display:block;font-size:24px;color:var(--p);line-height:1.1}.adm-stat span{font-size:12px;color:var(--mut);font-weight:700}
@@ -421,16 +459,43 @@ body.in #hint.gone{opacity:0;visibility:hidden}
 .sales-pay-item{background:#fbf7ef;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
 .sales-pay-item small{display:block;font-size:11px;color:var(--mut);font-weight:700}
 .sales-pay-item b{display:block;font-size:14.5px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:1px}
-.sales-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:8px;transition:border-color .15s ease}
-.sales-card:hover{border-color:#c8102e55}
-.sales-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.sales-cname{font-weight:800;font-size:15px;color:var(--ink)}
-.sales-cmeta{font-size:12px;color:var(--mut);font-weight:700;margin-top:3px;line-height:1.55;font-variant-numeric:tabular-nums}
-.sales-amt{text-align:left;flex:0 0 auto;font-variant-numeric:tabular-nums}
-.sales-amt b{display:block;font-size:17px;font-weight:900;color:var(--p);white-space:nowrap}
-.sales-amt del{display:block;font-size:11.5px;color:var(--mut);font-weight:700}
-.sales-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid #f0e8da;font-size:12px}
-.sales-st{font-weight:800;padding:3px 8px;border-radius:7px;font-size:11.5px}
+.ord-list{display:flex;flex-direction:column;gap:8px}
+.ord-card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .15s ease,box-shadow .15s ease}
+.ord-card:hover{border-color:#c8102e55}
+.ord-card.open{border-color:#c8102e77;box-shadow:0 5px 16px rgba(0,0,0,.06)}
+.ord-card-head{width:100%;display:flex;flex-direction:column;gap:5px;padding:10px 12px;background:transparent;border:0;border-radius:0;text-align:right;cursor:pointer;color:var(--ink);font:inherit}
+.ord-card-row1,.ord-card-row2{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
+.ord-card-title{min-width:0;flex:1;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ord-cname{font-weight:800;font-size:14.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.ord-num{font-size:12px;font-weight:700;color:var(--mut);direction:ltr;unicode-bidi:bidi-override;white-space:nowrap}
+.ord-card-side{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.ord-price{text-align:left;font-variant-numeric:tabular-nums;line-height:1.15}
+.ord-price b{display:block;font-size:15.5px;font-weight:900;color:var(--p);white-space:nowrap}
+.ord-price del{display:block;font-size:11px;color:var(--mut);font-weight:700}
+.ord-chev{font-size:16px;font-weight:900;color:var(--mut);display:inline-block;line-height:1;transition:transform .2s ease,color .2s ease}
+.ord-card.open .ord-chev{transform:rotate(180deg);color:var(--p)}
+.ord-meta-mini{font-size:11.5px;color:var(--mut);font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ord-card-body{display:none;padding:8px 12px 12px;border-top:1px solid #f0e8da;background:#fdfbf7}
+.ord-card.open .ord-card-body{display:block}
+.ord-lines{display:flex;flex-direction:column;gap:4px}
+.ord-line{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font-size:12.5px;line-height:1.5;padding:4px 0;border-bottom:1px dashed #ece2d1}
+.ord-line:last-child{border-bottom:0}
+.ord-line-k{color:var(--mut);font-weight:700;flex:0 0 auto;white-space:nowrap}
+.ord-line-v{color:var(--ink);font-weight:700;text-align:left;word-break:break-word;min-width:0}
+.ord-items-box{background:#fff;border:1px solid var(--line);border-radius:11px;padding:7px 9px;margin-top:7px}
+.ord-items-hdr{font-size:11.5px;font-weight:800;color:var(--mut);margin-bottom:4px}
+.ord-item-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;padding:4px 0;border-bottom:1px solid #f4eee4}
+.ord-item-row:last-child{border-bottom:0}
+.ord-actions{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+.ord-st-btns{display:flex;gap:6px;flex-wrap:wrap}
+.ord-st-btn{flex:1;min-width:92px;padding:8px 9px;font-size:12px;font-weight:800;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.ord-st-btn.cur{background:#fffbeb;border-color:#d97706;color:#92400e}
+.ord-st-btn.deliver{background:#16a34a;border-color:#15803d;color:#fff}
+.ord-st-btn.deliver:hover{background:#15803d}
+.ord-sub-actions{display:flex;gap:6px;flex-wrap:wrap}
+.ord-wa-btn{flex:1;min-width:120px;text-align:center;padding:8px 10px;font-size:12px;font-weight:800;border-radius:10px;border:1px solid #16a34a;color:#166534;background:#f0fdf4;text-decoration:none;white-space:nowrap}
+.ord-det-btn{flex:1;min-width:120px;padding:8px 10px;font-size:12px;font-weight:800;border-radius:10px}
+.sales-st{font-weight:800;padding:3px 8px;border-radius:7px;font-size:11.5px;white-space:nowrap;display:inline-block}
 .sales-st-done{background:#f0fdf4;color:#15803d}
 .sales-st-pend{background:#fffbeb;color:#b45309}
 .sales-st-ret{background:#fff7ed;color:#c2410c}
@@ -461,6 +526,9 @@ body.in #hint.gone{opacity:0;visibility:hidden}
   .sales-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:520px){
+  .box.prod-card{padding:11px 12px;border-radius:18px}
+  .pc{grid-template-columns:1fr;gap:8px}
+  .pimg{height:clamp(124px,calc(var(--fp-h,100dvh) * .20),176px)}
   .adm-tabs{flex-wrap:wrap;overflow:visible}
   .adm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .adm-prod{grid-template-columns:56px minmax(0,1fr);}.adm-thumb{width:56px;height:70px}
@@ -470,6 +538,30 @@ body.in #hint.gone{opacity:0;visibility:hidden}
   .adm-actions{justify-content:flex-start}
   .sales-item-row{grid-template-columns:1fr}
 }
+/* ===== تثبيت الوضع الرأسي الصارم على الهواتف حتى عند إمالة الجهاز ===== */
+html.force-port,html.force-port body{overflow:hidden;width:100vw;height:100vh}
+html.force-port body{position:fixed;top:0;left:0;width:var(--fp-w,100dvh);height:var(--fp-h,100dvw);transform-origin:0 0;transform:translateY(var(--fp-w,100dvh)) rotate(-90deg);margin:0}
+html.force-port.force-port-cw body{transform:translateX(var(--fp-h,100dvw)) rotate(90deg)}
+html.force-port #stick,html.force-port #scene,html.force-port #videoIntro{height:var(--fp-h,100dvw)!important;max-height:var(--fp-h,100dvw)!important}
+html.force-port #landing .cta{width:min(calc(var(--fp-w,100dvh) - 24px),460px)}
+html.force-port #landing .land-notice{width:min(calc(var(--fp-w,100dvh) - 24px),540px)}
+html.force-port #landing .install-wrap{max-width:calc(var(--fp-w,100dvh) - 24px)}
+html.force-port #toast{width:min(calc(var(--fp-w,100dvh) - 24px),420px);max-width:calc(var(--fp-w,100dvh) - 24px)}
+html.force-port #rail{display:none}
+html.force-port .box.prod-card{padding:11px 12px;border-radius:18px}
+html.force-port .pc{grid-template-columns:1fr;gap:8px}
+html.force-port .pimg{height:clamp(124px,calc(var(--fp-h,100dvw) * .20),176px)}
+html.force-port .sales-4grid,html.force-port .sales-pay-strip,html.force-port .sales-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+html.force-port .adm-tabs{flex-wrap:wrap;overflow:visible}
+html.force-port .adm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+html.force-port .adm-prod{grid-template-columns:56px minmax(0,1fr)}
+html.force-port .adm-thumb{width:56px;height:70px}
+html.force-port .adm-prod .adm-side{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+html.force-port .adm-form-grid{grid-template-columns:1fr}
+html.force-port .adm-cat{grid-template-columns:40px minmax(0,1fr) 40px}
+html.force-port .adm-cat .adm-cat-count{grid-column:2/4}
+html.force-port .adm-actions{justify-content:flex-start}
+html.force-port .sales-item-row{grid-template-columns:1fr}
 </style>
 </head>
 <body>
@@ -605,6 +697,28 @@ window.__esdSplashAt = Date.now();
 </header>
 <div id="toast"></div>
 <div class="modal" id="m"><div class="box" id="mb"></div></div>
+<div id="imgZoom" class="iz-modal" hidden role="dialog" aria-modal="true" aria-label="معاينة الصورة">
+  <div class="iz-top">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span id="izCnt" class="iz-pill">1 / 1</span>
+      <span id="izScale" class="iz-pill">100%</span>
+    </div>
+    <button type="button" class="iz-close" onclick="closeImgZoom()">إغلاق ✕</button>
+  </div>
+  <div class="iz-stage" id="izStage">
+    <button type="button" class="iz-arr prev" id="izPrev" onclick="zoomNav(-1)" aria-label="الصورة السابقة">‹</button>
+    <img id="izImg" alt="" draggable="false">
+    <button type="button" class="iz-arr next" id="izNext" onclick="zoomNav(1)" aria-label="الصورة التالية">›</button>
+  </div>
+  <div class="iz-bar">
+    <button type="button" id="izBtnPrev" onclick="zoomNav(-1)" aria-label="الصورة السابقة">‹</button>
+    <button type="button" id="izBtnOut" onclick="zoomStep(-0.5)" aria-label="تصغير">−</button>
+    <button type="button" id="izBtnReset" onclick="zoomSet(1)" aria-label="الحجم الطبيعي">1×</button>
+    <button type="button" id="izBtnIn" onclick="zoomStep(0.5)" aria-label="تكبير">＋</button>
+    <button type="button" id="izBtnNext" onclick="zoomNav(1)" aria-label="الصورة التالية">›</button>
+  </div>
+  <div class="iz-hint">اسحب للتنقل بين الصور • اضغط مرتين أو باعد بأصابعك للتكبير</div>
+</div>
 <script>
 /* =====================================================================
    config.js — إعدادات المتجر
@@ -762,6 +876,15 @@ const hasDisc = p => discOff(p) > .0001;
 const discLabel = p => p.discType === "amount" ? "-" + Math.round(discOff(p)) + " " + CONFIG.CURRENCY : "-" + Math.round(+p.disc || 0) + "%";
 const eff = p => Math.max(0, Math.round(((+p.price || 0) - discOff(p)) * 100) / 100);
 const vr = p => (p.sizes && p.sizes.length ? p.sizes : getSizes(p.cat));
+const varLabelOf = p => {
+  if (p && (p.varLabel === "الوزن" || p.varLabel === "الحجم" || p.varLabel === "الحجم / الوزن")) return p.varLabel;
+  const list = vr(p || {});
+  const hasWt = list.some(s => /(?:^|\s|\d)(?:جم|كجم|كيلو|جرام|mg|g|kg)(?:\s|$)/i.test(String(s || "")));
+  const hasSz = list.some(s => /(?:مل|لتر|صغير|وسط|كبير|عبوة|ml|l)(?:\s|$)/i.test(String(s || "")));
+  if (hasWt && hasSz) return "الحجم / الوزن";
+  if (hasWt) return "الوزن";
+  return "الحجم";
+};
 const mul = (p, i) => (vr(p).length == 3 ? MUL[i] : 1);
 const rawOf = (p, i) => {
   const sp = Array.isArray(p.sizePrices) ? +p.sizePrices[i] : 0;
@@ -1044,6 +1167,11 @@ function prefetchFbImgs() {
       idx += 6;
     }
   })();
+}
+function prefetchImgList(arr) {
+  (Array.isArray(arr) ? arr : []).forEach(u => {
+    if (typeof u === "string" && u.startsWith("fbimg://") && !FB_IMG_MEM.has(u)) fetchFbImg(u);
+  });
 }
 function getImg(src) {
   let e = imgCache.get(src);
@@ -1767,7 +1895,51 @@ const musicEl = $("bgMusic");
 const landingEl = $("landing");
 const VIDEO_LAND_SRC = "esd_market_hypermarket_transition.mp4";
 const VIDEO_PORT_SRC = "esd_market_hypermarket_transition_portrait.mp4";
-const isPortraitView = () => innerHeight >= innerWidth;
+function isMobileTouchDevice() {
+  if (!COARSE) return false;
+  const minDim = Math.min(screen.width || innerWidth, screen.height || innerHeight);
+  const maxDim = Math.max(screen.width || innerWidth, screen.height || innerHeight);
+  return minDim <= 760 || maxDim <= 960;
+}
+function shouldForcePortrait() {
+  if (!isMobileTouchDevice()) return false;
+  if (innerWidth <= innerHeight) return false;
+  const so = (screen.orientation && screen.orientation.type) || "";
+  if (so.startsWith("landscape")) return true;
+  const ae = document.activeElement;
+  const typing = ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName || "");
+  if (so.startsWith("portrait") && typing) return false;
+  if (typing && !so) return false;
+  return true;
+}
+function syncPortraitMode() {
+  const fp = shouldForcePortrait();
+  const root = document.documentElement;
+  const soType = (screen.orientation && screen.orientation.type) || "";
+  const cw = fp && (soType === "landscape-secondary" || window.orientation === -90);
+  root.classList.toggle("force-port", fp);
+  root.classList.toggle("force-port-cw", fp && cw);
+  if (fp) {
+    root.style.setProperty("--fp-w", innerHeight + "px");
+    root.style.setProperty("--fp-h", innerWidth + "px");
+    root.style.setProperty("--ui-w", Math.min(innerHeight, 480) + "px");
+  } else {
+    root.style.removeProperty("--fp-w");
+    root.style.removeProperty("--fp-h");
+    root.style.setProperty("--ui-w", Math.min(innerWidth, 480) + "px");
+  }
+  return fp;
+}
+function clientToLocal(cx0, cy0) {
+  const root = document.documentElement;
+  if (!root.classList.contains("force-port")) return { x: cx0, y: cy0 };
+  if (root.classList.contains("force-port-cw")) return { x: cy0, y: innerWidth - cx0 };
+  return { x: innerHeight - cy0, y: cx0 };
+}
+function rectCenterLocal(r) {
+  return clientToLocal(r.left + r.width / 2, r.top + r.height / 2);
+}
+const isPortraitView = () => shouldForcePortrait() || innerHeight >= innerWidth;
 const introSrcForView = () => isPortraitView() ? VIDEO_PORT_SRC : VIDEO_LAND_SRC;
 const MUSIC_VOL = 0.16;        // موسيقى الخلفية داخل المتجر هادئة (10%)
 const MUSIC_INTRO_VOL = 0.10;  // الموسيقى مع فيديو الدخلة بمستوى هادئ (10%)
@@ -1777,10 +1949,15 @@ let lookHold = 0, camHd = null, camS = 0, prevS = 0, vel = 0, lookT = 0, lookC =
 let rsRaf = 0;
 function rsNow() {
   rsRaf = 0;
+  const fp = syncPortraitMode();
   const ndpr = Math.min(devicePixelRatio || 1, COARSE ? 1.5 : 2);
-  const nW = cv.clientWidth || innerWidth, nH = cv.clientHeight || innerHeight;
+  const nW = fp ? innerHeight : (cv.clientWidth || innerWidth);
+  const nH = fp ? innerWidth : (cv.clientHeight || innerHeight);
   const bw = Math.round(nW * ndpr), bh = Math.round(nH * ndpr);
-  if (bw === cv.width && bh === cv.height && nW === W && nH === H) return;
+  if (bw === cv.width && bh === cv.height && nW === W && nH === H) {
+    sizeScene();
+    return;
+  }
   DPR = ndpr; W = nW; H = nH;
   cv.width = bw; cv.height = bh; cx.setTransform(DPR, 0, 0, DPR, 0, 0);
   port = nH >= nW;
@@ -1800,8 +1977,10 @@ function rs() {
   if (!rsRaf) rsRaf = requestAnimationFrame(rsNow);
 }
 function sizeScene() {
-  if (COARSE && entered) { scene.style.height = "100svh"; return; }
-  scene.style.height = Math.round((cv.clientHeight || innerHeight) + CAMMAX * PXU) + "px";
+  const fp = document.documentElement.classList.contains("force-port");
+  if (COARSE && entered) { scene.style.height = fp ? (innerWidth + "px") : "100svh"; return; }
+  const vh = fp ? innerWidth : (cv.clientHeight || innerHeight);
+  scene.style.height = Math.round(vh + CAMMAX * PXU) + "px";
 }
 
 const OBJFAR = 1950, NC = 6, TILE = 120;
@@ -2210,19 +2389,21 @@ cv.addEventListener("pointerdown", e => {
   dismissHint(); cancelNav(); touchVelY = 0;
   try { cv.setPointerCapture(e.pointerId); } catch (err) {}
   const nowT = performance.now();
-  drag = { x: e.clientX, y: e.clientY, prevX: e.clientX, prevY: e.clientY, prevT: nowT, samples: [], look: lookT, moved: false, startedX: false, startedY: false, axis: "", id: e.pointerId, ptr: e.pointerType };
+  const pt = clientToLocal(e.clientX, e.clientY);
+  drag = { x: pt.x, y: pt.y, prevX: pt.x, prevY: pt.y, prevT: nowT, samples: [], look: lookT, moved: false, startedX: false, startedY: false, axis: "", id: e.pointerId, ptr: e.pointerType };
 });
 cv.addEventListener("pointermove", e => {
-  mx = e.clientX; my = e.clientY; mouseIn = e.pointerType === "mouse";
+  const pt = clientToLocal(e.clientX, e.clientY);
+  mx = pt.x; my = pt.y; mouseIn = e.pointerType === "mouse";
   if (drag && e.pointerId === drag.id) {
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    const stepX = e.clientX - drag.prevX, rawStepY = e.clientY - drag.prevY;
-    drag.prevX = e.clientX;
+    const dx = pt.x - drag.x, dy = pt.y - drag.y;
+    const stepX = pt.x - drag.prevX, rawStepY = pt.y - drag.prevY;
+    drag.prevX = pt.x;
     if (!drag.startedX && (Math.abs(dx) > 6 || (Math.abs(stepX) > 3 && Math.abs(stepX) > Math.abs(rawStepY) * 1.15))) {
       drag.startedX = true; drag.moved = true;
     }
     if (!drag.startedY && (Math.abs(dy) > 6 || (Math.abs(rawStepY) > 3 && Math.abs(rawStepY) > Math.abs(stepX) * 1.15))) {
-      drag.startedY = true; drag.moved = true; drag.prevY = e.clientY; drag.prevT = performance.now();
+      drag.startedY = true; drag.moved = true; drag.prevY = pt.y; drag.prevT = performance.now();
     }
     if (drag.startedX) {
       drag.axis = drag.startedY ? "xy" : "x";
@@ -2234,7 +2415,7 @@ cv.addEventListener("pointermove", e => {
       if (!drag.startedX) drag.axis = "y";
       const nowT = performance.now();
       const stepY = clamp(rawStepY, -54, 54);
-      drag.prevY = e.clientY; drag.prevT = nowT;
+      drag.prevY = pt.y; drag.prevT = nowT;
       if (stepY) {
         const mult = drag.ptr === "mouse" ? 1.5 : (IS_IOS ? 0.88 : 1.42);
         const delta = -stepY * mult;
@@ -2264,7 +2445,8 @@ cv.addEventListener("pointerup", e => {
   try { if (cv.hasPointerCapture && cv.hasPointerCapture(e.pointerId)) cv.releasePointerCapture(e.pointerId); } catch (err) {}
   touchVelY = computeTouchReleaseVel(d, performance.now());
   if (!d || d.moved || !entered || mm.classList.contains("on")) return;
-  const o = hitAt(e.clientX, e.clientY); if (o) activate(o, e.clientX, e.clientY);
+  const pt = clientToLocal(e.clientX, e.clientY);
+  const o = hitAt(pt.x, pt.y); if (o) activate(o, pt.x, pt.y);
 });
 cv.addEventListener("pointercancel", () => {
   drag = null; touchVelY = 0;
@@ -2369,11 +2551,13 @@ function lockPortraitOrientation() {
 }
 function handleOrientationSync() {
   lockPortraitOrientation();
-  rs();
-  setTimeout(() => { lockPortraitOrientation(); rs(); }, 120);
+  rsNow();
+  setTimeout(() => { lockPortraitOrientation(); rsNow(); }, 90);
 }
 addEventListener("resize", rs);
 addEventListener("orientationchange", handleOrientationSync);
+addEventListener("focusin", () => { if (COARSE) setTimeout(rsNow, 60); });
+addEventListener("focusout", () => { if (COARSE) setTimeout(rsNow, 120); });
 try {
   if (screen.orientation && screen.orientation.addEventListener) {
     screen.orientation.addEventListener("change", handleOrientationSync);
@@ -2672,7 +2856,12 @@ function closeM() {
   if (wasAdminView && ADMIN) setAdmin(false, true);
 }
 mm.addEventListener("click", e => { if (e.target == mm) closeM() });
-addEventListener("keydown", e => { if (e.key == "Escape") closeM() });
+addEventListener("keydown", e => {
+  if (e.key == "Escape") {
+    if ($("imgZoom") && !$("imgZoom").hidden) { closeImgZoom(); return; }
+    closeM();
+  }
+});
 const X = '<button onclick="closeM()" style="float:left">إغلاق ✕</button>';
 
 /* صورة المنتج: المرفوعة أو رسمة تلقائية */
@@ -2683,8 +2872,8 @@ function prodImg(p) {
   const c = document.createElement("canvas"); c.width = 360; c.height = 450; drawArt(c.getContext("2d"), 0, 0, 360, 450, p);
   return artCache[k] = c.toDataURL("image/jpeg", .8);
 }
-const extraImgs = p => Array.isArray(p.imgs) ? p.imgs.filter(Boolean) : [];
-const galleryOf = p => { const a = [p.img, ...extraImgs(p)].filter(Boolean); return a.length ? a : [prodImg(p)]; };
+const extraImgs = p => Array.isArray(p.imgs) ? p.imgs.filter(Boolean).slice(0, 7) : [];
+const galleryOf = p => { const a = [p.img, ...extraImgs(p)].filter(Boolean).slice(0, 8); return a.length ? a : [prodImg(p)]; };
 function upd() {
   const n = cnt(), b = $("bCart"), c = $("cartCnt");
   if (c) { c.textContent = n; c.hidden = n <= 0; }
@@ -2698,45 +2887,234 @@ upd();
 
 /* ---------- المنتج ---------- */
 let sel = null;
-function openProduct(p, fromSecIdx) { sel = { p, vi: vr(p).length == 3 ? 1 : 0, q: 1, gi: 0, imgs: galleryOf(p), fromSecIdx: fromSecIdx == null ? null : fromSecIdx }; cardH() }
+function openProduct(p, fromSecIdx) {
+  const imgs = galleryOf(p);
+  prefetchImgList(imgs);
+  const hasCustomSP = Array.isArray(p.sizePrices) && p.sizePrices.some(v => +v > 0);
+  const initVi = (!hasCustomSP && vr(p).length === 3) ? 1 : 0;
+  sel = { p, vi: initVi, q: 1, gi: 0, imgs, fromSecIdx: fromSecIdx == null ? null : fromSecIdx };
+  cardH();
+}
 function openProductById(id, fromSecIdx) { const p = P.find(x => x.id == id); if (p) openProduct(p, fromSecIdx); }
-function cardH() {
+function updateCardGalUI() {
+  if (!sel) return;
+  const cntEl = $("pimgCnt");
+  if (cntEl) cntEl.textContent = (sel.gi + 1) + " / " + sel.imgs.length;
+  document.querySelectorAll(".pgal img").forEach((el, k) => el.classList.toggle("on", k === sel.gi));
+  const slides = document.querySelectorAll("#pimgTrack .pimg-slide img");
+  slides.forEach((im, k) => { if (k === sel.gi) im.id = "pimgEl"; else if (im.id === "pimgEl") im.removeAttribute("id"); });
+}
+function cardInfoHtml() {
   const { p, vi, q } = sel, sz = vr(p);
   const finalUnit = unit(p, vi), rawUnit = rawOf(p, vi), saveAmt = Math.max(0, Math.round((rawUnit - finalUnit) * 100) / 100), off = saveAmt > 0;
-  const rawImg = sel.imgs[sel.gi] || "";
-  const img = rawImg ? imgSrcOf(rawImg) : prodImg(p);
   const backSec = sel.fromSecIdx != null ? SECS[sel.fromSecIdx] : null;
-  openM(`${X}<div class="pc"><div><div class="pimg"><img id="pimgEl" src="${esc(img)}"${fbImgAttr(rawImg)} alt="${esc(p.name)}"></div>
-   ${sel.imgs.length > 1 ? `<div class="pgal">${sel.imgs.map((src, i) => `<img class="${i == sel.gi ? "on" : ""}" src="${esc(imgSrcOf(src))}"${fbImgAttr(src)} alt="" onclick="pickImg(${i})">`).join("")}</div>` : ""}</div><div>
-   <h3>${esc(p.name)}</h3><div style="color:var(--mut)">${esc(CATS[p.cat] || "")} · العبوة: ${esc(p.pack)}</div>
-   <div style="font-size:12px;color:#15803d;font-weight:700;margin-top:4px">${p.stock ? "✔ متوفر الآن بالمخزن • توصيل سريع لباب البيت" : ""}</div>
-   <div style="margin-top:10px;font-weight:700">الحجم</div><div class="chips">${sz.map((s, i) => `<button class="${i == vi ? "on" : ""}" onclick="pickV(${i})">${esc(s)}</button>`).join("")}</div>
-   <div><span class="big">${money(finalUnit)}</span>${off ? `<span class="old">${money(rawUnit)}</span> <span class="tag">${esc(discLabel(p))} · وفّر ${money(saveAmt)}</span>` : ""}</div><br>
-   ${p.stock ? `<div class="qty"><button onclick="qtyCh(-1)">−</button><b style="font-size:20px;min-width:28px;text-align:center">${q}</b><button onclick="qtyCh(1)">+</button><span style="margin-inline-start:auto">${money(Math.round(finalUnit * q * 100) / 100)}</span></div>
-   <button class="pr" style="width:100%;padding:13px" onclick="addSel()">أضف إلى السلة 🛒</button>` : `<p class="tag" style="padding:10px;font-size:15px">هذا المنتج غير متاح حالياً (خلص من المخزون)</p>`}
-   ${backSec ? `<button style="width:100%;margin-top:8px;border-color:#84cc16;color:#365314;background:#f7fee7;font-weight:800" onclick="openSectionOffers(SECS[${backSec.idx}])">🔥 عرض كل عروض ${esc(backSec.name)}</button>` : ""}
-   ${ADMIN ? `<button style="width:100%;margin-top:8px" onclick="adm()">⚙ إدارة المنتجات</button>` : ""}</div></div>`);
+  return `<div class="pc-meta"><span>${esc(CATS[p.cat] || "")} · ${esc(p.pack)}</span>${p.stock ? `<span class="pc-stock">✔ متوفر الآن</span>` : ""}</div>
+    <div class="pc-vlabel">${esc(varLabelOf(p))}${sz.length > 1 ? `<small>(${sz.length} خيارات)</small>` : ""}</div>
+    <div class="chips">${sz.map((s, i) => `<button type="button" class="${i == vi ? "on" : ""}" onclick="pickV(${i})">${esc(s)}</button>`).join("")}</div>
+    <div class="pc-price"><span class="big">${money(finalUnit)}</span>${off ? `<span class="old">${money(rawUnit)}</span> <span class="tag">${esc(discLabel(p))} · وفّر ${money(saveAmt)}</span>` : ""}</div>
+    ${p.stock ? `<div class="qty"><button type="button" onclick="qtyCh(-1)">−</button><b style="font-size:18px;min-width:26px;text-align:center">${q}</b><button type="button" onclick="qtyCh(1)">+</button><span style="margin-inline-start:auto;font-weight:800">${money(Math.round(finalUnit * q * 100) / 100)}</span></div>
+    <button type="button" class="pr pc-add" onclick="addSel()">أضف إلى السلة 🛒</button>` : `<p class="tag" style="padding:10px;font-size:14px">هذا المنتج غير متاح حالياً (خلص من المخزون)</p>`}
+    ${backSec ? `<button type="button" style="width:100%;margin-top:7px;padding:7px 10px;font-size:12.5px;border-color:#84cc16;color:#365314;background:#f7fee7;font-weight:800" onclick="openSectionOffers(SECS[${backSec.idx}])">🔥 عرض كل عروض ${esc(backSec.name)}</button>` : ""}
+    ${ADMIN ? `<button type="button" style="width:100%;margin-top:7px;padding:7px 10px;font-size:12.5px" onclick="adm()">⚙ إدارة المنتجات</button>` : ""}`;
 }
-function pickV(i) { sel.vi = i; cardH() }
+function cardH() {
+  const { p } = sel;
+  const multiImg = sel.imgs.length > 1;
+  const slidesHtml = sel.imgs.map((raw, i) => {
+    const src = raw ? imgSrcOf(raw) : prodImg(p);
+    return `<div class="pimg-slide" data-slide-idx="${i}" title="اضغط للتكبير"><img${i === sel.gi ? ' id="pimgEl"' : ""} src="${esc(src)}"${fbImgAttr(raw)} alt="${esc(p.name)}"></div>`;
+  }).join("");
+  openM(`<div class="pc-head"><h3>${esc(p.name)}</h3><button type="button" class="pc-close" onclick="closeM()">إغلاق ✕</button></div>
+    <div class="pc"><div>
+      <div class="pimg">
+        <div class="pimg-track" id="pimgTrack">${slidesHtml}</div>
+        ${multiImg ? `<button type="button" class="pimg-arr prev" onclick="stepImg(-1)" aria-label="الصورة السابقة">‹</button><button type="button" class="pimg-arr next" onclick="stepImg(1)" aria-label="الصورة التالية">›</button>` : ""}
+        ${multiImg ? `<span class="pimg-badge cnt" id="pimgCnt">${sel.gi + 1} / ${sel.imgs.length}</span>` : ""}
+        <span class="pimg-badge zoom" onclick="openImgZoom(sel?sel.gi:0)" style="pointer-events:auto;cursor:pointer">🔍 تكبير</span>
+      </div>
+      ${multiImg ? `<div class="pgal">${sel.imgs.map((src, i) => `<img class="${i == sel.gi ? "on" : ""}" src="${esc(imgSrcOf(src))}"${fbImgAttr(src)} alt="" onclick="pickImg(${i})">`).join("")}</div>` : ""}
+    </div><div class="pc-info" id="pcInfo">${cardInfoHtml()}</div></div>`, "prod-card");
+  const tr = $("pimgTrack");
+  if (tr) {
+    if (sel.gi > 0 && tr.clientWidth > 0) tr.scrollLeft = sel.gi * tr.clientWidth;
+    let scTimer = 0, downX = 0, downY = 0, downSL = 0;
+    tr.addEventListener("pointerdown", e => { downX = e.clientX; downY = e.clientY; downSL = tr.scrollLeft; }, { passive: true });
+    tr.addEventListener("click", e => {
+      const slide = e.target && e.target.closest ? e.target.closest(".pimg-slide") : null;
+      if (!slide) return;
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 10 || Math.abs(tr.scrollLeft - downSL) > 8) return;
+      const idx = +(slide.getAttribute("data-slide-idx") || 0);
+      openImgZoom(idx);
+    });
+    tr.addEventListener("scroll", () => {
+      clearTimeout(scTimer);
+      scTimer = setTimeout(() => {
+        if (!sel || !tr.clientWidth) return;
+        const ni = clamp(Math.round(tr.scrollLeft / tr.clientWidth), 0, sel.imgs.length - 1);
+        if (ni !== sel.gi) { sel.gi = ni; updateCardGalUI(); }
+      }, 40);
+    }, { passive: true });
+  }
+}
+function refreshCardInfo() {
+  const info = $("pcInfo");
+  if (info && sel) info.innerHTML = cardInfoHtml();
+  else if (sel) cardH();
+}
+function pickV(i) { sel.vi = i; refreshCardInfo(); }
 function pickImg(i) {
   if (!sel || !sel.imgs[i]) return;
   sel.gi = i;
-  const rawImg = sel.imgs[i];
-  const im = $("pimgEl");
-  if (im) {
-    if (String(rawImg).startsWith("fbimg://")) im.setAttribute("data-fbimg", rawImg);
-    else im.removeAttribute("data-fbimg");
-    im.src = imgSrcOf(rawImg);
-  }
-  document.querySelectorAll(".pgal img").forEach((el, k) => el.classList.toggle("on", k === i));
+  const tr = $("pimgTrack");
+  if (tr && tr.clientWidth > 0) tr.scrollTo({ left: i * tr.clientWidth, behavior: "smooth" });
+  updateCardGalUI();
 }
-function qtyCh(d) { sel.q = Math.max(1, Math.min(20, sel.q + d)); cardH() }
+function stepImg(d) {
+  if (!sel || sel.imgs.length < 2) return;
+  const ni = (sel.gi + d + sel.imgs.length) % sel.imgs.length;
+  pickImg(ni);
+}
+/* ---------- عارض تكبير الصور التفاعلي ---------- */
+const iz = { open: false, idx: 0, scale: 1, x: 0, y: 0, ptrs: new Map(), pinchD: 0, pinchS: 1, dragMoved: false, swipeX: 0, swipeY: 0, lastTap: 0 };
+function izApplyTransform(dragging) {
+  const st = $("izStage"), im = $("izImg"), sc = $("izScale");
+  if (!im) return;
+  if (st) st.classList.toggle("dragging", !!dragging);
+  if (iz.scale <= 1.01) { iz.x = 0; iz.y = 0; }
+  else {
+    const bw = (st ? st.clientWidth : 320) * (iz.scale - 1) * 0.55;
+    const bh = (st ? st.clientHeight : 320) * (iz.scale - 1) * 0.55;
+    iz.x = clamp(iz.x, -bw, bw);
+    iz.y = clamp(iz.y, -bh, bh);
+  }
+  im.style.transform = `translate3d(${iz.x.toFixed(1)}px,${iz.y.toFixed(1)}px,0) scale(${iz.scale.toFixed(3)})`;
+  if (sc) sc.textContent = Math.round(iz.scale * 100) + "%";
+  const outB = $("izBtnOut"), inB = $("izBtnIn"), rstB = $("izBtnReset");
+  if (outB) outB.disabled = iz.scale <= 1.01;
+  if (inB) inB.disabled = iz.scale >= 3.99;
+  if (rstB) rstB.disabled = iz.scale <= 1.01 && Math.abs(iz.x) < 1 && Math.abs(iz.y) < 1;
+}
+function izRenderImage() {
+  if (!sel || !sel.imgs.length) return;
+  iz.idx = clamp(iz.idx, 0, sel.imgs.length - 1);
+  const raw = sel.imgs[iz.idx] || "";
+  const im = $("izImg");
+  if (im) {
+    if (String(raw).startsWith("fbimg://")) im.setAttribute("data-fbimg", raw);
+    else im.removeAttribute("data-fbimg");
+    im.src = raw ? imgSrcOf(raw) : prodImg(sel.p);
+    im.alt = sel.p ? sel.p.name : "";
+  }
+  const multi = sel.imgs.length > 1;
+  const cntEl = $("izCnt"); if (cntEl) cntEl.textContent = (iz.idx + 1) + " / " + sel.imgs.length;
+  ["izPrev", "izNext", "izBtnPrev", "izBtnNext"].forEach(id => { const el = $(id); if (el) el.hidden = !multi; });
+  iz.scale = 1; iz.x = 0; iz.y = 0;
+  izApplyTransform(false);
+}
+function openImgZoom(idx) {
+  if (!sel || !sel.imgs.length) return;
+  const modal = $("imgZoom"); if (!modal) return;
+  iz.open = true;
+  iz.idx = typeof idx === "number" ? clamp(idx, 0, sel.imgs.length - 1) : (sel.gi || 0);
+  iz.ptrs.clear();
+  modal.hidden = false;
+  izRenderImage();
+}
+function closeImgZoom() {
+  const modal = $("imgZoom");
+  iz.open = false;
+  iz.ptrs.clear();
+  if (modal) modal.hidden = true;
+}
+function zoomSet(s) { iz.scale = clamp(s, 1, 4); izApplyTransform(false); }
+function zoomStep(d) { zoomSet(Math.round((iz.scale + d) * 10) / 10); }
+function zoomNav(d) {
+  if (!sel || sel.imgs.length < 2) return;
+  iz.idx = (iz.idx + d + sel.imgs.length) % sel.imgs.length;
+  sel.gi = iz.idx;
+  const tr = $("pimgTrack");
+  if (tr && tr.clientWidth > 0) tr.scrollLeft = sel.gi * tr.clientWidth;
+  updateCardGalUI();
+  izRenderImage();
+}
+(() => {
+  const st = $("izStage"); if (!st) return;
+  st.addEventListener("pointerdown", e => {
+    if (!iz.open || (e.target && e.target.closest && e.target.closest("button"))) return;
+    try { st.setPointerCapture(e.pointerId); } catch (err) {}
+    const pt = clientToLocal(e.clientX, e.clientY);
+    iz.ptrs.set(e.pointerId, pt);
+    iz.dragMoved = false;
+    if (iz.ptrs.size === 1) {
+      iz.swipeX = pt.x; iz.swipeY = pt.y;
+    } else if (iz.ptrs.size === 2) {
+      const [a, b] = [...iz.ptrs.values()];
+      iz.pinchD = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      iz.pinchS = iz.scale;
+    }
+  });
+  st.addEventListener("pointermove", e => {
+    if (!iz.open || !iz.ptrs.has(e.pointerId)) return;
+    const pt = clientToLocal(e.clientX, e.clientY);
+    const prev = iz.ptrs.get(e.pointerId);
+    iz.ptrs.set(e.pointerId, pt);
+    if (iz.ptrs.size >= 2) {
+      const [a, b] = [...iz.ptrs.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      if (iz.pinchD > 0) {
+        iz.scale = clamp(iz.pinchS * (d / iz.pinchD), 1, 4);
+        iz.dragMoved = true;
+        izApplyTransform(true);
+      }
+      return;
+    }
+    const dx = pt.x - prev.x, dy = pt.y - prev.y;
+    if (Math.hypot(pt.x - iz.swipeX, pt.y - iz.swipeY) > 6) iz.dragMoved = true;
+    if (iz.scale > 1.02) {
+      iz.x += dx; iz.y += dy;
+      izApplyTransform(true);
+    }
+  });
+  const endPtr = e => {
+    if (!iz.ptrs.has(e.pointerId)) return;
+    const last = iz.ptrs.get(e.pointerId);
+    iz.ptrs.delete(e.pointerId);
+    try { if (st.hasPointerCapture && st.hasPointerCapture(e.pointerId)) st.releasePointerCapture(e.pointerId); } catch (err) {}
+    if (iz.ptrs.size < 2) iz.pinchD = 0;
+    if (iz.ptrs.size === 0) {
+      const dx = last.x - iz.swipeX, dy = last.y - iz.swipeY;
+      if (iz.scale <= 1.02 && Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        zoomNav(dx < 0 ? 1 : -1);
+        return;
+      }
+      if (!iz.dragMoved) {
+        const now = performance.now();
+        if (now - iz.lastTap < 300) {
+          iz.lastTap = 0;
+          zoomSet(iz.scale > 1.2 ? 1 : 2.4);
+        } else {
+          iz.lastTap = now;
+        }
+      } else {
+        izApplyTransform(false);
+      }
+    }
+  };
+  st.addEventListener("pointerup", endPtr);
+  st.addEventListener("pointercancel", endPtr);
+  st.addEventListener("wheel", e => {
+    if (!iz.open) return;
+    e.preventDefault();
+    zoomSet(iz.scale + (e.deltaY < 0 ? 0.3 : -0.3));
+  }, { passive: false });
+})();
+function qtyCh(d) { sel.q = Math.max(1, Math.min(20, sel.q + d)); refreshCardInfo(); }
 function flyToCart(srcEl, src) {
   if (RM) return;
   try {
-    const r = srcEl.getBoundingClientRect(), t = $("bCart").getBoundingClientRect(), f = document.createElement("img");
-    f.src = src; f.className = "fly"; f.style.left = r.left + r.width / 2 - 28 + "px"; f.style.top = r.top + r.height / 2 - 35 + "px"; document.body.appendChild(f);
-    requestAnimationFrame(() => requestAnimationFrame(() => { f.style.transform = `translate(${t.left + t.width / 2 - (r.left + r.width / 2)}px,${t.top + t.height / 2 - (r.top + r.height / 2)}px) scale(.25)`; f.style.opacity = .1 }));
+    const r = rectCenterLocal(srcEl.getBoundingClientRect()), t = rectCenterLocal($("bCart").getBoundingClientRect()), f = document.createElement("img");
+    f.src = src; f.className = "fly"; f.style.left = r.x - 28 + "px"; f.style.top = r.y - 35 + "px"; document.body.appendChild(f);
+    requestAnimationFrame(() => requestAnimationFrame(() => { f.style.transform = `translate(${t.x - r.x}px,${t.y - r.y}px) scale(.25)`; f.style.opacity = .1 }));
     setTimeout(() => f.remove(), 900);
   } catch (e) {}
 }
@@ -2751,7 +3129,10 @@ function add(id, vi) { const k = id + "|" + (vi == null ? 1 : vi); cart[k] = (ca
 $("bCat").onclick = () => openM(`${X}<h3>الأقسام</h3><div class="cats">${SECS.map((s, i) => `<button onclick="goCat(${i})" style="border-inline-start:4px solid ${accOf(s.ci)}">${s.e} ${esc(s.name)} <small style="color:var(--mut)">(${s.items.length})</small></button>`).join("")}</div>`);
 function goCat(i) { closeM(); jumpSec(i) }
 function goProd(id) { closeM(); const o = OBJS.find(o => o.p && o.p.id == id); if (o) jumpS(o.s - 470) }
-const vi1 = p => (vr(p).length == 3 ? 1 : 0);
+const vi1 = p => {
+  const hasCustomSP = Array.isArray(p && p.sizePrices) && p.sizePrices.some(v => +v > 0);
+  return (!hasCustomSP && vr(p).length === 3) ? 1 : 0;
+};
 function openSectionOffers(sec, highlightCamp) {
   if (!sec) return;
   const rawCamps = campaignsOfSec(sec);
@@ -3241,6 +3622,10 @@ const ADM_TABS = {
 let contactDraft = null;
 let CLOUD_ORDERS = [];
 let CLOUD_ORDERS_LOADED = false;
+const ORDER_RETENTION_DAYS = 14;
+let SALES_LEDGER = load("_sales_ledger", { months: [], archivedOrdersCount: 0, lastArchivedAtMs: 0 });
+let SALES_LEDGER_LOADED = false;
+let __archiveRunning = false;
 let salesPeriod = "all";
 let salesStatusFilter = "all";
 let salesPayFilter = "all";
@@ -3248,6 +3633,7 @@ let salesSearch = "";
 let salesEditDraft = null;
 let salesEditOrigStatus = 0;
 let salesEditAutoWa = true;
+let expandedOrderIds = new Set();
 let admLoginState = { step: "loading", email: "", uid: "", hasPin: true, err: "" };
 function isAllowedImgUrl(u) {
   const s = String(u || "").trim();
@@ -3275,6 +3661,8 @@ function sanitizeCatalogStateForLocal(j) {
       img,
       imgs
     };
+    if (p.varLabel === "الوزن" || p.varLabel === "الحجم" || p.varLabel === "الحجم / الوزن") next.varLabel = p.varLabel;
+    else delete next.varLabel;
     if (sizePrices) next.sizePrices = sizePrices;
     else delete next.sizePrices;
     return next;
@@ -3476,6 +3864,7 @@ function adm(tab) {
   if (window.__esdFb && typeof window.__esdFb.startOrdersRealtimeSync === "function") {
     window.__esdFb.startOrdersRealtimeSync();
   }
+  maybeAutoArchiveOldOrders();
   if (typeof tab === "string" && ADM_TABS[tab]) {
     if ((admTab === "contact" || admTab === "notice") && (tab === "contact" || tab === "notice")) {
       syncContactInputsIntoDraft();
@@ -3487,6 +3876,7 @@ function adm(tab) {
   }
   const offers = P.filter(hasDisc).length;
   const allOrders = getAdminOrders();
+  const activeOrdersCount = getActiveOrdersCount(allOrders);
   const body = admTab === "categories" ? admCategories() :
     admTab === "offers" ? admOffers() :
     admTab === "sales" ? admSales() :
@@ -3496,12 +3886,12 @@ function adm(tab) {
     admTab === "publish" ? admPublish() : admProducts();
   openM(`<div class="adm">
     <div class="adm-head"><div><b>لوحة الإدارة</b><small>${esc(CONFIG.STORE_NAME)} · تحكم ومزامنة فورية للجميع</small></div><div class="adm-head-actions"><button type="button" onclick="closeM()">← العودة للمتجر</button><button type="button" onclick="logoutAdminAll()" style="color:#c8102e;border-color:#c8102e44">تسجيل خروج الإدارة</button></div></div>
-    <div class="adm-tabs">${Object.keys(ADM_TABS).map(k => `<button class="adm-tab ${admTab === k ? "on" : ""}" onclick="adm('${k}')">${ADM_TABS[k]}</button>`).join("")}</div>
+    <div class="adm-tabs">${Object.keys(ADM_TABS).map(k => `<button class="adm-tab ${admTab === k ? "on" : ""}" onclick="adm('${k}')">${ADM_TABS[k]}${k === "orders" ? `<span id="admOrdersBadge" class="adm-tab-badge ${activeOrdersCount ? "" : "zero"}">${activeOrdersCount}</span>` : ""}</button>`).join("")}</div>
     <div class="adm-stats">
       <div class="adm-stat"><b>${CATS.length}</b><span>قسم</span></div>
       <div class="adm-stat"><b>${P.length}</b><span>منتج</span></div>
       <div class="adm-stat"><b>${offers}</b><span>عرض نشط</span></div>
-      <div class="adm-stat"><b>${allOrders.length}</b><span>طلب مسجل</span></div>
+      <div class="adm-stat"><b id="admOrdersStatNum">${activeOrdersCount}</b><span>طلب وارد</span></div>
     </div>
     ${body}
   </div>`, "admin");
@@ -3762,6 +4152,45 @@ function fmtOrderDate(ms) {
     return new Date(ms).toLocaleString("ar-EG");
   }
 }
+function ymOfMs(ms) {
+  const d = new Date(Number(ms) || Date.now());
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
+function getRetentionCutoffMs() {
+  return Date.now() - ORDER_RETENTION_DAYS * 86400000;
+}
+function normalizeSalesLedger(raw) {
+  const r = raw && typeof raw === "object" ? raw : {};
+  const r2 = n => Math.max(0, Math.round((Number(n) || 0) * 100) / 100);
+  const i0 = n => Math.max(0, Math.round(Number(n) || 0));
+  const months = (Array.isArray(r.months) ? r.months : []).map(m => {
+    const x = m && typeof m === "object" ? m : {};
+    const ym = String(x.ym || "").trim();
+    if (!/^[0-9]{4}-[0-9]{2}$/.test(ym)) return null;
+    return {
+      ym,
+      totalOrders: i0(x.totalOrders),
+      netSales: r2(x.netSales),
+      grossSales: r2(x.grossSales),
+      returnsVal: r2(x.returnsVal),
+      completedCount: i0(x.completedCount),
+      completedVal: r2(x.completedVal),
+      cancelledCount: i0(x.cancelledCount),
+      itemsSold: i0(x.itemsSold),
+      codVal: r2(x.codVal),
+      vfVal: r2(x.vfVal),
+      ipVal: r2(x.ipVal),
+      paidVal: r2(x.paidVal),
+      unpaidVal: r2(x.unpaidVal)
+    };
+  }).filter(Boolean).sort((a, b) => a.ym.localeCompare(b.ym)).slice(-120);
+  return {
+    months,
+    archivedOrdersCount: i0(r.archivedOrdersCount),
+    lastArchivedAtMs: i0(r.lastArchivedAtMs)
+  };
+}
+SALES_LEDGER = normalizeSalesLedger(SALES_LEDGER);
 function getPeriodRange(periodKey) {
   const now = new Date();
   if (periodKey === "day") {
@@ -3769,6 +4198,9 @@ function getPeriodRange(periodKey) {
   }
   if (periodKey === "week") {
     return Date.now() - 7 * 86400000;
+  }
+  if (periodKey === "14d") {
+    return getRetentionCutoffMs();
   }
   if (periodKey === "month") {
     return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
@@ -3826,14 +4258,72 @@ function orderStatusClass(st) {
   if (st === 5) return "sales-st sales-st-can";
   return "sales-st sales-st-pend";
 }
+function isActiveOrderStatus(st) {
+  return st === 0 || st === 1 || st === 2;
+}
+function isClosedSaleOrder(o) {
+  return !!o && (o.status === 3 || o.status === 4 || o.status === 5);
+}
+function getActiveOrdersCount(all) {
+  return (all || getAdminOrders()).filter(o => isActiveOrderStatus(o.status)).length;
+}
+function toggleOrderCard(docId) {
+  if (!docId) return;
+  const wasOpen = expandedOrderIds.has(docId);
+  if (wasOpen) expandedOrderIds.delete(docId);
+  else expandedOrderIds.add(docId);
+  document.querySelectorAll(".ord-card[data-doc-id]").forEach(el => {
+    if (el.getAttribute("data-doc-id") === docId) {
+      el.classList.toggle("open", !wasOpen);
+      const btn = el.querySelector(".ord-card-head");
+      if (btn) btn.setAttribute("aria-expanded", String(!wasOpen));
+    }
+  });
+}
+function calcSalesPeriodStats(salesAll, periodKey) {
+  const since = getPeriodRange(periodKey);
+  const liveStats = calcSalesStats(salesAll.filter(o => o.createdAtMs >= since));
+  const ledger = normalizeSalesLedger(SALES_LEDGER);
+  const now = new Date();
+  const curYm = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
+  const curYearPrefix = String(now.getFullYear()) + "-";
+  let matchingMonths = [];
+  if (periodKey === "month") {
+    matchingMonths = ledger.months.filter(m => m.ym === curYm);
+  } else if (periodKey === "year") {
+    matchingMonths = ledger.months.filter(m => m.ym.startsWith(curYearPrefix));
+  } else if (periodKey === "all") {
+    matchingMonths = ledger.months;
+  }
+  if (!matchingMonths.length) return liveStats;
+  const r2 = n => Math.round(n * 100) / 100;
+  const merged = { ...liveStats };
+  matchingMonths.forEach(m => {
+    merged.totalOrders += m.totalOrders;
+    merged.netSales = r2(merged.netSales + m.netSales);
+    merged.grossSales = r2(merged.grossSales + m.grossSales);
+    merged.returnsVal = r2(merged.returnsVal + m.returnsVal);
+    merged.completedCount += m.completedCount;
+    merged.completedVal = r2(merged.completedVal + m.completedVal);
+    merged.cancelledCount += m.cancelledCount;
+    merged.itemsSold += m.itemsSold;
+    merged.codVal = r2(merged.codVal + m.codVal);
+    merged.vfVal = r2(merged.vfVal + m.vfVal);
+    merged.ipVal = r2(merged.ipVal + m.ipVal);
+    merged.paidVal = r2(merged.paidVal + m.paidVal);
+    merged.unpaidVal = r2(merged.unpaidVal + m.unpaidVal);
+  });
+  return merged;
+}
 function getSalesFiltered(all) {
-  const since = getPeriodRange(salesPeriod);
-  const inPeriod = all.filter(o => o.createdAtMs >= since);
-  const stStats = calcSalesStats(inPeriod);
+  const salesBase = all.filter(isClosedSaleOrder);
+  const cutoff14d = getRetentionCutoffMs();
+  const sinceList = Math.max(getPeriodRange(salesPeriod), cutoff14d);
+  const inPeriod = salesBase.filter(o => o.createdAtMs >= sinceList);
+  const stStats = calcSalesPeriodStats(salesBase, salesPeriod);
   const q = salesSearch.trim().toLowerCase();
   const filtered = inPeriod.filter(o => {
     if (salesStatusFilter === "done" && o.status !== 3 && o.status !== 4) return false;
-    if (salesStatusFilter === "pending" && (o.status !== 0 && o.status !== 1 && o.status !== 2)) return false;
     if (salesStatusFilter !== "all" && salesStatusFilter !== "done" && salesStatusFilter !== "pending" && o.status !== +salesStatusFilter) return false;
     if (salesPayFilter !== "all" && o.payMethod !== salesPayFilter) return false;
     if (q) {
@@ -3842,77 +4332,158 @@ function getSalesFiltered(all) {
     }
     return true;
   });
-  return { inPeriod, stStats, filtered };
+  return { salesBase, inPeriod, stStats, filtered };
+}
+async function maybeAutoArchiveOldOrders() {
+  if (!ADMIN || __archiveRunning || salesEditDraft || !CLOUD_ORDERS_LOADED) return;
+  const fb = window.__esdFb;
+  if (!fb || typeof fb.archiveAgedOrdersInCloud !== "function") return;
+  const st = typeof fb.getStatus === "function" ? fb.getStatus() : {};
+  if (!st.userEmail) return;
+  const cutoffMs = getRetentionCutoffMs();
+  const aged = getAdminOrders().filter(o => o.isCloud && isClosedSaleOrder(o) && o.createdAtMs > 0 && o.createdAtMs < cutoffMs);
+  if (!aged.length) return;
+  __archiveRunning = true;
+  try {
+    const res = await fb.archiveAgedOrdersInCloud(aged, cutoffMs);
+    if (res && res.ledger) {
+      SALES_LEDGER = normalizeSalesLedger(res.ledger);
+      SALES_LEDGER_LOADED = true;
+      save("_sales_ledger", SALES_LEDGER);
+    }
+    const delIds = new Set(Array.isArray(res && res.deletedIds) ? res.deletedIds : []);
+    if (delIds.size) {
+      CLOUD_ORDERS = CLOUD_ORDERS.filter(x => !delIds.has(x.docId));
+      orders = orders.filter(x => !delIds.has(x.docId));
+      save("_o", orders);
+      delIds.forEach(id => expandedOrderIds.delete(id));
+      toast(`تم ترحيل ${delIds.size} عملية أقدم من ${ORDER_RETENTION_DAYS} يوماً إلى الإجماليات ✔`);
+      if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft && (admTab === "sales" || admTab === "orders")) {
+        adm(admTab);
+      }
+    }
+  } catch (e) {
+    console.warn("Auto-archive skipped:", e && e.message ? e.message : e);
+  } finally {
+    __archiveRunning = false;
+  }
+}
+function renderCompactOrderCard(o, mode) {
+  const isOpen = expandedOrderIds.has(o.docId);
+  const qtySum = o.items.reduce((s, it) => s + Math.max(0, it.qty - it.returnedQty), 0);
+  const waUrl = buildCustomerStatusWaUrl(o);
+  const telHref = o.phone ? "tel:" + String(o.phone).replace(/[^0-9+]/g, "") : "";
+  const payBadge = o.paymentPaid
+    ? `<span class="sales-st sales-st-done">تم التحصيل ✔</span>`
+    : `<span class="sales-st sales-st-pend">لم يُحصّل بعد</span>`;
+  const itemsHtml = o.items.map(it => {
+    const netQ = Math.max(0, it.qty - it.returnedQty);
+    const lineSum = Math.round(it.price * netQ * 100) / 100;
+    return `<div class="ord-item-row">
+      <span style="min-width:0;flex:1">${esc(it.name)} × <b>${it.qty}</b>${it.returnedQty > 0 ? ` <small style="color:#c2410c;font-weight:800">(مرتجع ${it.returnedQty})</small>` : ""}</span>
+      <b style="white-space:nowrap;font-variant-numeric:tabular-nums">${money(lineSum)}</b>
+    </div>`;
+  }).join("") || `<div class="ord-meta-mini">لا توجد أصناف مسجلة.</div>`;
+  const actionsHtml = mode === "orders"
+    ? `<div class="ord-st-btns">
+        <button type="button" class="ord-st-btn ${o.status === 1 ? "cur" : ""}" onclick="event.stopPropagation();quickUpdateOrderStatus('${esc(o.docId)}', 1)">📦 جاري التجهيز</button>
+        <button type="button" class="ord-st-btn ${o.status === 2 ? "cur" : ""}" onclick="event.stopPropagation();quickUpdateOrderStatus('${esc(o.docId)}', 2)">🚚 خرج للتوصيل</button>
+        <button type="button" class="ord-st-btn deliver" onclick="event.stopPropagation();quickUpdateOrderStatus('${esc(o.docId)}', 3)">✅ تم التسليم</button>
+      </div>
+      <div class="ord-sub-actions">
+        ${waUrl ? `<a href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="ord-wa-btn">💬 واتساب (${esc(ST[o.status] || ST[0])})</a>` : ""}
+        <button type="button" class="ord-det-btn" onclick="event.stopPropagation();openOrderDetail('${esc(o.docId)}')">تفاصيل / تعديل / مرتجع</button>
+      </div>`
+    : `<div class="ord-sub-actions">
+        ${waUrl ? `<a href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="ord-wa-btn">💬 واتساب (${esc(ST[o.status] || ST[0])})</a>` : ""}
+        <button type="button" class="pr ord-det-btn" onclick="event.stopPropagation();openOrderDetail('${esc(o.docId)}')">تفاصيل ومرتجع / تعديل</button>
+      </div>`;
+  return `<div class="ord-card ${isOpen ? "open" : ""}" data-doc-id="${esc(o.docId)}">
+    <button type="button" class="ord-card-head" aria-expanded="${isOpen ? "true" : "false"}" onclick="toggleOrderCard('${esc(o.docId)}')">
+      <div class="ord-card-row1">
+        <div class="ord-card-title">
+          <span class="ord-cname">${esc(o.customerName)}</span>
+          <span class="ord-num">${esc(o.orderNumber)}</span>
+        </div>
+        <div class="ord-card-side">
+          <span class="ord-price"><b>${money(o.total)}</b>${o.returnedTotal > 0 ? `<del>${money(o.subtotal)}</del>` : ""}</span>
+          <span class="ord-chev" aria-hidden="true">⌄</span>
+        </div>
+      </div>
+      <div class="ord-card-row2">
+        <span class="ord-meta-mini">${o.items.length} صنف (${qtySum} قطعة) · ${esc(fmtOrderDate(o.createdAtMs))}</span>
+        <span class="${orderStatusClass(o.status)}">${esc(ST[o.status] || ST[0])}</span>
+      </div>
+    </button>
+    <div class="ord-card-body">
+      <div class="ord-lines">
+        <div class="ord-line"><span class="ord-line-k">الهاتف</span><span class="ord-line-v">${telHref ? `<a href="${esc(telHref)}" dir="ltr" onclick="event.stopPropagation()" style="color:var(--p);text-decoration:none;font-weight:800">${esc(o.phone)}</a>` : "—"}</span></div>
+        <div class="ord-line"><span class="ord-line-k">العنوان</span><span class="ord-line-v">${esc(o.address || "—")}</span></div>
+        <div class="ord-line"><span class="ord-line-k">الدفع</span><span class="ord-line-v">${esc(o.payLabel)} · ${payBadge}</span></div>
+        <div class="ord-line"><span class="ord-line-k">التاريخ</span><span class="ord-line-v">${esc(fmtOrderDate(o.createdAtMs))}</span></div>
+        ${o.returnedTotal > 0 ? `<div class="ord-line"><span class="ord-line-k">المرتجع / الخصم</span><span class="ord-line-v" style="color:#c2410c">− ${money(o.returnedTotal)} (الأصلي: ${money(o.subtotal)})</span></div>` : ""}
+        ${o.notes ? `<div class="ord-line"><span class="ord-line-k">ملاحظات</span><span class="ord-line-v">${esc(o.notes)}</span></div>` : ""}
+      </div>
+      <div class="ord-items-box">
+        <div class="ord-items-hdr">الأصناف (${o.items.length} صنف · ${qtySum} قطعة صافية)</div>
+        ${itemsHtml}
+      </div>
+      <div class="ord-actions">${actionsHtml}</div>
+    </div>
+  </div>`;
 }
 function renderSalesCardsHtml(filtered) {
-  return filtered.map(o => {
-    const qtySum = o.items.reduce((s, it) => s + Math.max(0, it.qty - it.returnedQty), 0);
-    return `<div class="sales-card" style="cursor:pointer" onclick="openOrderDetail('${esc(o.docId)}')">
-      <div class="sales-card-top">
-        <div style="min-width:0">
-          <div class="sales-cname">${esc(o.customerName)} · <span style="color:var(--mut);font-weight:700;font-size:13px">${esc(o.orderNumber)}</span></div>
-          <div class="sales-cmeta">
-            الهاتف: <span dir="ltr">${esc(o.phone || "—")}</span> · ${esc(fmtOrderDate(o.createdAtMs))}<br>
-            العنوان: ${esc(o.address || "—")}<br>
-            الدفع: <b>${esc(o.payLabel)}</b> (${o.paymentPaid ? "تم التحصيل ✔" : "لم يُحصّل بعد"}) · ${o.items.length} صنف (${qtySum} قطعة)
-            ${o.returnedTotal > 0 ? `<br><span style="color:#c2410c">مرتجع / خصم: −${money(o.returnedTotal)}</span>` : ""}
-            ${o.notes ? `<br><span style="color:var(--ink)">ملاحظة: ${esc(o.notes)}</span>` : ""}
-          </div>
-        </div>
-        <div class="sales-amt">
-          <b>${money(o.total)}</b>
-          ${o.returnedTotal > 0 ? `<del>${money(o.subtotal)}</del>` : ""}
-        </div>
-      </div>
-      <div class="sales-card-foot">
-        <span class="${orderStatusClass(o.status)}">${esc(ST[o.status] || ST[0])}</span>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${buildCustomerStatusWaUrl(o) ? `<a href="${esc(buildCustomerStatusWaUrl(o))}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="padding:6px 10px;font-size:12px;font-weight:800;border-radius:10px;border:1px solid #16a34a;color:#166534;background:#f0fdf4;text-decoration:none">💬 واتساب (${esc(ST[o.status] || ST[0])})</a>` : ""}
-          <button type="button" class="pr" style="padding:6px 12px;font-size:12.5px" onclick="event.stopPropagation();openOrderDetail('${esc(o.docId)}')">تفاصيل ومرتجع / تعديل</button>
-        </div>
-      </div>
-    </div>`;
-  }).join("") || `<p style="color:var(--mut);text-align:center;padding:18px">لا توجد عمليات بيع مطابقة للبحث أو الفترة المحددة.</p>`;
+  return filtered.map(o => renderCompactOrderCard(o, "sales")).join("") || `<div class="adm-card" style="text-align:center;color:var(--mut);padding:18px">لا توجد عمليات مبيعات مطابقة للبحث أو الفترة المحددة.</div>`;
 }
 function refreshSalesListOnly() {
   const all = getAdminOrders();
-  const { filtered } = getSalesFiltered(all);
+  const { inPeriod, filtered } = getSalesFiltered(all);
   const box = $("salesListBox");
   const cnt = $("salesCountLbl");
   const shown = $("salesShownVal");
   if (box) box.innerHTML = renderSalesCardsHtml(filtered);
-  if (cnt) cnt.textContent = `${filtered.length} من ${all.length}`;
+  if (cnt) cnt.textContent = `${filtered.length} من ${inPeriod.length}`;
   if (shown) shown.textContent = `${filtered.length} عملية`;
 }
 function admSales() {
   const all = getAdminOrders();
+  const salesAll = all.filter(isClosedSaleOrder);
+  const activeOrders = all.filter(o => isActiveOrderStatus(o.status));
+  const activeVal = Math.round(activeOrders.reduce((s, o) => s + o.total, 0) * 100) / 100;
   const periods = [
     ["day", "اليوم"],
     ["week", "هذا الأسبوع"],
+    ["14d", "آخر 14 يوم"],
     ["month", "هذا الشهر"],
     ["year", "هذه السنة"],
     ["all", "الإجمالي الكلي"]
   ];
-  const dayStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("day")));
-  const weekStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("week")));
-  const monthStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("month")));
-  const yearStats = calcSalesStats(all.filter(o => o.createdAtMs >= getPeriodRange("year")));
-  const { stStats, filtered } = getSalesFiltered(all);
+  const dayStats = calcSalesPeriodStats(salesAll, "day");
+  const weekStats = calcSalesPeriodStats(salesAll, "week");
+  const monthStats = calcSalesPeriodStats(salesAll, "month");
+  const yearStats = calcSalesPeriodStats(salesAll, "year");
+  const { inPeriod, stStats, filtered } = getSalesFiltered(all);
+  const deliveredCnt = inPeriod.filter(o => o.status === 3).length;
+  const partRetCnt = inPeriod.filter(o => o.status === 4).length;
+  const archivedCnt = (SALES_LEDGER && SALES_LEDGER.archivedOrdersCount) || 0;
+  const listScopeHint = (salesPeriod === "month" || salesPeriod === "year" || salesPeriod === "all")
+    ? `الأرقام بالأعلى شاملة إجمالي الفترة بالكامل${archivedCnt > 0 ? ` (تشمل ${archivedCnt} عملية مؤرشفة)` : ""} — أما السجل بالأسفل فيعرض آخر ${ORDER_RETENTION_DAYS} يوماً فقط.`
+    : `يعرض السجل تلقائياً عمليات آخر ${ORDER_RETENTION_DAYS} يوماً فقط؛ وما يمر عليه ${ORDER_RETENTION_DAYS} يوماً يُحفظ إجماليه وتُحذف تفاصيله تلقائياً لتخفيف قاعدة البيانات.`;
 
   return `
   <div class="sales-tabs" role="tablist" aria-label="فترة المبيعات">
     ${periods.map(([k, lbl]) => `<button type="button" class="sales-ptab ${salesPeriod === k ? "on" : ""}" onclick="salesPeriod='${k}';adm('sales')">${lbl}</button>`).join("")}
   </div>
   <div class="sales-4grid">
-    <button type="button" class="sales-pcard ${salesPeriod === "day" ? "on" : ""}" onclick="salesPeriod='day';adm('sales')"><span class="sp-lbl">مبيعات اليوم</span><span class="sp-val">${money(dayStats.netSales)}</span><span class="sp-sub">${dayStats.totalOrders} طلب</span></button>
-    <button type="button" class="sales-pcard ${salesPeriod === "week" ? "on" : ""}" onclick="salesPeriod='week';adm('sales')"><span class="sp-lbl">مبيعات الأسبوع</span><span class="sp-val">${money(weekStats.netSales)}</span><span class="sp-sub">${weekStats.totalOrders} طلب</span></button>
-    <button type="button" class="sales-pcard ${salesPeriod === "month" ? "on" : ""}" onclick="salesPeriod='month';adm('sales')"><span class="sp-lbl">مبيعات الشهر</span><span class="sp-val">${money(monthStats.netSales)}</span><span class="sp-sub">${monthStats.totalOrders} طلب</span></button>
-    <button type="button" class="sales-pcard ${salesPeriod === "year" ? "on" : ""}" onclick="salesPeriod='year';adm('sales')"><span class="sp-lbl">مبيعات السنة</span><span class="sp-val">${money(yearStats.netSales)}</span><span class="sp-sub">${yearStats.totalOrders} طلب</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "day" ? "on" : ""}" onclick="salesPeriod='day';adm('sales')"><span class="sp-lbl">مبيعات اليوم</span><span class="sp-val">${money(dayStats.netSales)}</span><span class="sp-sub">${dayStats.totalOrders} عملية</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "week" ? "on" : ""}" onclick="salesPeriod='week';adm('sales')"><span class="sp-lbl">مبيعات الأسبوع</span><span class="sp-val">${money(weekStats.netSales)}</span><span class="sp-sub">${weekStats.totalOrders} عملية</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "month" ? "on" : ""}" onclick="salesPeriod='month';adm('sales')"><span class="sp-lbl">مبيعات الشهر</span><span class="sp-val">${money(monthStats.netSales)}</span><span class="sp-sub">${monthStats.totalOrders} عملية</span></button>
+    <button type="button" class="sales-pcard ${salesPeriod === "year" ? "on" : ""}" onclick="salesPeriod='year';adm('sales')"><span class="sp-lbl">مبيعات السنة</span><span class="sp-val">${money(yearStats.netSales)}</span><span class="sp-sub">${yearStats.totalOrders} عملية</span></button>
   </div>
   <div class="sales-kpis">
-    <div class="sales-kpi"><small>صافي المبيعات (${periods.find(x => x[0] === salesPeriod)[1]})</small><b style="color:var(--p)">${money(stStats.netSales)}</b><div class="sk-sub">قبل المرتجع: ${money(stStats.grossSales)}</div></div>
-    <div class="sales-kpi"><small>الطلبات المكتملة</small><b style="color:#15803d">${stStats.completedCount}</b><div class="sk-sub">${money(stStats.completedVal)}</div></div>
-    <div class="sales-kpi"><small>طلبات لم تكتمل بعد</small><b style="color:#b45309">${stStats.pendingCount}</b><div class="sk-sub">${money(stStats.pendingVal)}</div></div>
+    <div class="sales-kpi"><small>صافي المبيعات (${(periods.find(x => x[0] === salesPeriod) || periods[0])[1]})</small><b style="color:var(--p)">${money(stStats.netSales)}</b><div class="sk-sub">قبل المرتجع: ${money(stStats.grossSales)}</div></div>
+    <div class="sales-kpi"><small>العمليات المكتملة</small><b style="color:#15803d">${stStats.completedCount}</b><div class="sk-sub">${money(stStats.completedVal)}</div></div>
+    <div class="sales-kpi" style="cursor:pointer" onclick="adm('orders')"><small>طلبات قيد التوصيل الآن ↗</small><b style="color:#b45309">${activeOrders.length}</b><div class="sk-sub">${money(activeVal)} في الطلبات</div></div>
     <div class="sales-kpi"><small>إجمالي المرتجعات والخصومات</small><b style="color:#c2410c">${money(stStats.returnsVal)}</b><div class="sk-sub">${stStats.cancelledCount} طلب ملغي/مرتجع</div></div>
     <div class="sales-kpi"><small>القطع المباعة</small><b>${stStats.itemsSold}</b><div class="sk-sub">من أصل ${stStats.totalOrders} عملية</div></div>
     <div class="sales-kpi"><small>حالة التحصيل</small><b style="color:#15803d">${money(stStats.paidVal)}</b><div class="sk-sub">غير محصل: ${money(stStats.unpaidVal)}</div></div>
@@ -3921,17 +4492,18 @@ function admSales() {
     <div class="sales-pay-item"><small>الدفع عند الاستلام</small><b>${money(stStats.codVal)}</b></div>
     <div class="sales-pay-item"><small>فودافون كاش</small><b>${money(stStats.vfVal)}</b></div>
     <div class="sales-pay-item"><small>إنستا باي</small><b>${money(stStats.ipVal)}</b></div>
-    <div class="sales-pay-item"><small>إجمالي المعروض</small><b id="salesShownVal">${filtered.length} عملية</b></div>
+    <div class="sales-pay-item"><small>معروض بالسجل (14 يوم)</small><b id="salesShownVal">${filtered.length} عملية</b></div>
   </div>
-  <div class="adm-card">
-    <h4>سجل المبيعات والعملاء <small id="salesCountLbl">${filtered.length} من ${all.length}</small></h4>
-    <div class="adm-toolbar">
+  <div class="adm-card" style="padding:10px 12px">
+    <h4 style="margin-bottom:6px">سجل العمليات (آخر ${ORDER_RETENTION_DAYS} يوم فقط) <small id="salesCountLbl">${filtered.length} من ${inPeriod.length}</small></h4>
+    <div class="adm-note" style="margin:0 0 8px">${esc(listScopeHint)}</div>
+    <div class="adm-toolbar" style="margin-bottom:0">
       <input type="search" value="${esc(salesSearch)}" placeholder="ابحث بالاسم أو التليفون أو العنوان أو رقم الطلب..." oninput="salesSearch=this.value;refreshSalesListOnly()" style="flex:1;min-width:190px;margin:0">
       <select onchange="salesStatusFilter=this.value;adm('sales')" style="margin:0">
-        <option value="all" ${salesStatusFilter === "all" ? "selected" : ""}>كل الحالات</option>
-        <option value="pending" ${salesStatusFilter === "pending" ? "selected" : ""}>لم تكتمل (${stStats.pendingCount})</option>
-        <option value="done" ${salesStatusFilter === "done" ? "selected" : ""}>المكتملة (${stStats.completedCount})</option>
-        ${ST.map((s, idx) => `<option value="${idx}" ${salesStatusFilter === String(idx) ? "selected" : ""}>${s}</option>`).join("")}
+        <option value="all" ${salesStatusFilter === "all" ? "selected" : ""}>كل عمليات السجل (${inPeriod.length})</option>
+        <option value="3" ${salesStatusFilter === "3" ? "selected" : ""}>تم التسليم (${deliveredCnt})</option>
+        <option value="4" ${salesStatusFilter === "4" ? "selected" : ""}>مرتجع جزئي (${partRetCnt})</option>
+        <option value="5" ${salesStatusFilter === "5" ? "selected" : ""}>ملغي / مرتجع (${inPeriod.filter(o => o.status === 5).length})</option>
       </select>
       <select onchange="salesPayFilter=this.value;adm('sales')" style="margin:0">
         <option value="all" ${salesPayFilter === "all" ? "selected" : ""}>كل طرق الدفع</option>
@@ -3940,29 +4512,19 @@ function admSales() {
         <option value="ip" ${salesPayFilter === "ip" ? "selected" : ""}>إنستا باي</option>
       </select>
     </div>
-    ${!CLOUD_ORDERS_LOADED ? `<div class="adm-note">جاري مزامنة الطلبات من Firestore...</div>` : ""}
-    <div id="salesListBox">${renderSalesCardsHtml(filtered)}</div>
-  </div>`;
+    ${!CLOUD_ORDERS_LOADED ? `<div class="adm-note" style="margin-bottom:0">جاري مزامنة الطلبات من Firestore...</div>` : ""}
+  </div>
+  <div id="salesListBox" class="ord-list">${renderSalesCardsHtml(filtered)}</div>`;
 }
 function admOrders() {
-  const all = getAdminOrders();
-  return `<div class="adm-card"><h4>الطلبات الواردة <small>${all.length}</small></h4>
-    <div class="adm-note">عند تغيير حالة أي طلب (جاري التجهيز / خرج للتوصيل / تم التسليم / مرتجع جزئي / ملغي)، يتم فتح محادثة واتساب للعميل برسالة جاهزة برقم الطلب والحالة الجديدة، ويمكنك أيضاً إعادة إرسالها بزر واتساب المباشر.</div>
-    ${all.map(o => {
-      const waUrl = buildCustomerStatusWaUrl(o);
-      return `<div class="adm-offer">
-      <div style="min-width:0">
-        <b>${esc(o.orderNumber)}</b> · ${esc(o.customerName)}
-        <div class="adm-meta">${money(o.total)} · ${esc(o.payLabel)} · ${o.items.length} صنف · <span dir="ltr">${esc(o.phone || "")}</span></div>
-        <div class="adm-meta">${esc(fmtOrderDate(o.createdAtMs))} · ${esc(o.address || "")}</div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <select style="width:auto;margin:0" onchange="quickUpdateOrderStatus('${esc(o.docId)}', +this.value)">${ST.map((s, j) => `<option value="${j}" ${o.status == j ? "selected" : ""}>${s}</option>`).join("")}</select>
-        ${waUrl ? `<a href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" style="padding:7px 10px;font-size:12px;font-weight:800;border-radius:10px;border:1px solid #16a34a;color:#166534;background:#f0fdf4;text-decoration:none;white-space:nowrap">💬 واتساب</a>` : ""}
-        <button type="button" onclick="openOrderDetail('${esc(o.docId)}')" style="padding:7px 10px;font-size:12px">تفاصيل / مرتجع</button>
-      </div>
-    </div>`;
-    }).join("") || `<p style="color:var(--mut);text-align:center;padding:14px">لا توجد طلبات مسجلة حالياً.</p>`}
+  const active = getAdminOrders().filter(o => isActiveOrderStatus(o.status));
+  return `<div class="adm-card" style="padding:10px 12px">
+    <h4 style="margin-bottom:4px">الطلبات الواردة <small>${active.length} طلب قيد التنفيذ</small></h4>
+    <div class="adm-note" style="margin:6px 0 0">اضغط على أي كارت لفتحه وعرض التفاصيل سطراً بسطر، وعند الضغط على «✅ تم التسليم» يخرج الطلب من هذه الشاشة وينتقل مباشرة إلى شاشة المبيعات.</div>
+    ${!CLOUD_ORDERS_LOADED ? `<div class="adm-note" style="margin-bottom:0">جاري مزامنة الطلبات من Firestore...</div>` : ""}
+  </div>
+  <div class="ord-list">
+    ${active.map(o => renderCompactOrderCard(o, "orders")).join("") || `<div class="adm-card" style="text-align:center;color:var(--mut);padding:20px">لا توجد طلبات واردة قيد التنفيذ حالياً.</div>`}
   </div>`;
 }
 async function quickUpdateOrderStatus(docId, newStatus) {
@@ -3971,9 +4533,15 @@ async function quickUpdateOrderStatus(docId, newStatus) {
   const st = Math.max(0, Math.min(5, Math.round(Number(newStatus) || 0)));
   o.status = st;
   if (st === 3 && !o.paymentPaid) o.paymentPaid = true;
+  if (st >= 3) expandedOrderIds.delete(o.docId);
   sendCustomerStatusWa(o, false);
-  await persistOrderUpdate(o, `تم تحديث الحالة إلى «${ST[st] || ST[0]}» ✔`);
-  if (admTab === "orders" && !salesEditDraft) adm("orders");
+  const okMsg = st === 3
+    ? "تم تسليم الطلب ونقله إلى شاشة المبيعات ✔"
+    : st >= 4
+      ? `تم تحديث الحالة إلى «${ST[st] || ST[0]}» ونقلها للمبيعات ✔`
+      : `تم تحديث الحالة إلى «${ST[st] || ST[0]}» ✔`;
+  await persistOrderUpdate(o, okMsg);
+  if ((admTab === "orders" || admTab === "sales") && !salesEditDraft) adm(admTab);
 }
 function openOrderDetail(docId) {
   if (!ADMIN) { openAdminLogin(); return }
@@ -4018,7 +4586,7 @@ function renderOrderDetailModal() {
   openM(`<div class="adm">
     <div class="adm-head">
       <div><b>تفاصيل العملية ${esc(d.orderNumber)}</b><small>${esc(fmtOrderDate(d.createdAtMs))}</small></div>
-      <div class="adm-head-actions"><button type="button" onclick="salesEditDraft=null;adm(admTab==='orders'?'orders':'sales')">← رجوع للمبيعات</button></div>
+      <div class="adm-head-actions"><button type="button" onclick="salesEditDraft=null;adm(admTab==='orders'?'orders':'sales')">${admTab === "orders" ? "← رجوع للطلبات" : "← رجوع للمبيعات"}</button></div>
     </div>
     <div class="adm-card">
       <h4>بيانات العميل والدفع</h4>
@@ -4190,6 +4758,8 @@ async function persistOrderUpdate(orderObj, okMsg) {
       return false;
     }
   }
+  const cIdxLocal = CLOUD_ORDERS.findIndex(x => x.docId === n.docId);
+  if (cIdxLocal >= 0) CLOUD_ORDERS[cIdxLocal] = { ...CLOUD_ORDERS[cIdxLocal], ...n };
   toast(okMsg || "تم الحفظ محلياً ✔");
   return true;
 }
@@ -4214,7 +4784,13 @@ async function saveOrderDetail() {
   }
   const btn = $("ordSaveBtn");
   if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; }
-  const ok = await persistOrderUpdate(salesEditDraft, "تم حفظ التعديلات وتحديث المبيعات ✔");
+  const okMsg = Number(salesEditDraft.status) >= 3 && Number(salesEditOrigStatus) < 3
+    ? "تم حفظ الطلب ونقله إلى شاشة المبيعات ✔"
+    : "تم حفظ التعديلات وتحديث المبيعات ✔";
+  if (Number(salesEditDraft.status) >= 3 && Number(salesEditOrigStatus) < 3) {
+    expandedOrderIds.delete(salesEditDraft.docId);
+  }
+  const ok = await persistOrderUpdate(salesEditDraft, okMsg);
   if (ok) {
     salesEditDraft = null;
     adm(admTab === "orders" ? "orders" : "sales");
@@ -4635,7 +5211,8 @@ function clearDisc(id) {
 }
 function persist() { save("_p5", P); }
 let pedit = null, peditImgs = [], peditCoverIdx = 0, peditReplaceIdx = -1, peditRemovedUrls = [], peditSizes = [];
-const PEDIT_SIZE_PRESETS = ["250 جم", "500 جم", "1 كجم", "3 كجم", "250 مل", "500 مل", "1 لتر"];
+const PEDIT_WEIGHT_PRESETS = ["100 جم", "250 جم", "500 جم", "1 كجم", "2 كجم", "5 كجم"];
+const PEDIT_SIZE_PRESETS = ["250 مل", "500 مل", "1 لتر", "صغير", "وسط", "كبير"];
 function openProductEditor(id, ci) {
   if (!ADMIN) { openAdminLogin(); return }
   const p = id == null ? null : P.find(x => x.id == id);
@@ -4648,6 +5225,7 @@ function openProductEditor(id, ci) {
   peditRemovedUrls = [];
   const baseSizes = p && Array.isArray(p.sizes) && p.sizes.length ? p.sizes.slice(0, 8) : [p ? (p.size || "قياسي") : "قياسي"];
   const basePrices = p && Array.isArray(p.sizePrices) ? p.sizePrices : [];
+  const vLbl = p ? varLabelOf(p) : "الحجم";
   peditSizes = baseSizes.map((s, idx) => ({
     name: String(s || "قياسي"),
     price: (+basePrices[idx] > 0) ? String(+basePrices[idx]) : ""
@@ -4663,12 +5241,20 @@ function openProductEditor(id, ci) {
       <label>نوع الخصم<select id="edDiscType" onchange="peditPreview()"><option value="percent" ${type === "percent" ? "selected" : ""}>نسبة مئوية %</option><option value="amount" ${type === "amount" ? "selected" : ""}>قيمة ثابتة (${CONFIG.CURRENCY})</option></select></label>
       <label>قيمة الخصم<input id="edDiscVal" type="number" min="0" step="0.01" value="${val}" oninput="peditPreview()"></label>
       <div class="full" id="edPreview"></div>
+      <label class="full">تسمية الخيارات ببطاقة العميل
+        <select id="edVarLabel">
+          <option value="الحجم"${vLbl === "الحجم" ? " selected" : ""}>الحجم</option>
+          <option value="الوزن"${vLbl === "الوزن" ? " selected" : ""}>الوزن</option>
+          <option value="الحجم / الوزن"${vLbl === "الحجم / الوزن" ? " selected" : ""}>الحجم / الوزن</option>
+        </select>
+      </label>
       <div class="full">
-        <label style="display:block;margin-bottom:4px">الأحجام المتاحة <small style="color:var(--mut)">(أضف حتى 8 أحجام — السعر اختياري لكل حجم)</small></label>
+        <label style="display:block;margin-bottom:4px">الأوزان والأحجام المتاحة <small style="color:var(--mut)">(أضف حتى 8 خيارات — السعر اختياري لكل خيار)</small></label>
         <div class="adm-sizes-box">
           <div id="edSizesList" class="adm-sizes-list"></div>
-          <button type="button" onclick="peditAddSize()" style="width:100%;padding:8px;font-weight:800">＋ إضافة حجم جديد</button>
-          <div class="adm-size-presets"><small>اختصارات سريعة:</small>${PEDIT_SIZE_PRESETS.map(s => `<button type="button" onclick="peditAddSize('${esc(s)}')">＋ ${esc(s)}</button>`).join("")}</div>
+          <button type="button" onclick="peditAddSize()" style="width:100%;padding:8px;font-weight:800">＋ إضافة وزن / حجم جديد</button>
+          <div class="adm-size-presets"><small>أوزان سريعة:</small>${PEDIT_WEIGHT_PRESETS.map(s => `<button type="button" onclick="peditAddSize('${esc(s)}')">＋ ${esc(s)}</button>`).join("")}</div>
+          <div class="adm-size-presets"><small>أحجام سريعة:</small>${PEDIT_SIZE_PRESETS.map(s => `<button type="button" onclick="peditAddSize('${esc(s)}')">＋ ${esc(s)}</button>`).join("")}</div>
         </div>
       </div>
       <label class="full">العبوة<input id="edPack" value="${esc(p ? p.pack : "1 قطعة")}"></label>
@@ -4704,9 +5290,9 @@ function peditPreview() {
 function peditRenderSizes() {
   const box = $("edSizesList"); if (!box) return;
   box.innerHTML = peditSizes.map((s, i) => `<div class="adm-size-row">
-    <input type="text" maxlength="40" value="${esc(s.name)}" placeholder="اسم الحجم (مثال: 500 جم)" oninput="peditUpdateSize(${i},'name',this.value)">
+    <input type="text" maxlength="40" value="${esc(s.name)}" placeholder="الوزن أو الحجم (مثال: 500 جم أو كبير)" oninput="peditUpdateSize(${i},'name',this.value)">
     <input type="number" min="0" step="0.01" value="${esc(s.price)}" placeholder="السعر (${CONFIG.CURRENCY})" oninput="peditUpdateSize(${i},'price',this.value)">
-    <button type="button" class="adm-size-rm" onclick="peditRmSize(${i})" title="حذف الحجم"${peditSizes.length <= 1 ? " disabled" : ""}>✕</button>
+    <button type="button" class="adm-size-rm" onclick="peditRmSize(${i})" title="حذف الخيار"${peditSizes.length <= 1 ? " disabled" : ""}>✕</button>
   </div>`).join("");
 }
 function peditUpdateSize(i, key, val) {
@@ -4714,11 +5300,11 @@ function peditUpdateSize(i, key, val) {
   peditSizes[i][key] = val;
 }
 function peditAddSize(preset) {
-  if (peditSizes.length >= 8) { toast("الحد الأقصى 8 أحجام للمنتج"); return }
+  if (peditSizes.length >= 8) { toast("الحد الأقصى 8 أوزان / أحجام للمنتج"); return }
   if (preset && peditSizes.length === 1 && !peditSizes[0].name.trim()) {
     peditSizes[0].name = preset;
   } else if (preset && peditSizes.some(x => x.name.trim() === preset)) {
-    toast("هذا الحجم مضاف بالفعل");
+    toast("هذا الخيار مضاف بالفعل");
     return;
   } else {
     peditSizes.push({ name: preset || "", price: "" });
@@ -4726,7 +5312,7 @@ function peditAddSize(preset) {
   peditRenderSizes();
 }
 function peditRmSize(i) {
-  if (peditSizes.length <= 1) { toast("يجب الإبقاء على حجم واحد على الأقل"); return }
+  if (peditSizes.length <= 1) { toast("يجب الإبقاء على خيار واحد على الأقل"); return }
   peditSizes.splice(i, 1);
   peditRenderSizes();
 }
@@ -4880,6 +5466,8 @@ async function saveProductEditor() {
     ? cleanSizes.map(s => s.price > 0 ? Math.round(s.price * 100) / 100 : 0)
     : undefined;
   const pack = $("edPack").value.trim() || "1 قطعة";
+  const varLblEl = $("edVarLabel");
+  const varLabel = varLblEl && (varLblEl.value === "الوزن" || varLblEl.value === "الحجم" || varLblEl.value === "الحجم / الوزن") ? varLblEl.value : "الحجم";
   const id = pedit.id || Date.now();
   const btn = $("edSaveBtn");
   const hasPending = peditImgs.some(it => it.pending);
@@ -4917,7 +5505,7 @@ async function saveProductEditor() {
   const old = pedit.id ? P.find(x => x.id == pedit.id) : null;
   const item = {
     id, name, cat, price, discType: type, disc: type === "percent" ? val : 0, discAmt: type === "amount" ? val : 0,
-    size, pack, sizes,
+    size, pack, sizes, varLabel,
     stock: !!$("edStock").checked, mine: true, e: ECAT[cat] || "🛒", img: cover, imgs: extras
   };
   if (sizePrices) item.sizePrices = sizePrices;
@@ -4971,9 +5559,30 @@ window.__esdStoreBridge = {
   applyCloudOrders(list) {
     CLOUD_ORDERS = Array.isArray(list) ? list : [];
     CLOUD_ORDERS_LOADED = true;
-    if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft && (admTab === "sales" || admTab === "orders")) {
-      adm(admTab);
+    if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft) {
+      if (admTab === "sales" || admTab === "orders") {
+        adm(admTab);
+      } else {
+        const activeCnt = getActiveOrdersCount();
+        const b = $("admOrdersBadge");
+        if (b) {
+          b.textContent = String(activeCnt);
+          b.classList.toggle("zero", activeCnt === 0);
+        }
+        const s = $("admOrdersStatNum");
+        if (s) s.textContent = String(activeCnt);
+      }
     }
+    maybeAutoArchiveOldOrders();
+  },
+  applySalesLedger(raw) {
+    SALES_LEDGER = normalizeSalesLedger(raw);
+    SALES_LEDGER_LOADED = true;
+    save("_sales_ledger", SALES_LEDGER);
+    if (ADMIN && mm.classList.contains("on") && mb.querySelector(".adm") && !salesEditDraft && admTab === "sales") {
+      adm("sales");
+    }
+    maybeAutoArchiveOldOrders();
   },
   applyCloudSettings(raw) {
     if (!raw || typeof raw !== "object") return;
@@ -5052,13 +5661,8 @@ function hideLanding() {
 function startExperience() {
   if (entered || introStarted) return;
   introStarted = true;
-  if (COARSE && !IS_IOS && window.self === window.top && document.documentElement && document.documentElement.requestFullscreen) {
-    try {
-      const fp = document.documentElement.requestFullscreen({ navigationUI: "hide" });
-      if (fp && fp.then) fp.then(() => lockPortraitOrientation()).catch(() => {});
-    } catch (e) {}
-  }
   lockPortraitOrientation();
+  rsNow();
   hideLanding();
   const wantSrc = introSrcForView();
   if (videoEl.getAttribute("src") !== wantSrc) {
@@ -5268,6 +5872,7 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  runTransaction,
   query,
   orderBy,
   limit,
@@ -5397,6 +6002,9 @@ function sanitizeProductForCloud(p, skippedCounter) {
     img,
     imgs: imgs.slice(0, 7)
   };
+  if (p.varLabel === "الوزن" || p.varLabel === "الحجم" || p.varLabel === "الحجم / الوزن") {
+    out.varLabel = p.varLabel;
+  }
   if (Array.isArray(p.sizePrices) && p.sizePrices.some(v => Number(v) > 0)) {
     out.sizePrices = sizes.map((_, idx) => {
       const n = Number(p.sizePrices[idx]) || 0;
@@ -5820,7 +6428,9 @@ async function createOrderInCloud(orderObj) {
 
 function startOrdersRealtimeSync() {
   const user = auth.currentUser;
-  if (!user || ordersUnsub) return;
+  if (!user) return;
+  loadSalesLedgerFromCloud().catch(() => {});
+  if (ordersUnsub) return;
   const q = query(collection(db, "orders"), orderBy("createdAtMs", "desc"), limit(500));
   ordersUnsub = onSnapshot(q, (snap) => {
     const list = [];
@@ -5839,6 +6449,182 @@ function stopOrdersRealtimeSync() {
     try { ordersUnsub(); } catch (_) {}
     ordersUnsub = null;
   }
+}
+
+function sanitizeLedgerMonthEntry(m) {
+  const x = m && typeof m === "object" ? m : {};
+  const ym = String(x.ym || "").trim();
+  if (!/^[0-9]{4}-[0-9]{2}$/.test(ym)) return null;
+  const r2 = n => Math.max(0, Math.round((Number(n) || 0) * 100) / 100);
+  const i0 = n => Math.max(0, Math.round(Number(n) || 0));
+  return {
+    ym,
+    totalOrders: i0(x.totalOrders),
+    netSales: r2(x.netSales),
+    grossSales: r2(x.grossSales),
+    returnsVal: r2(x.returnsVal),
+    completedCount: i0(x.completedCount),
+    completedVal: r2(x.completedVal),
+    cancelledCount: i0(x.cancelledCount),
+    itemsSold: i0(x.itemsSold),
+    codVal: r2(x.codVal),
+    vfVal: r2(x.vfVal),
+    ipVal: r2(x.ipVal),
+    paidVal: r2(x.paidVal),
+    unpaidVal: r2(x.unpaidVal)
+  };
+}
+
+function sanitizeSalesLedgerDoc(raw) {
+  const r = raw && typeof raw === "object" ? raw : {};
+  const months = (Array.isArray(r.months) ? r.months : [])
+    .map(sanitizeLedgerMonthEntry)
+    .filter(Boolean)
+    .sort((a, b) => a.ym.localeCompare(b.ym))
+    .slice(-120);
+  return {
+    months,
+    archivedOrdersCount: Math.max(0, Math.round(Number(r.archivedOrdersCount) || 0)),
+    lastArchivedAtMs: Math.max(0, Math.round(Number(r.lastArchivedAtMs) || 0))
+  };
+}
+
+async function loadSalesLedgerFromCloud() {
+  const user = auth.currentUser;
+  if (!user) return { months: [], archivedOrdersCount: 0, lastArchivedAtMs: 0 };
+  try {
+    const snap = await getDoc(doc(db, "store_private", "sales_ledger"));
+    const clean = snap.exists() ? sanitizeSalesLedgerDoc(snap.data()) : { months: [], archivedOrdersCount: 0, lastArchivedAtMs: 0 };
+    window.__esdStoreBridge?.applySalesLedger(clean);
+    return clean;
+  } catch (err) {
+    try { handleFirestoreError(err, OperationType.GET, "store_private/sales_ledger"); } catch (_) {}
+    return { months: [], archivedOrdersCount: 0, lastArchivedAtMs: 0 };
+  }
+}
+
+async function archiveAgedOrdersInCloud(agedOrders, cutoffMs) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("يجب تسجيل الدخول بحساب الإدارة أولاً");
+  const cleanIds = Array.from(new Set(
+    (Array.isArray(agedOrders) ? agedOrders : [])
+      .map(o => String((o && o.docId) || "").replace(/[^a-zA-Z0-9_\-]/g, "").slice(0, 128))
+      .filter(id => id && !id.startsWith("local_"))
+  ));
+  if (!cleanIds.length) return { deletedIds: [], ledger: null };
+
+  const cutoff = Number(cutoffMs) || (Date.now() - 14 * 86400000);
+  const ledgerRef = doc(db, "store_private", "sales_ledger");
+  const deletedIds = [];
+  let latestLedger = null;
+  const r2 = n => Math.max(0, Math.round((Number(n) || 0) * 100) / 100);
+
+  for (let i = 0; i < cleanIds.length; i += 40) {
+    const batchIds = cleanIds.slice(i, i + 40);
+    const ordRefs = batchIds.map(id => doc(db, "orders", id));
+    const batchDeleted = [];
+
+    const txLedger = await runTransaction(db, async (tx) => {
+      const ledgerSnap = await tx.get(ledgerRef);
+      const ordSnaps = await Promise.all(ordRefs.map(ref => tx.get(ref)));
+
+      const base = ledgerSnap.exists()
+        ? sanitizeSalesLedgerDoc(ledgerSnap.data())
+        : { months: [], archivedOrdersCount: 0, lastArchivedAtMs: 0 };
+      const monthMap = new Map(base.months.map(m => [m.ym, { ...m }]));
+      let archivedInBatch = 0;
+
+      ordSnaps.forEach((osnap, idx) => {
+        if (!osnap.exists()) return;
+        const d = osnap.data() || {};
+        const st = Math.round(Number(d.status) || 0);
+        const createdMs = Math.max(0, Math.round(Number(d.createdAtMs) || 0));
+        // حارس أمان مزدوج: لا نحذف الطلبات النشطة (0,1,2) أو الحديثة أبداً
+        if (st < 3 || st > 5 || !createdMs || createdMs >= cutoff) return;
+
+        const dt = new Date(createdMs);
+        const ym = dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0");
+        const bucket = monthMap.get(ym) || {
+          ym,
+          totalOrders: 0,
+          netSales: 0,
+          grossSales: 0,
+          returnsVal: 0,
+          completedCount: 0,
+          completedVal: 0,
+          cancelledCount: 0,
+          itemsSold: 0,
+          codVal: 0,
+          vfVal: 0,
+          ipVal: 0,
+          paidVal: 0,
+          unpaidVal: 0
+        };
+
+        const items = sanitizeOrderItemsForCloud(d.items);
+        const subtotal = d.subtotal !== undefined
+          ? Math.max(0, r2(d.subtotal))
+          : r2(items.reduce((s, it) => s + it.price * it.qty, 0));
+        const itemsRet = r2(items.reduce((s, it) => s + it.price * it.returnedQty, 0));
+        const discDed = Math.max(0, r2(d.discountDeduction || 0));
+        const returnedTotal = d.returnedTotal !== undefined
+          ? Math.min(subtotal, Math.max(0, r2(d.returnedTotal)))
+          : Math.min(subtotal, r2(itemsRet + discDed));
+        const total = d.total !== undefined
+          ? Math.max(0, r2(d.total))
+          : Math.max(0, r2(subtotal - returnedTotal));
+
+        bucket.totalOrders += 1;
+        if (st === 5) {
+          bucket.cancelledCount += 1;
+          bucket.returnsVal = r2(bucket.returnsVal + subtotal);
+        } else {
+          bucket.grossSales = r2(bucket.grossSales + subtotal);
+          bucket.netSales = r2(bucket.netSales + total);
+          bucket.returnsVal = r2(bucket.returnsVal + returnedTotal);
+          bucket.completedCount += 1;
+          bucket.completedVal = r2(bucket.completedVal + total);
+          items.forEach(it => {
+            bucket.itemsSold += Math.max(0, it.qty - it.returnedQty);
+          });
+          if (d.payMethod === "vf") bucket.vfVal = r2(bucket.vfVal + total);
+          else if (d.payMethod === "ip") bucket.ipVal = r2(bucket.ipVal + total);
+          else bucket.codVal = r2(bucket.codVal + total);
+          if (d.paymentPaid) bucket.paidVal = r2(bucket.paidVal + total);
+          else bucket.unpaidVal = r2(bucket.unpaidVal + total);
+        }
+
+        monthMap.set(ym, bucket);
+        archivedInBatch += 1;
+        batchDeleted.push(batchIds[idx]);
+        tx.delete(osnap.ref);
+      });
+
+      if (archivedInBatch === 0) return null;
+
+      const sortedMonths = Array.from(monthMap.values())
+        .sort((a, b) => a.ym.localeCompare(b.ym))
+        .slice(-120);
+      const nextDoc = {
+        months: sortedMonths,
+        archivedOrdersCount: base.archivedOrdersCount + archivedInBatch,
+        lastArchivedAtMs: Date.now()
+      };
+      tx.set(ledgerRef, {
+        ...nextDoc,
+        updatedAt: serverTimestamp(),
+        updatedBy: user.uid
+      });
+      return nextDoc;
+    });
+
+    if (txLedger) {
+      latestLedger = txLedger;
+      deletedIds.push(...batchDeleted);
+    }
+  }
+
+  return { deletedIds, ledger: latestLedger };
 }
 
 async function updateOrderInCloud(orderObj) {
@@ -6063,6 +6849,8 @@ window.__esdFb = {
   createOrderInCloud,
   startOrdersRealtimeSync,
   stopOrdersRealtimeSync,
+  loadSalesLedgerFromCloud,
+  archiveAgedOrdersInCloud,
   updateOrderInCloud,
   deleteOrderInCloud
 };

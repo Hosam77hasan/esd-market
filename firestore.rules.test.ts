@@ -107,6 +107,26 @@ export async function runDirtyDozenTests() {
   await assertSucceeds(setDoc(doc(adminDb, 'store', 'settings'), validSettings));
   await assertSucceeds(getDoc(doc(guestDb, 'store', 'settings')));
 
+  // SalesLedger assertions (admin-only, bounded monthly roll-ups)
+  const validLedger = {
+    months: [{
+      ym: '2026-11', totalOrders: 10, netSales: 1000, grossSales: 1100, returnsVal: 100,
+      completedCount: 9, completedVal: 1000, cancelledCount: 1, itemsSold: 25,
+      codVal: 600, vfVal: 200, ipVal: 200, paidVal: 900, unpaidVal: 100
+    }],
+    archivedOrdersCount: 10,
+    lastArchivedAtMs: Date.now(),
+    updatedAt: serverTimestamp(),
+    updatedBy: adminUid
+  };
+  await assertFails(getDoc(doc(guestDb, 'store_private', 'sales_ledger')));
+  await assertFails(getDoc(doc(attackerDb, 'store_private', 'sales_ledger')));
+  await assertFails(setDoc(doc(attackerDb, 'store_private', 'sales_ledger'), { ...validLedger, updatedBy: attackerUid }));
+  await assertFails(setDoc(doc(adminDb, 'store_private', 'sales_ledger'), { ...validLedger, months: [{ ...validLedger.months[0], ym: 'bad' }] }));
+  await assertFails(setDoc(doc(adminDb, 'store_private', 'sales_ledger'), { ...validLedger, extra: true }));
+  await assertSucceeds(setDoc(doc(adminDb, 'store_private', 'sales_ledger'), validLedger));
+  await assertSucceeds(getDoc(doc(adminDb, 'store_private', 'sales_ledger')));
+
   // Authorized admin & public guest reads pass
   await assertSucceeds(setDoc(doc(adminDb, 'store', 'catalog'), { cats: ['الألبان'], ecat: ['🧀'], colors: ['#ffc107'], chunkCount: 1, productCount: 1, updatedAt: serverTimestamp(), updatedBy: adminUid }));
   await assertSucceeds(setDoc(doc(adminDb, 'product_images', 'pimg_1'), { dataUrl: 'data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=', mime: 'image/webp', width: 100, height: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: adminUid }));
